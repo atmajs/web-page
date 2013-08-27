@@ -1,0 +1,28 @@
+
+script src='/public/build/scripts.js' type='text/javascript';
+
+% if=load >
+	:html >
+		'~[load]'
+
+% if=page >
+	script src='/public/build/~[page]/scripts.js' type='text/javascript';
+
+
+script type='text/javascript' > """
+	
+			
+		var start = Date.now(),
+			App = Compo({
+				compos: {}
+			});
+			
+			
+		window.app = new App;
+		
+		mask.Compo.bootstrap(document.body, app);
+		
+		console.log('Render - ', Date.now() - start);
+
+	
+"""

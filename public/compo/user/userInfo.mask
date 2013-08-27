@@ -1,0 +1,10 @@
+
+.-userInfo {
+	% if='username' {
+		span > '~[username]'
+	}
+	
+	% else {
+		'Pleas login'
+	}
+}

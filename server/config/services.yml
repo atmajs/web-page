@@ -1,0 +1,6 @@
+
+service:
+	location: /server/http/service/{0}.js
+
+services:
+	'/auth/github': auth/github

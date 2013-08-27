@@ -1,0 +1,142 @@
+layout:view master='view' {
+
+	@content #title {
+		a href='https://github.com/tenbits/IncludeJS' target=_blank >
+			'github@IncludeJS';
+	}
+
+	@content #tabs {
+		
+		button name='info' > 'Info'
+		button name='api' > 'Api'
+	
+	}
+	
+	@content #side-menu {
+		:radio .group
+			name=api
+			selector='.side-menu-item'
+			x-route='/-/api/js' {
+				.side-menu-item name='js' > 'js(package)'
+				.side-menu-item name='css' > 'css(package)'
+				.side-menu-item name='load' > 'load(package)'
+				.side-menu-item name='ajax' > 'ajax(package)'
+				.side-menu-item name='embed' > 'embed(package)'
+				.side-menu-item name='lazy' > 'lazy(package)'
+				.side-menu-item name='done' > 'done(fn)'
+				.side-menu-item name='ready' > 'ready(package)'
+				.side-menu-item name='cfg' > 'cfg(cfg)'
+				.side-menu-item name='routes' > 'routes(routes)'
+				.side-menu-item name='instance' > 'instance()'
+				
+			}
+	}
+	
+	@content #content {
+		
+		div name=info {
+				div {
+					ul.-ul-features {
+						li {
+							'Resource loader'
+							.hint > 'Javascript, Style, HTML, Ajax, Image'
+							.hint > 'Javascript can be loaded using XMLHttpRequest with eval() and also by embedding script tags with "src=%path%" attribute'
+						}
+						li {
+							'Works same in browser and node.js'
+						}
+						li {
+							'Inline declaration'
+							.hint > 'No external files (such as "config.json")'
+						}
+						li {
+							'No prerequest for module definitions'
+							.hint > 'Can load any javascript file'
+						}
+						li {
+							'Namespaced Routing'
+							:prism > "
+								include.routes({ lib: '/src/myLib/{0}.js' });
+								// ...
+								include.js({ lib: 'myScript' })
+							"
+						}
+						li {
+							'Parameterized include - args then are available in included resource'
+							:prism > "include.js({ compo: 'myComponent?color=white' })"
+							
+						}
+						li {
+							'Exports. Example: myScript.js'
+							:prism > 'include.exports = { someFunction: function(){ console.log("hey"); } }'
+							.hint {
+								'It is also possible to use CommonJS modules'
+								div > code > 'exports.someFunction = function(){ ... }'
+							}
+						}
+						li {
+							'Javascript aliases'
+							:prism > formatter:pre > "
+								include
+									.js('myScript.js::MyObj')
+									.done(function(resp){
+										resp.MyObj.someFunction();
+										
+										// or when without alias
+										// resp.myScript.someFunction();
+									});
+							"
+						}
+						li {
+							'User defined loaders'
+							tt > 'Already supports: *.coffee, *.less, *.json'
+							.hint {
+								div > 'Best to use in development - no more need to build coffee or less resources before test it'
+								div > 'Any *.js can be replaced with *.coffee equivalent, and you do not even notice this'
+								div > 'IncludeJS.Builder will compile/parse that resources for better performance'
+							}
+						}
+						li {
+							'Callbacks'
+							.hint > 'Sub- and ResourceLoaded and DOMContentLoaded'
+						}
+						li {
+							'Lazy Modules'
+							.hint > 'Parse(eval) Scripts only when they are needed'
+						}
+						li {
+							'Stand-alone'
+						}
+						li {
+							'Performance '
+							.hint > 'Loading with script tag is slower, as XMLHttpRequest,
+											but good for development, as by exceptions file name and line number are shown.'
+							.hint > 'After IncludeJS.Builder builds the project no more needed'
+							.hint > 'We use it for Mobile Development mainly'
+						}
+
+						li {
+							'CommonJS Modules. In browser feature is disabled per default,
+							but can be enabled with'
+							
+							:prism > 'include.cfg({ modules:true })'
+							.hint > 'That objects are aliases for include.exports'
+							.hint > '.defineProperty is required'
+						}
+						
+						li {
+							'That are only stand-alone features, but using Atma node.js tool, there much more things to enjoy.'
+						}
+					}
+					
+				}
+			}
+			div name=api {
+				:tabs #api anchors x-route='/-/api/js' >
+                    @panels >
+						:prism src='/public/api/include.api.js';
+			}
+		
+	}
+
+}

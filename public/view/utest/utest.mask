@@ -1,0 +1,29 @@
+layout:view master='view' {
+
+    @content #title {
+        a href='https://github.com/tenbits/utest' target=_blank> 'github@UTest';
+    }
+
+
+
+
+    @content #tabs {
+        button name='info' > 'Info'
+        button name='doc' > 'DOC'
+    }
+
+
+    @content #content {
+        div name='info' {
+            
+            h5 >  'Enpowers Unit Testing and Test Driven Development'
+            div > img src='/images/libs/utest/screen.png';
+
+        }
+
+        div name='doc' {
+            :markdown src='/public/view/utest/README.md';
+        }
+    }
+
+}

@@ -1,0 +1,55 @@
+layout:view master='view' {
+
+    @content #header {
+        a href='https://github.com/tenbits/RuqqJS' target=_blank > 'github@RuqqJS';
+    }
+
+    @content #tabs {
+        
+        button name='info' > 'Info'
+        button name='routing' > 'Routing'
+        button name='array' > 'Array'
+        button name='object' > 'Object'
+    
+    }
+
+    @content #content {
+        div name=info {
+                div > 'Here are helper classes for "daily dev". '
+                div.hint > 'This Lib is still in work, as it is pretty dirty.'
+
+                ul {
+                    li {
+                        code > 'ruqq.arr'
+                        div > 'Array Helpers'
+                    }
+                    li {
+                        code > 'ruqq.animate'
+                        div > 'Animation Helpers / CssSprite Animation'
+                    }
+                    li {
+                        code > 'ruqq.events'
+                        div > 'Event Helpers'
+                    }
+                    li {
+                        code > 'utils'
+                        div > 'Object. , String. , Date. Helpers'
+                    }
+                    li {
+                        code > 'ruqq.net.URI'
+                        div > 'URI Class'
+                    }
+                }
+
+            }
+            div name=animation {
+
+                div.animation {
+                    div.animatedPanel style='width:100px; height:100px; background:red;';
+                }
+            }
+        }
+    }
+
+
+}

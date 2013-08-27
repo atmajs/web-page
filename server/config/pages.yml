@@ -1,0 +1,122 @@
+
+
+page:
+	route: '/?:page/?:tab/?:section'
+	
+	
+	location:
+		template: '/server/http/page/{0}/{1}.mask'
+		master: '/server/http/master/{0}.mask'
+		viewTemplate: '/public/view/{0}/{1}.mask'
+		viewController: '/public/view/{0}/{1}.js'
+	
+	extension:
+		javascript: js
+		style: less
+		template: mask
+	
+	index:
+		template: index
+		master: default
+		
+pages:
+	# Page urls
+	# Default page path is /server/http/page/index/index.mask
+	# Each page item also has some additional infos
+	# - title - Page Title
+	
+	
+	!/:
+		id: 'index'
+		title: 'Atma.js Project'
+		
+		view:
+			style: index
+			
+		menuHidden: true
+		
+	/get:
+		title: 'Source'
+		view:
+			controller: get
+	
+	/feedback:
+		title: 'Feedback'
+	
+	/class:
+		title: 'ClassJS - Atma'
+		
+		view:
+			controller: class
+	
+	/mask: 
+		title: 'MaskJS - Atma'
+		
+		view:
+			controller: 'mask'
+			
+		tabs:
+			info:
+			examples:
+				navigation: false
+			syntax:
+				navigation: false
+			api:
+			snippets:
+	
+	/mask-j: 
+		title: 'mask.J'
+	
+	/mask-binding: 
+		title: 'mask.Binding'
+	
+	/mask-compo: 
+		title: 'mask.Compo'
+		tabs:
+			info:
+			example:
+				navigation: false
+			api:
+				navigation: false
+			visual:
+			
+	/mask-animation: 
+		title: 'Animations'
+		tabs:
+			example:
+				navigation: false
+			api:
+				navigation: false
+			
+	
+	/include: 
+		title: 'IncludeJS - Atma'
+		tabs:
+			api:
+				navigation: false
+				
+	/atma-tool: 
+		title: 'Atma Toolkit'
+	
+	
+	/utest: 
+		title: 'UTest - Atma'
+	
+	/sys: 
+		title: 'Handler: Percent'
+	
+	/ruqq: 
+		title: 'RuqqJS'
+	
+	/compos: 
+		title: 'Component'
+		
+		view:
+			controller: compos
+	
+	
+		
+		
+	
+		
+			

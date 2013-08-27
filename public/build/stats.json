@@ -1,0 +1,27 @@
+{
+    "/": {
+        "scripts": true,
+        "styles": true,
+        "load": true
+    },
+    "get": {
+        "scripts": true,
+        "styles": false,
+        "load": false
+    },
+    "class": {
+        "scripts": true,
+        "styles": false,
+        "load": true
+    },
+    "mask": {
+        "scripts": true,
+        "styles": false,
+        "load": true
+    },
+    "compos": {
+        "scripts": true,
+        "styles": false,
+        "load": false
+    }
+}

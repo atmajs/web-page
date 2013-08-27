@@ -1,0 +1,249 @@
+<script type='include/load' id='includejs-publiccompodownloaderdownloadermask' data-appuri='/public/compo/downloader/downloader.mask'> 
+.-downloader {
+	
+	button #download x-signal='click:download' > 'Download'
+	
+	i > ' (~[bind:size] KB)'
+	
+	a #download-link download='lib.js' target='_blank'  style='display:none' > 'Download'
+	
+	
+	h4 > 'Environment'
+	select {
+		
+		:dualbind value='env';
+		
+		option name='browser' >
+			'Browser'
+		option name='node' >
+			'node.js'
+	}
+	
+	h4 > 'Compression'
+	select {
+		
+		:dualbind value='compression';
+		
+		option name='min' selected>
+			'Minified'
+		option name='dev' >
+			'Development'
+	}
+	
+	h4 > 'Libraries'
+	% each='libs' >
+		%% visible='env == "both" || env == closest(":downloader").model.env'  >
+			.-lib-item {
+		
+				label {
+					input type='checkbox' > :dualbind value='enabled';
+					'~[name]'
+				}
+				
+				% each=modules {
+					
+						.modules  {
+							label {
+								//%% log='parent.parent.parent.model.enabled';
+								input type='checkbox' disabled='~[bind: parent.parent.model.enabled ? "" : "disabled"]' >
+									:dualbind value='enabled';
+									
+								'~[name]'
+							}
+						}
+				}
+		}
+	
+	h4 > 'Exports'
+	.group {
+		.title > 'Exports'
+		
+		.exports-group {
+			input#exports-globals type=radio name='exports' checked;
+			label for='exports-globals' > 'globals'
+			
+			.libs {
+				% each='libs' {
+					%% visible="enabled && (env == 'both' || env == closest(':downloader').model.env)" {
+						
+						.comment > '// ~[name]'
+						% each='exports' > div > '~[.]'
+					}
+				}
+			}
+		}
+		
+		.exports-group {
+			input#exports-namespace type=radio name='exports';
+			label for='exports-namespace' > 'namespace'
+			input type='text'
+				> :dualbind value='namespace' changeEvent='keyup';
+			
+			
+			.libs {
+				% each='libs' {
+					%% visible="enabled && (env == 'both' || env == closest(':downloader').model.env)" {
+						
+						.comment > '// ~[name]'
+						% each='exports' > div {
+							'~[bind:closest(":downloader").model.namespace].~[.]'
+						}
+					}
+				}
+			}
+		}
+		
+		.exports-group {
+			input#exports-common type=radio name='exports';
+			label for='exports-common' > 'CommonJS'
+			
+			
+			.libs {
+				% each='libs' {
+					%% visible="enabled && (env == 'both' || env == closest(':downloader').model.env)" {
+						
+						.comment > '// ~[name]'
+						% each='exports' > div {
+							'"~[.]"'
+						}
+					}
+				}
+			}
+			
+		}
+		
+	}
+	
+	div style='clear:both; height: 50px;';
+	
+	
+}
+ </script>
+<script type='include/load' id='includejs-publiccomponavigationnavigationmask' data-appuri='/public/compo/navigation/navigation.mask'> 
+:template #menuItemTemplate {
+	li.~[class] {
+			% if='name' >
+				a.viewTitle
+					href='~[: path ? path : ("/" + id) ]'
+					x-dynamic='~[: !navigate ? "x-dynamic"]'
+					
+						> .roll-link
+							> span data-title='~[name]'
+								> '~[name]'
+						
+			ul > % each='items' >
+				:import #menuItemTemplate;
+		}
+}
+
+menu.~[: menuHidden ? "hidden"] {
+	
+	.menu-show;
+	
+	:scroller {
+		
+		.menu-logo >
+			img src='http://lorempixel.com/200/120/abstract';
+			
+		:userInfo;
+				
+		% each='list' > section {
+			
+			h3.~[class]
+				> '~[title]'
+				
+			ul >
+				% each='items' >
+					:import #menuItemTemplate;
+					
+			div style='text-align:right; opacity:.3' > '~[hint]'
+		}
+	
+		div style='height:20px;';
+	}
+}
+
+ </script>
+<script type='include/load' id='includejs-publiccomponavigationlistyml' data-appuri='/public/compo/navigation/list.yml'> [object Object],[object Object],[object Object] </script>
+<script type='include/load' id='includejs-publiccompoviewdefaultmask' data-appuri='/public/compo/view/default.mask'> 
+:template #footer {
+	footer {
+		.footer-left > '@ Made in Germany with Love'
+		.footer-right {
+			ul {
+				li > 'MIT'
+				li > a href='#/feedback' > 'Feedback'
+				li > '© niob'
+			}
+		}
+	}
+}
+
+layout:master #viewFull {
+	.view >
+		:scroller.maximized
+			> .scroller-content > @placeholder #content;
+}
+
+layout:master #view-full {
+	
+		:scroller.fullpage {
+			.scroller-content
+				> @placeholder #content;
+			
+			:import #footer;
+		}
+}
+
+layout:master #view {
+	
+		header {
+			.header-content {
+				.title style='float:right; text-align:right;' {
+					@placeholder #title;
+				}
+	
+				@placeholder #tabs >
+					:radio .radioButtons x-route='/-/info' >
+						@placeholder;
+				
+			}
+		}
+		
+		@placeholder #side-menu {
+			:tabs .side-menu x-route='/-/-' {
+				@panels
+					> @placeholder;
+			
+				:animation #show {
+					'transform | translateX(250px) > translateX(0px) | 200ms ease-in'
+				}
+				
+				:animation #hide {
+					'transform | translateX(0px) > translateX(250px) | 200ms ease-in'
+				}
+			}
+		}
+		
+		:scroller #test dtop=-50 {
+			.scroller-content >
+				:tabs.container.tabs x-route='/-/info' >
+					@panels >
+						@placeholder #content;
+			
+			:import #footer;
+		}
+		
+	
+}
+ </script>
+<script type='include/load' id='includejs-publiccompouseruserInfomask' data-appuri='/public/compo/user/userInfo.mask'> 
+.-userInfo {
+	% if='username' {
+		span > '~[username]'
+	}
+	
+	% else {
+		'Pleas login'
+	}
+} </script>
