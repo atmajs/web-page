@@ -136,6 +136,7 @@
 		}
 }
 
+
 menu.~[: menuHidden ? "hidden"] {
 	
 	.menu-show;
@@ -143,9 +144,10 @@ menu.~[: menuHidden ? "hidden"] {
 	:scroller {
 		
 		.menu-logo >
-			img src='http://lorempixel.com/200/120/abstract';
+			a href='/' >
+				img src='/images/logos/atmajs.png' width=128 height=128;
 			
-		:userInfo;
+		//:userInfo;
 				
 		% each='list' > section {
 			
@@ -233,8 +235,16 @@ layout:master #view {
 			
 			:import #footer;
 		}
-		
+}
+
+layout:master #view-compo {
 	
+	:scroller dtop=-50 {
+		.scroller-content >
+				@placeholder #content;
+		
+		:import #footer;
+	}
 }
  </script>
 <script type='include/load' id='includejs-publiccompouseruserInfomask' data-appuri='/public/compo/user/userInfo.mask'> 

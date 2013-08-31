@@ -35,6 +35,7 @@ layout:view master='view' {
 	@content #content {
 		
 		div name=info {
+				img src='/images/logos/include.png' style='float:right; ';
 				div {
 					ul.-ul-features {
 						li {

@@ -15,6 +15,7 @@ layout:view master='view' {
 	@content #content {
 		
 			div name=info {
+				img src='/images/logos/toolkit.png' style='float:right; ';
 				div {
 				    :prism > ' > npm install -g includejs'
 					ul {

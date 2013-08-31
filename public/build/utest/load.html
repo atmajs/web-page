@@ -1,0 +1,28 @@
+<script type='include/load' id='includejs-publicviewutestutestmask' data-appuri='/public/view/utest/utest.mask'> layout:view master='view' {
+
+    @content #title {
+        a href='https://github.com/tenbits/utest' target=_blank> 'github@UTest';
+    }
+
+
+    @content #tabs {
+        button name='info' > 'Info'
+        button name='doc' > 'DOC'
+    }
+
+
+    @content #content {
+        div name='info' {
+            img src='/images/logos/utest.png' style='float:right; ';
+            h5 >  'Enpowers Unit Testing and Test Driven Development'
+            div > img src='/images/libs/utest/screen.png';
+
+        }
+
+        div name='doc' {
+            :markdown src='/public/view/utest/README.md';
+        }
+    }
+
+}
+ </script>

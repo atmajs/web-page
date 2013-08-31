@@ -58,37 +58,46 @@ function initialize() {
 			});
 			
 			
-			var pages = cfg.pages;
+			var pages = cfg.pages,
+				pageCfg = cfg.page;
 			
 			for (var id in pages) {
-				scripts = cfg
-					.page
+				
+				scripts = pageCfg
 					.getScriptsForPageOnly(id) || [];
-				styles = cfg
-					.page
+				
+					
+				styles = pageCfg
 					.getStylesForPageOnly(id) || [];
 					
-				include = cfg
-					.page
+				include = pageCfg
 					.getIncludeForPageOnly(id);
 				
+				var page = pages[id],
+					template = cfg.formatPath(cfg.page.location.viewTemplate, id);
 				
-				if (!(scripts.length || styles.length)) 
-					continue;
-				
-				tasks.push({
-					resources: arr_combine(
-						res({content: incl_toCode(include)}),
-						res(scripts),
-						res(styles, 'css')
-					),
+				var task = {
+					resources: res([template], 'load'),
 					config: {
 						outputSources: 'public/build/' + id + '/',
 						outputMain: 'public/build/' + id + '/script.js'
 					},
 					id: id
-				});
+				};
 				
+				
+				if (scripts.length || styles.length) {
+					
+					task.resources = arr_combine(
+						task.resources,
+						res({content: incl_toCode(include)}),
+						res(scripts),
+						res(styles, 'css')
+					);	
+				}
+				
+				
+				tasks.push(task);
 			}
 			
 			tasks
@@ -97,10 +106,10 @@ function initialize() {
 					
 					new io
 						.File('public/build/stats.json')
-						.write(JSON.stringify(Stats, null, 4));
+						.write(JSON.stringify({build: Stats}, null, 4));
 					
 					console.log('DONE'.green.bold);
-				})
+				});
 			
 		});
 	
@@ -113,14 +122,18 @@ var BuildTask = Class({
 		this.config = data.config;
 		this.id = data.id;
 		
+		
 	},
 	process: function(){
+		
 		new(Builder)()
 			.process(this.resources, this.config)
 			.done(this.complete);
 	},
 	Self: {
 		complete: function(solution){
+			
+			
 			
 			var output = this.config.outputSources,
 				path_scripts = net.Uri.combine(output, 'scripts.js'),
@@ -143,6 +156,9 @@ var BuildTask = Class({
 			
 			var load = solution.output.load,
 				lazy = solution.output.lazy;
+		
+			
+			
 			if (lazy || load){
 				new io
 					.File(path_load)
@@ -169,11 +185,12 @@ var BuildTaskCollection = Class.Collection(BuildTask, {
 	Self:{
 		process: function(){
 			if (++this.index > this.length - 1) {
+				logger.log('<build:tasks> Done'.green, this.index, this.length);
 				this.resolve();
 				return;
 			}
 			
-			console.log('Processing %d/%d', this.index + 1, this.length);
+			logger.log('Processing %s/%s', this.index + 1, this.length);
 			this[this.index]
 				.done(this.complete)
 				.process();

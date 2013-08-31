@@ -9,18 +9,13 @@
 }
 
 #views > .view {
+   .box-sizing(border-box);
    
 	margin-left: 250px;
-	//min-height: 200px;
-	//height: 100%;
-	
-	.box-sizing(border-box);
-	
-    position: relative;
+	position: relative;
 	
     display: none;
 	z-index: 999;
-	
 	height: 100%;
 }
 
@@ -109,9 +104,9 @@
 			margin: 3px 3px 3px 40px;
 			
 			
-			background: fadeout(@color_Selected, 40%);
+			//background: fadeout(@color_Selected, 40%);
 			
-			color: #fff;
+			color: @color_Black;
 			cursor: pointer;
 			
 			.transition(~"background 100ms ease-in");
@@ -122,6 +117,7 @@
 			
 			&.active {
 				background: @color_Selected;
+				color: #fff;
 			}
 		}
 		
@@ -177,9 +173,8 @@
 
 .scroller-container > footer {
 	.box-sizing(border-box);
-	.size(50%, 40px);
-	padding: 0 30px;
-	
+	height: 40px;
+	min-width: 50%;
 	
 	background: fadeout(@color_Selected, 90%);
 	
@@ -236,6 +231,7 @@
 .footer-right {
 	text-align: right;
 	> ul {
+		padding: 0;
 		list-style: none;
 		display: inline-block;
 		

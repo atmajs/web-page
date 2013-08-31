@@ -169,17 +169,15 @@ button:active {
     
 }
 .radioButtons > button.active {
-    //box-shadow: inset 0px 0px 10px #000;
     border-color: rgba(0,0,0,.5);
     background:transparent;
     
-	//color:#e1e1e1;
 	color: #F7F7F7;
 	
     text-shadow: 0px 0px 5px #000;
 	
-	//background:#2D2C2B url(../images/low_contrast_linen.png) 0 0 repeat;
-	background: #191919;
+	
+	background: @color_Black;
 }
 
 .tabPanel > * { display: none; }
@@ -342,6 +340,6 @@ ol > li {
 /** scrollbar */
 ::-webkit-scrollbar { width: 8px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: @color_Selected;  }
-::-webkit-scrollbar-thumb:window-inactive { background: @color_Selected;  }
+::-webkit-scrollbar-thumb { background: @color_Black;  }
+::-webkit-scrollbar-thumb:window-inactive { background: @color_Black;  }
 

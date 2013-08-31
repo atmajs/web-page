@@ -1,4 +1,4 @@
-layout:view master='view' {
+ layout:view master='view' {
 
     @content #title {
         a href='https://github.com/tenbits/MaskJS' target=_blank > 'github@MaskJS';
@@ -40,7 +40,7 @@ layout:view master='view' {
     @content #content {
             
             div name='info' {
-                img src='/images/mask.png' style='float:right; max-height: 150px';
+                img src='/images/logos/mask.png' style='float:right; ';
 
                 .info {
                     h4 > 'Syntax'

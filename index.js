@@ -1,6 +1,10 @@
 
 
 require('atma-libs/globals-dev');
+
+
+mask.cfg('allowCache', false);
+
 require('atma-logger');
 require('atma-io');
 require('atma-server');
@@ -12,16 +16,14 @@ global.app = atma
 	.Application()
 	.done(function(app) {
 		
-		
-		mask.cfg('allowCache', false);
 	
 		var connect = require('connect'),
 			passport = require('passport'),
 			redirect = require('connect-redirection'),
-			port = 5777;
+			port = process.env.PORT || 5777;
 	
 	
-		connect()
+		var server = connect()
 			.use(connect.favicon())
 			
 			.use(connect.query())
@@ -33,6 +35,11 @@ global.app = atma
 			.use(app.responder())
 			.use(connect.static(__dirname))
 			.listen(port);
+		
+		
+		if (app.args.debug) {
+			app.autoreload(server);
+		}
 		
 		logger.log('Listen %s'.green.bold, port);
 	});	

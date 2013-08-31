@@ -20,7 +20,7 @@ layout:view master='view' {
         
         % if='sideMenu' >
             % each='sideMenu' >
-                :radio .group name='~[name]' >
+                :radio .group name='~[name]' x-route='/-/examples/simple' >
                     % each='list' >
                         .side-menu-item name='~[name]'
                                 > '~[title]'
@@ -32,7 +32,8 @@ layout:view master='view' {
     @content #content {
                 
             div name='info' {
-                h5 >  'Class-Model Implementation — creates Business logic Layer'
+                h4 >  'Business Logic Layer'
+                img src='/images/logos/class.png' style='float:right; ';
                 p {
                     'Check out speed comparison: '
                     a href='http://jsperf.com/class-libjs-vs-others' target='_blank' > 'jsperf.com'

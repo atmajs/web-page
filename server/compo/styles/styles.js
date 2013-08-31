@@ -1,5 +1,5 @@
 
-
+var	isDebugMode = app.args.debug || app.config.app.debug;
 	
 function Style() {}
 
@@ -11,28 +11,26 @@ var T = "% each='.' > link type='text/css' rel='stylesheet' href='~[.]';";
 Style.prototype = {
 	mode: 'server:all',
 	nodes: mask.parse(T),
-	renderStart: function(model, cntx){
+	renderStart: function(model, ctx){
 		
-		this.model = cntx.page.getStyles(app.config.env);
+		if (isDebugMode) {
+			this.model = ctx.page.getStyles(app.config.env);
+			return;
+		}
+		
+		this.model = ['/public/build/styles.css'];
+		
+		var pageData = ctx.page.data,
+			id = pageData.id,
+			data = app.config.build[id];
+			
+					
+		if (data.styles) {
+			this
+				.model
+				.push('/public/build/' + id  + '/styles.css');
+		}
+		
 		
 	}
 };
-	
-function page_handlePath(styles, pageData) {
-	for (var i = 0, x, imax = styles.length; i < imax; i++){
-		x = styles[i];
-		
-		if (x[0] === '/') 
-			continue;
-		
-		if (x.indexOf('.') === -1) 
-			x += '.less';
-		
-		
-		styles[i] = '/public/view/'
-			+ pageData.view
-			+ '/'
-			+ x
-			;
-	}
-}

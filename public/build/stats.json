@@ -1,27 +1,84 @@
 {
-    "/": {
-        "scripts": true,
-        "styles": true,
-        "load": true
-    },
-    "get": {
-        "scripts": true,
-        "styles": false,
-        "load": false
-    },
-    "class": {
-        "scripts": true,
-        "styles": false,
-        "load": true
-    },
-    "mask": {
-        "scripts": true,
-        "styles": false,
-        "load": true
-    },
-    "compos": {
-        "scripts": true,
-        "styles": false,
-        "load": false
+    "build": {
+        "/": {
+            "scripts": true,
+            "styles": true,
+            "load": true
+        },
+        "index": {
+            "scripts": false,
+            "styles": false,
+            "load": true
+        },
+        "get": {
+            "scripts": true,
+            "styles": false,
+            "load": true
+        },
+        "feedback": {
+            "scripts": false,
+            "styles": false,
+            "load": true
+        },
+        "class": {
+            "scripts": true,
+            "styles": false,
+            "load": true
+        },
+        "mask": {
+            "scripts": true,
+            "styles": false,
+            "load": true
+        },
+        "mask-j": {
+            "scripts": false,
+            "styles": false,
+            "load": true
+        },
+        "mask-binding": {
+            "scripts": false,
+            "styles": false,
+            "load": true
+        },
+        "mask-compo": {
+            "scripts": false,
+            "styles": false,
+            "load": true
+        },
+        "mask-animation": {
+            "scripts": false,
+            "styles": false,
+            "load": true
+        },
+        "include": {
+            "scripts": false,
+            "styles": false,
+            "load": true
+        },
+        "atma-tool": {
+            "scripts": false,
+            "styles": false,
+            "load": true
+        },
+        "utest": {
+            "scripts": false,
+            "styles": false,
+            "load": true
+        },
+        "sys": {
+            "scripts": false,
+            "styles": false,
+            "load": true
+        },
+        "ruqq": {
+            "scripts": false,
+            "styles": false,
+            "load": true
+        },
+        "compo": {
+            "scripts": true,
+            "styles": false,
+            "load": true
+        }
     }
 }

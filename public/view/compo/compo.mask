@@ -1,0 +1,8 @@
+
+layout:view master='view-compo' {
+
+    @content #content >
+        .content.maximized.tagAPI {
+            .tabPanel;
+        }
+}

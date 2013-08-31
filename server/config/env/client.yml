@@ -12,11 +12,15 @@ client:
 			- ruqq/dom/jquery
 			- class
 			- mask
+			- if#debug:
+				- mask/plugin.reload
 			- ruqq/ruqq.base
 			- ruqq/utils
 			- mask.node/mask.bootstrap
 			- ruta
 			- mask.animation
+			- if#debug:
+				- include/include.autoreload
 			
 		public.compo:
 			- pageActivity

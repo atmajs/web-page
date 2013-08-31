@@ -5,8 +5,6 @@ layout:view master='view' {
     }
 
 
-
-
     @content #tabs {
         button name='info' > 'Info'
         button name='doc' > 'DOC'
@@ -15,7 +13,7 @@ layout:view master='view' {
 
     @content #content {
         div name='info' {
-            
+            img src='/images/logos/utest.png' style='float:right; ';
             h5 >  'Enpowers Unit Testing and Test Driven Development'
             div > img src='/images/libs/utest/screen.png';
 

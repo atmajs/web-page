@@ -1,0 +1,41 @@
+layout:view master='tagApiItem' {
+    @content #title > ':markdown;'
+    @content #description {
+        div {
+            'Based on '
+            a href='https://github.com/chjj/marked' target='_blank' > 'marked library'
+        }
+
+    }
+
+    @content #include > '{libjs}/compos/markdown/lib/markdown.js'
+    @content #source {
+        a href='https://github.com/tenbits/Compos/blob/master/markdown/lib/markdown.js' target='_blank' > 'github/compos/markdown.js'
+    }
+    @content #attributes {
+       
+        tr {
+            td > 'src'
+            td > '(optional) Url to load source from. Include Url Resolving is used'
+        }
+    }
+    @content #depends {
+        li > 'MaskJS'
+        li > 'IncludeJS'
+        li > 'Compos.prism'
+    }
+
+    @content #example {
+        prism > formatter:pre > "
+            :markdown >
+                '''
+                ### Heading
+                _italic_
+                '''
+        "
+        
+        prism > ":markdown src='/wiki/about.md';"
+        
+    }
+
+}

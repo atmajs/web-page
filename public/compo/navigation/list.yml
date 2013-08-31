@@ -61,25 +61,25 @@
 	items:
 		-
 			name: ':layout'
-			path: 'compo/layout'
+			path: '/compo/layout'
 		
 		-
 			name: ':markdown'
-			path: 'compo/markdown'
+			path: '/compo/markdown'
 		
 		-
 			name: ':scroller'
-			path: 'compo/scroller'
+			path: '/compo/scroller'
 		
 		-
 			name: ':prism'
-			path: 'compo/prism'
+			path: '/compo/prism'
 		
 		-
 			name: ':datePicker'
-			path: 'compo/datePicker'
+			path: '/compo/datePicker'
 		
 		-
 			name: ':timePicker'
-			path: 'compo/timePicker'
+			path: '/compo/timePicker'
 		

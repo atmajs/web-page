@@ -1,15 +1,16 @@
 
-script src='/public/build/scripts.js' type='text/javascript';
-
 % if=load >
 	:html >
 		'~[load]'
+		
+		
+script src='/public/build/scripts.js' type='text/javascript';
 
 % if=page >
 	script src='/public/build/~[page]/scripts.js' type='text/javascript';
 
 
-script type='text/javascript' > """
+script type='text/javascript' > :html > """
 	
 			
 		var start = Date.now(),

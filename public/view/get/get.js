@@ -5,12 +5,11 @@
 		Base: mask.getHandler(':view:default'),
 		
 		Override: {
-			section: function(route) {
-	
-				if (route.category === 'download') 
+			showTab: function(name) {
+				if (name === 'download') 
 					this.find(':downloader').initialize();
 				
-				this.super(route);
+				this.super(name);
 			},
 			
 			activate: function(){

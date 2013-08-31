@@ -48,6 +48,9 @@ pages:
 		
 		view:
 			controller: class
+		tabs:
+			examples:
+				navigation: false
 	
 	/mask: 
 		title: 'MaskJS - Atma'
@@ -108,11 +111,11 @@ pages:
 	/ruqq: 
 		title: 'RuqqJS'
 	
-	/compos: 
+	/compo: 
 		title: 'Component'
 		
 		view:
-			controller: compos
+			controller: compo
 	
 	
 		

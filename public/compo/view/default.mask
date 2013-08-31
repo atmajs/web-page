@@ -66,6 +66,14 @@ layout:master #view {
 			
 			:import #footer;
 		}
-		
+}
+
+layout:master #view-compo {
 	
+	:scroller dtop=-50 {
+		.scroller-content >
+				@placeholder #content;
+		
+		:import #footer;
+	}
 }

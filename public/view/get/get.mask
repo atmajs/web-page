@@ -16,11 +16,11 @@ layout:view master='view' {
                
                 
                 li {
-                    'Install IncludeJS'
-                    div > code > '$ npm install includejs'
+                    'Install Atma.js Toolkit'
+                    div > code > '$ npm install atma'
 
                     .hint {
-                        'test: ' code > 'ijs --help'
+                        'test: ' code > 'atma --help'
                     }
                     
                     .hint {
@@ -39,12 +39,12 @@ layout:view master='view' {
                     }
                 }
                 li {
-                    'Install LibJS Libraries'
-                    div > code > '$ cd c:/anyfolder/to/save/libjs_libraries'
-                    div > code > '$ ijs git-clone libjs'
+                    'Install Atma Libraries'
+                    div > code > '$ cd c:/anyfolder/to/save/atma_libraries'
+                    div > code > '$ atma git-clone atma'
                     .hint {
-                        'test: ' code > 'ijs globals'
-                        p > 'Should contain in projects.libjs.path = "file:///c:/anyfolder/to/save/libjs_libraries"'
+                        'test: ' code > 'atma globals'
+                        p > 'Should contain in projects.libjs.path = "file:///c:/anyfolder/to/save/atma_libraries"'
                     }
                 }
             }
@@ -56,14 +56,14 @@ layout:view master='view' {
 
                     prism language='css' > formatter:pre > '
                       $ cd c:/any/temp/folder
-                      $ ijs template starter
+                      $ atma template starter
                     '
 
                     .hint {
                         'In some case to create symbolic links to installed libjs you have run this command with admin. rights'
                     }
                     .hint {
-                        'test: ' code > 'ijs server index.dev.html'
+                        'test: ' code > 'atma server index.dev.html'
                         p > 'Page should be opened, or navigate to http://localhost:5777/index.dev.html'
                         p > 'If you see some text on the page, then everything was successfully installed'
                     }
@@ -73,7 +73,7 @@ layout:view master='view' {
                     h5 > 'Todo MVC'
                      prism language='css' > formatter:pre > '
                       $ cd c:/any/temp/folder
-                      $ ijs template todoapp
+                      $ atma template todoapp
                     '
                     
                     p {

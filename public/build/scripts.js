@@ -15,7 +15,9 @@
         lockedToFolder: null,
         sync: null,
         eval: null == document
-    }, handler = {}, hasOwnProp = {}.hasOwnProperty, __array_slice = Array.prototype.slice, XMLHttpRequest = global.XMLHttpRequest;
+    }, handler = {}, hasOwnProp = {}.hasOwnProperty, emptyResponse = {
+        load: {}
+    }, __array_slice = Array.prototype.slice, XMLHttpRequest = global.XMLHttpRequest;
     var Helper = {
         reportError: function(e) {
             console.error("IncludeJS Error:", e, e.message, e.url);
@@ -156,10 +158,7 @@
             },
             each: function(type, includeData, fn, namespace, xpath) {
                 var key;
-                if (null == includeData) {
-                    console.error("Include Item has no Data", type, namespace);
-                    return;
-                }
+                if (null == includeData) return;
                 if ("lazy" === type && null == xpath) {
                     for (key in includeData) this.each(type, includeData[key], fn, null, key);
                     return;
@@ -292,7 +291,7 @@
                     }
                 }
             }
-            callback(this.response);
+            callback(this.response || emptyResponse);
         }
     };
     var Include = function(IncludeDeferred) {
@@ -305,7 +304,7 @@
                 var resource = new Resource("js", {
                     path: data.id
                 }, data.namespace, null, null, data.id);
-                if (4 !== resource.state) console.error("Current Resource should be loaded");
+                if (4 !== resource.state) console.error("<include> Resource should be loaded", data);
                 resource.state = 3;
                 global.include = resource;
             },
@@ -373,7 +372,7 @@
                         var container = document.querySelector("#includejs-" + id.replace(/\W/g, ""));
                         if (null == container) {
                             console.error('"%s" Data was not embedded into html', id);
-                            return;
+                            break;
                         }
                         resource.exports = container.innerHTML;
                     }
@@ -937,12 +936,6 @@ include.routes({
     view: "/public/view/{0}/{1}.js"
 });
 
-include.setCurrent({
-    id: "undefined",
-    namespace: "",
-    url: "undefined"
-});
-
 include.cfg({
     loader: {
         example: "/public/script/loader/examples.js"
@@ -954,8 +947,6 @@ include.cfg({
     "atma.compos": "/.reference/libjs/compos/{0}/lib/{1}.js",
     view: "/public/view/{0}/{1}.js"
 });
-
-include.getResource("undefined", "js").readystatechanged(3);
 
 (function(a, b) {
     function G(a) {
@@ -7009,7 +7000,7 @@ include.setCurrent({
 
               case ".":
                 key = "class";
-                selector = new RegExp("\\b" + selector.substring(1) + "\\b");
+                selector = sel_hasClassDelegate(selector.substring(1));
                 prop = "attr";
                 break;
 
@@ -7031,10 +7022,26 @@ include.setCurrent({
             }
             var obj = selector.prop ? node[selector.prop] : node;
             if (null == obj) return false;
+            if ("function" === typeof selector.selector) return selector.selector(obj[selector.key]);
             if (null != selector.selector.test) {
                 if (selector.selector.test(obj[selector.key])) return true;
             } else if (obj[selector.key] == selector.selector) return true;
             return false;
+        }
+        function sel_hasClassDelegate(matchClass) {
+            return function(className) {
+                return sel_hasClass(className, matchClass);
+            };
+        }
+        function sel_hasClass(className, matchClass, index) {
+            if ("string" !== typeof className) return false;
+            if (null == index) index = 0;
+            index = className.indexOf(matchClass, index);
+            if (index === -1) return false;
+            if (index > 0 && className.charCodeAt(index - 1) > 32) return sel_hasClass(className, matchClass, index + 1);
+            var class_Length = className.length, match_Length = matchClass.length;
+            if (index < class_Length - match_Length && className.charCodeAt(index + match_Length) > 32) return sel_hasClass(className, matchClass, index + 1);
+            return true;
         }
         function find_findSingle(node, matcher) {
             if (node instanceof Array) {
@@ -7924,7 +7931,7 @@ include.setCurrent({
             };
         }
         function sel_hasClass(className, matchClass, index) {
-            if (null == className) return false;
+            if ("string" !== typeof className) return false;
             if (null == index) index = 0;
             index = className.indexOf(matchClass, index);
             if (index === -1) return false;
@@ -11847,6 +11854,7 @@ include.css();
                 var sel = '[name="' + this.visible + '"].-tab-panel';
                 var pane = elements[0].querySelector(sel);
                 if (pane) pane.classList.add("-show");
+                if (!pane) debugger;
             }
         },
         onRenderEnd: function() {
@@ -12811,19 +12819,12 @@ include.load("default.mask").done(function(resp) {
             if (this.compos.tabs_tabs) this.compos.tabs_tabs.setActive(name);
         },
         showSection: function(name) {
-            var $sideMenu = this.$.find(".side-menu");
-            if (0 === $sideMenu.length) return;
-            if (!$sideMenu.compo().getActiveName()) return;
-            var $group = $sideMenu.find(".group.-show");
+            var sideMenu = this.compos.radio_sideMenu;
+            if (null == sideMenu) return;
+            var currentName = sideMenu.getActiveName();
+            if (!currentName) return;
+            var $group = sideMenu.$.find(".group.-show");
             if (0 === $group.length) return;
-            if (this.cntx && this.cntx.promise && this.cntx.promise.length) {
-                console.error(">> unexpected");
-                var that = this, dfrs = this.cntx.promise.splice(0);
-                when(dfrs, function() {
-                    that.showSection(name);
-                });
-                return true;
-            }
             var groupName = $group.attr("name"), group = $group.compo();
             if (!name) name = group.getList()[0];
             group.setActive(name);
@@ -12868,16 +12869,22 @@ include.setCurrent({
     };
     var currentCompo;
     function load_View(data, callback) {
-        var view = data.view || {}, viewId = view, controllerId = "default", controller, styles;
-        var viewId = view.view || data.id || "index";
-        if (data.controller) {
-            controller = "/public/view/" + viewId + "/" + view.controller + ".js";
-            controllerId = data.controller;
-        }
-        view = "/public/view/" + viewId + "/" + viewId + ".mask::View";
-        include.instance().load(view).js(controller).done(function(resp) {
-            callback(viewId, controllerId, resp.load.View);
+        var controllerName = view_getController(data), viewName = view_getView(data), styleName = view_getStyle(data), view, controller, style;
+        if ("default" !== controllerName) controller = "/public/view/" + viewName + "/" + controllerName + ".js";
+        if (styleName) controller = "/public/view/" + viewName + "/" + styleName + ".less";
+        view = "/public/view/" + viewName + "/" + viewName + ".mask::View";
+        include.instance().load(view).js(controller).css(style).done(function(resp) {
+            callback(viewName, controllerName, resp.load.View);
         });
+    }
+    function view_getView(pageData) {
+        return null == pageData.view ? pageData.id : pageData.view.template || pageData.view.id || pageData.id || "index";
+    }
+    function view_getController(pageData) {
+        return pageData.view && pageData.view.controller ? pageData.view.controller : "default";
+    }
+    function view_getStyle(pageData) {
+        return pageData.view && pageData.view.style;
     }
     var ViewManager = Compo({
         tagName: "div",
@@ -12931,9 +12938,9 @@ include.setCurrent({
         },
         show: function(data, page) {
             var $menu = $(document.getElementsByTagName("menu"));
-            $menu.find(".selected").removeClass("selected");
-            $menu.find('[data-view="' + page.id + '"]').addClass("selected");
-            var compo = this.find("#" + page.view);
+            $menu.find(".selected").removeClass("selected").end().find('[data-view="' + page.id + '"]').addClass("selected");
+            var viewID = page.view && page.view.id || page.id;
+            var compo = this.find("#" + viewID);
             if (null == compo) {
                 this.$.children(".active").removeClass("active");
                 this.load(data, page);

@@ -1,3 +1,25 @@
+include.register({
+    load: [ {
+        id: "/public/view/mask/mask.mask",
+        url: "/public/view/mask/mask.mask"
+    }, {
+        id: "/public/view/mask/mask.example",
+        url: "/public/view/mask/mask.example"
+    } ],
+    js: [ {
+        id: "/public/view/mask/mask.js",
+        url: "/public/view/mask/mask.js"
+    } ]
+});
+
+include.routes({
+    "public": "/public/script/{0}.js",
+    "public.compo": "/public/compo/{0}/{1}.js",
+    atma: "/.reference/libjs/{0}/lib/{1}.js",
+    "atma.compos": "/.reference/libjs/compos/{0}/lib/{1}.js",
+    view: "/public/view/{0}/{1}.js"
+});
+
 include.setCurrent({
     id: "/public/view/mask/mask.js",
     namespace: "",
@@ -5,8 +27,9 @@ include.setCurrent({
 });
 
 include.load("mask.example::Examples").done(function(resp) {
+    var Default = mask.getHandler(":view:default");
     mask.registerHandler(":view:mask", Class({
-        Base: mask.getHandler(":view:default"),
+        Base: Default,
         compos: {
             tabsexamples: "compo: #tabs-examples",
             tabssyntax: "compo: #tabs-syntax"

@@ -1,3 +1,4 @@
+
 include
 	.css('navigation.less')
 
@@ -7,21 +8,20 @@ include
 		'list.yml'
 	)
 	
-	.done(function(resp) {
-		
+	.done(function(resp) { 
+	
+	
 	var Template = resp.load && resp.load.Template,
 		List = resp.load && resp.load.list;
 	
-
+	 
 	mask.registerHandler(':navigation', Compo({
 		template: Template,
 		mode: 'server:children',
 		modeMenu: 'none',
 		
 		constructor: function() {
-
 			this.removeForced = this.removeForced.bind(this);
-			
 		},
 
 		events: {
@@ -35,20 +35,7 @@ include
 					that.$.on('mouseleave', that.removeForced);
 				}, 300);
 
-			},
-
-			//'click: .viewTitle': function(event) {
-			//	
-			//	var $current = event.currentTarget;
-			//	
-			//	if ($current.hasAttribute('data-dynamic')) 
-			//		return;
-			//	
-			//	event.preventDefault();
-			//	event.stopPropagation();
-			//	
-			//	ruta.navigate($current.href);
-			//},
+			}
 		},
 
 		removeForced: function() {

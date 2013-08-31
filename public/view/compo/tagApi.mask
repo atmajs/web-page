@@ -1,0 +1,40 @@
+
+layout:master #tagApiItem {
+    .tagItem {
+        hr;
+        h4 > code > @placeholder #title;
+        p.description {
+            @placeholder #description;
+        }
+
+        small {
+            div {
+                @placeholder #include;
+            }
+            div {
+                @placeholder #source;
+            }
+        }
+
+        @placeholder #attributes > p {
+            div > 'Attributes '
+            table.api-list cellspacing='0' > @placeholder;
+        }
+
+        @placeholder #component >  p {
+            div > 'Component '
+            table.api-list cellspacing='0' > @placeholder;
+        }
+
+
+        @placeholder #depends > p {
+            div > 'Depends '
+            ul > @placeholder;
+        }
+
+        @placeholder #example > p {
+            div > 'Usage '
+            div > @placeholder;
+        }
+    }
+}
