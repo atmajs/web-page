@@ -1,4 +1,4 @@
-// Atma.js )
+// Atma.js ) ;)
 
 require('atma-libs/globals-dev');
 
