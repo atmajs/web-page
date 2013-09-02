@@ -7,7 +7,7 @@ include.exports = atma.server.HttpPage({
         var remoteAddress = req.connection.remoteAddress;
         
         
-        if (req.method === 'GET'
+        if (req.method === 'POST'
             && (
                 remoteAddress === '127.0.0.1'
                 || /^204\.232\.175\./.test(remoteAddress)
