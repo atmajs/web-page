@@ -30,7 +30,7 @@ include.exports = atma.server.HttpPage({
             return;
         }
         
-        logger.warn('<page:fetch> Access denied');
+        logger.error('<page:fetch> Access denied [%s] %s', req.method, remoteAddress);
             
         this.ctx.rewrite = '/error/401';
     }
