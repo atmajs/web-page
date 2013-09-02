@@ -5,6 +5,7 @@ page:
 	
 	
 	location:
+		controller: '/server/http/page/{0}/{1}.js'
 		template: '/server/http/page/{0}/{1}.mask'
 		master: '/server/http/master/{0}.mask'
 		viewTemplate: '/public/view/{0}/{1}.mask'
@@ -117,6 +118,13 @@ pages:
 		view:
 			controller: compo
 	
+	/tools/fetch:
+		title: 'Fetch'
+		template: 'fetch'
+		controller: 'fetch'
+		master: 'simple'
+		
+			
 	
 		
 		

@@ -1,10 +1,11 @@
 
 var	isDebugMode = app.args.debug || app.config.app.debug;
 	
-function Style() {}
+
 
 mask.registerHandler(':styles', Style);
 
+function Style() {}
 
 var T = "% each='.' > link type='text/css' rel='stylesheet' href='~[.]';";
 
