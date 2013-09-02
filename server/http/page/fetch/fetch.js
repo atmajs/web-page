@@ -6,6 +6,13 @@ include.exports = atma.server.HttpPage({
         
         var remoteAddress = req.connection.remoteAddress;
         
+        if (remoteAddress == null) {
+            // iisnode
+            remoteAddress = req
+                .headers['x-forwarded-for']
+                .replace(/:.+/, '');
+        }
+        
         
         if (req.method === 'POST'
             && (
