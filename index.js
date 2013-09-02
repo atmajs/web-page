@@ -1,4 +1,4 @@
-// Atma.js Entry !
+// Atma.js )
 
 require('atma-libs/globals-dev');
 

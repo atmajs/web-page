@@ -24,7 +24,7 @@ include.exports = atma.server.HttpPage({
         
             logger.log('<page:fetch> Update');
             require('child_process')
-                .exec('tools/fetch.bat', function(error, stdout, stderror){
+                .exec('tools\\fetch.bat', function(error, stdout, stderror){
                     
                     error =  (error || stderror).toString();
                     if (error) {
