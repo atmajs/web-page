@@ -79,6 +79,11 @@
             "scripts": true,
             "styles": false,
             "load": true
+        },
+        "tools/fetch": {
+            "scripts": false,
+            "styles": false,
+            "load": true
         }
     }
 }

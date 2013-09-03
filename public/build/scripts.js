@@ -12867,8 +12867,30 @@ include.setCurrent({
             mask.animate($next.get(0), "opacity | 0 > 1 | 500ms cubic-bezier(.58,1.54,.59,.75)");
         }
     };
-    var currentCompo;
-    function load_View(data, callback) {
+    var _currentCompo;
+    function load_ViewRelease(manager, data, callback) {
+        var viewName = view_getView(data), buildData = manager.model.build[viewName];
+        if (null == buildData) {
+            console.error("<view:manager> No build information", viewName);
+            load_View(manager, data, callback);
+            return;
+        }
+        var dir = "/public/build/" + viewName + "/", scripts, styles, load;
+        if (buildData.scripts) scripts = dir + "/scripts.js";
+        if (buildData.styles) styles = dir + "/styles.css";
+        if (buildData.load) load = dir + "/load.html";
+        include.instance().css(styles).load(load).done(function(resp) {
+            if (resp.load.load) {
+                var container = document.createElement("div");
+                container.innerHTML = resp.load.load;
+                document.body.appendChild(container);
+            }
+            include.js(scripts).done(function() {
+                load_View(manager, data, callback);
+            });
+        });
+    }
+    function load_View(manager, data, callback) {
         var controllerName = view_getController(data), viewName = view_getView(data), styleName = view_getStyle(data), view, controller, style;
         if ("default" !== controllerName) controller = "/public/view/" + viewName + "/" + controllerName + ".js";
         if (styleName) controller = "/public/view/" + viewName + "/" + styleName + ".less";
@@ -12896,11 +12918,15 @@ include.setCurrent({
             this.show = this.show.bind(this);
         },
         renderStart: function(model, cntx) {
-            this.model = app.config.pages;
+            this.model = {
+                pages: app.config.pages,
+                build: app.config.build
+            };
             if (cntx.page) {
+                this.model.debug = app.args.debug;
                 var that = this;
                 Compo.pause(this, cntx);
-                load_View(cntx.page.data, function(viewId, controller, template) {
+                load_View(this, cntx.page.data, function(viewId, controller, template) {
                     that.nodes = jmask(":view:" + controller).attr("id", viewId).mask(template);
                     Compo.resume(that, cntx);
                 });
@@ -12912,19 +12938,22 @@ include.setCurrent({
                 console.error("[:viewManager] page data not defined");
                 debugger;
             }
-            for (var path in this.model) pages.add(path, this.model[path]);
+            for (var path in this.model.pages) pages.add(path, this.model.pages[path]);
             app.compos.viewManager = that;
             ruta.add("/?:page/?:tab/?:section", function(route) {
                 var path = route.current.path, page = pages.get(path);
                 page = page && page.value;
-                if (null == page) return;
+                if (null == page) {
+                    console.warn("No page", path);
+                    return;
+                }
                 that.show(route.current.params, page);
             });
-            currentCompo = this.components[0];
+            _currentCompo = this.components[0];
         },
         load: function(data, page) {
-            var activity = window.app.find(":pageActivity").show();
-            load_View(page, function(viewId, controller, template) {
+            var activity = window.app.find(":pageActivity").show(), loader = this.model.debug ? load_View : load_ViewRelease;
+            loader(this, page, function(viewId, controller, template) {
                 var compoName = ":view:" + controller, T = compoName + "#" + viewId + "{" + template + "}";
                 this.append(T);
                 activity.hide();
@@ -12950,11 +12979,11 @@ include.setCurrent({
         },
         performShow: function(compo, params, page) {
             compo.tab(params);
-            if (compo === currentCompo) return;
-            if (currentCompo) currentCompo.deactivate && currentCompo.deactivate();
-            if (this.$) Helper.doSwitch(currentCompo.$, compo.$);
+            if (compo === _currentCompo) return;
+            if (_currentCompo) _currentCompo.deactivate && _currentCompo.deactivate();
+            if (this.$) Helper.doSwitch(_currentCompo.$, compo.$);
             if (compo.activate) compo.activate();
-            currentCompo = compo;
+            _currentCompo = compo;
             if (page.title) document.title = page.title;
         }
     });

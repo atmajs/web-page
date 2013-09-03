@@ -11,10 +11,58 @@
 		}
 	};
 	
-	var currentCompo;
+	var _currentCompo;
 
+	function load_ViewRelease(manager, data, callback) {
+		var viewName = view_getView(data),
+			buildData = manager.model.build[viewName];
+			
+		if (buildData == null){
+			console.error('<view:manager> No build information', viewName);
+			load_View(manager, data, callback);	
+			return;
+		}
+		
+		var dir = '/public/build/' + viewName + '/',
+			scripts,
+			styles,
+			load;
+			
+		if (buildData.scripts) {
+			scripts = dir + '/scripts.js';
+		}
+		
+		if (buildData.styles) {
+			styles = dir + '/styles.css';
+		}
+		
+		if (buildData.load) {
+			load = dir + '/load.html';
+		}
+		
+		include
+			.instance()
+			.css(styles)
+			.load(load)
+			.done(function(resp){
+				if (resp.load.load) {
+					var container = document.createElement('div');
+					container.innerHTML = resp.load.load;
+					
+					document.body.appendChild(container);
+				}
+				
+				include
+					.js(scripts)
+					.done(function(){
+						
+						load_View(manager, data, callback);
+					});
+				
+			})
+	}
 	
-	function load_View(data, callback) {
+	function load_View(manager, data, callback) {
 		
 		var controllerName = view_getController(data),
 			viewName = view_getView(data),
@@ -93,15 +141,20 @@
 		},
 		
 		renderStart: function(model, cntx) {
-			this.model = app.config.pages;
+			this.model = {
+				pages: app.config.pages,
+				build: app.config.build
+			};
 			
 			if (cntx.page) {
+				
+				this.model.debug = app.args.debug;
 				// render
 				var that = this;
 				
 				Compo.pause(this, cntx);
 				
-				load_View(cntx.page.data, function(viewId, controller, template){
+				load_View(this, cntx.page.data, function(viewId, controller, template){
 					
 					that.nodes = jmask(':view:' + controller)
 							.attr('id', viewId)
@@ -122,8 +175,8 @@
 				debugger;
 			}
 			
-			for (var path in this.model) {
-				pages.add(path, this.model[path]);
+			for (var path in this.model.pages) {
+				pages.add(path, this.model.pages[path]);
 			}
 			
 			app.compos.viewManager = that;
@@ -134,22 +187,28 @@
 				
 				page = page && page.value;
 				
-				if (page == null) 
+				if (page == null) {
+					console.warn('No page', path);
 					return;
+				}
 				
 				that.show(route.current.params, page);
-				
 			});
 			
-			currentCompo = this.components[0];
+			_currentCompo = this.components[0];
 		},
 		
 		
 		load: function(data, page) {
 
-			var activity = window.app.find(':pageActivity').show();
-
-			load_View(page, function(viewId, controller, template){
+			var activity = window.app.find(':pageActivity').show(),
+				loader = this.model.debug
+					? load_View
+					: load_ViewRelease
+					;
+			
+			
+			loader(this, page, function(viewId, controller, template){
 
 				var compoName = ':view:' + controller,
 					T = compoName
@@ -210,25 +269,25 @@
 			
 			compo.tab(params);
 
-			if (compo === currentCompo) 
+			if (compo === _currentCompo) 
 				return;
 			
 			
-			if (currentCompo)
-				currentCompo.deactivate && currentCompo.deactivate();
+			if (_currentCompo)
+				_currentCompo.deactivate && _currentCompo.deactivate();
 			
 			
 
 			
 
 			if (this.$) 
-				Helper.doSwitch(currentCompo.$, compo.$);
+				Helper.doSwitch(_currentCompo.$, compo.$);
 			
 
 			if (compo.activate)
 				compo.activate();
 	
-			currentCompo = compo;
+			_currentCompo = compo;
 			
 			if (page.title)
 				document.title = page.title;

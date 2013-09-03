@@ -1,8 +1,17 @@
+var _busy = false;
 
 include.exports = atma.server.HttpPage({
     
     onRenderStart: function(req, res){
         
+        if (_busy) {
+            this.model = {
+                message: 'Processing ...'
+            };
+            return;
+        }
+        
+        _busy = true;
         
         var remoteAddress = req.connection.remoteAddress;
         
@@ -22,23 +31,30 @@ include.exports = atma.server.HttpPage({
             )) {
             
         
-            logger.log('<page:fetch> Update');
-            require('child_process')
-                .exec('tools\\fetch.bat', function(error, stdout, stderror){
-                    
-                    error =  (error || stderror).toString();
-                    if (error) {
-                        logger.error('<page:fetch> failed', error);
-                        return;
-                    }
-                    logger.log('<page:fetch> completed'.bold.green);
+            
+            var stream = require('child_process')
+                .spawn('cmd', ['/C', 'tools\\fetch.bat'], {
+                    cwd: process.cwd(),
+                    env: process.env
                 });
-        
+                
+            stream.on('close', function(code){
+                _busy = false;
+                logger.log('<page:fetch> done');
+            });
+            
+            this.model = {
+                title: 'Started ... '  
+            };
             return;
         }
         
+        this.model = {
+            title: 'Access denied ...'
+        };
+        
         logger.error('<page:fetch> Access denied [%s] %s', req.method, remoteAddress);
             
-        this.ctx.rewrite = '/error/401';
+        //- this.ctx.rewrite = '/error/401';
     }
 });
