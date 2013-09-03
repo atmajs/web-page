@@ -35,7 +35,8 @@ include.exports = atma.server.HttpPage({
             var stream = require('child_process')
                 .spawn('cmd', ['/C', 'tools\\fetch.bat'], {
                     cwd: process.cwd(),
-                    env: process.env
+                    env: process.env,
+                    stdio: 'inherit'
                 });
                 
             stream.on('close', function(code){
