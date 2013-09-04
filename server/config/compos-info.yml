@@ -18,6 +18,9 @@ compos-info:
 		
 	':pageActivity' :
 		mode: client
+
+	':spinner' :
+		mode: client
 		
 	':animation':
 		mode: client

@@ -23,6 +23,7 @@ client:
 				- include/include.autoreload
 			
 		public.compo:
+			- spinner
 			- pageActivity
 			- downloader
 		

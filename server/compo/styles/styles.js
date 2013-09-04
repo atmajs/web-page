@@ -15,7 +15,7 @@ Style.prototype = {
 	renderStart: function(model, ctx){
 		
 		if (isDebugMode) {
-			this.model = ctx.page.getStyles(app.config.env);
+			this.model = ctx.page.getStyles();
 			return;
 		}
 		

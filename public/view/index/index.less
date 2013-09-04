@@ -1,22 +1,16 @@
 @import "public/style/lesshat.less";
+@import "public/style/global.less";
 
-@pageMaxWidth: 800px;
+
 
 .-about-keyvisual {
 	.box-sizing(border-box);
-	
-	width: 100%;
+	position: relative;
 	
 	padding: 30px 0;
-	
-	background: url('/images/test.jpg') 0 0 no-repeat;
-	background-size: cover;
-	
-	border {
-		top: 1px solid green;
-		bottom: 1px solid green;
-	}
 	margin-bottom: 30px;
+	
+	background: url('/images/keyvisual.png') 0 0 repeat;
 }
 
 .-about-keyvisual > .content, .-about-content {
@@ -29,26 +23,79 @@
 	
 }
 
-.-i-bracket, .-i-js, .-i-atma {
-	font-family: 'Lucida Console', 'Monaco', 'monospace';
+.-about-keyvisual > .content > button {
+	.transition(~"all .1s ease-out");
+	
+	background: fadeout(@color_Selected, 10%);
+	border: none;
+	
+	color: #fff;
+	
 	display: inline-block;
-	font-weight: 900;
-	
-	color: rgba(0,0,0,.5);
-}
-.-i-bracket { font-size: 2em; }
-.-i-atma { font-size: 1.5em; }
-.-i-js {
-	font-size: 1em;
-}
+	margin: 10px 8px 2px 8px;
+	padding: 10px 20px;
 	
 	
-.-i-atma- {
-	font-family: 'Michroma', 'Lucida Console', 'Monaco', 'monospace';
+	
+	&:hover {
+		background-color: @color_Black;
+	}
+	
+	> a {
+		text-decoration: none;
+	}
 }
 
+.-about-logo-text {
+	font-family: 'Lucida Console', 'Monaco', 'monospace';
+	font-size: 1.5em;
+}
 
+.-about-logo {
+	max-height: 50%;
+	position: absolute;
+	top:25%;
+	left: 10px;
+}
 
+.family-list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	
+	> li {
+		.box-sizing(border-box);
+		
+		vertical-align: top;
+		display: inline-block;
+		width: 260px;
+		padding: 10px 20px;
+		text-align: left;
+		
+		> .family-description {
+			font-size: .95em;
+			opacity: .9;
+		}
+	}
+}
+
+.destiny {
+	list-style: none;
+	margin: 0;
+	margin-top: 20px;
+	padding: 0;
+	padding-top: 20px;
+	width: 100%;
+	
+	border-top: 1px solid @color_Black;
+	
+	li {
+		text-align: center;
+		vertical-align: top;
+		width: 33%;
+		display: inline-block;
+	}
+}
 
 
 .about-list {

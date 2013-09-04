@@ -6,8 +6,8 @@
             "load": true
         },
         "index": {
-            "scripts": false,
-            "styles": false,
+            "scripts": true,
+            "styles": true,
             "load": true
         },
         "get": {

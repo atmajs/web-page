@@ -82,7 +82,7 @@
 		}
 		
 		if (styleName) {
-			controller = '/public/view/'
+			style = '/public/view/'
 				+ viewName
 				+ '/'
 				+ styleName
@@ -182,7 +182,7 @@
 			app.compos.viewManager = that;
 			
 			ruta.add('/?:page/?:tab/?:section', function(route){
-				var path = route.current.path,
+				var path = route.current.path || 'index',
 					page = pages.get(path);
 				
 				page = page && page.value;
@@ -267,7 +267,7 @@
 		performShow: function(compo, params, page) {
 			
 			
-			compo.tab(params);
+			compo.tab(params, page);
 
 			if (compo === _currentCompo) 
 				return;

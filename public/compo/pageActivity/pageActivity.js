@@ -13,7 +13,7 @@
 		};
 
 
-	mask.registerHandler(':spinner', Compo({
+	mask.registerHandler(':pageActivity:spinner', Compo({
 		onRenderStart: function(values, container, cntx) {
 			this.currentPos = 0;
 			this.tagName = 'div';
@@ -129,7 +129,7 @@
 		tagName: 'div',
 		constructor: function() {
 			this.compos = {
-				'spinner': 'compo: :spinner'
+				'spinner': 'compo: :pageActivity:spinner'
 			};
 		},
 		onRenderStart: function() {
@@ -142,7 +142,7 @@
 				bottom: '0px',
 				display: 'none',
 				zIndex: 999999
-			}).append(':spinner').children().attr({
+			}).append(':pageActivity:spinner').children().attr({
 				image: '/public/image/128x128_spinner.png',
 				width: 128,
 				height: 128,

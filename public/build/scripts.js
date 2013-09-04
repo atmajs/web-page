@@ -842,6 +842,9 @@ include.pauseStack();
 
 include.register({
     css: [ {
+        id: "/public/compo/spinner/spinner.less",
+        url: "/public/compo/spinner/spinner.less"
+    }, {
         id: "/public/compo/downloader/downloader.css",
         url: "/public/compo/downloader/downloader.css"
     }, {
@@ -905,6 +908,9 @@ include.register({
     }, {
         id: "/.reference/libjs/mask.animation/lib/mask.animation.js",
         url: "/.reference/libjs/mask.animation/lib/mask.animation.js"
+    }, {
+        id: "/public/compo/spinner/spinner.js",
+        url: "/public/compo/spinner/spinner.js"
     }, {
         id: "/public/compo/pageActivity/pageActivity.js",
         url: "/public/compo/pageActivity/pageActivity.js"
@@ -10812,6 +10818,41 @@ include.setCurrent({
 include.getResource("/.reference/libjs/mask.animation/lib/mask.animation.js", "js").readystatechanged(3);
 
 (function() {
+    var animation = {
+        c1: "transform | rotate(0deg) > rotate(360deg) | 9s linear",
+        c2: "transform | rotate(0deg) > rotate(-360deg) | 6s linear",
+        c3: "transform | rotate(0deg) > rotate(360deg) | 8s linear"
+    };
+    mask.registerHandler(":spinner", Compo({
+        template: "._01;._02;._03",
+        tagName: "div",
+        attr: {
+            "class": "-spinner"
+        },
+        compos: {
+            c1: "$: ._01",
+            c2: "$: ._02",
+            c3: "$: ._03"
+        },
+        onRenderStart: function() {},
+        onRenderEnd: function() {
+            if (this.attr.autostart) this.start();
+        },
+        start: function() {
+            for (var key in animation) {
+                var fn = restartDelegate(this, key);
+                fn();
+            }
+        }
+    }));
+    function restartDelegate(spinner, key) {
+        return function() {
+            mask.animate(spinner.compos[key].get(0), animation[key], restartDelegate(spinner, key));
+        };
+    }
+})();
+
+(function() {
     var I = ruqq.info, vendor = null, initVendorStrings = function() {
         vendor = {
             TransitionProperty: I.prefix + "TransitionProperty",
@@ -10820,7 +10861,7 @@ include.getResource("/.reference/libjs/mask.animation/lib/mask.animation.js", "j
             cssTransform: I.cssprefix + "transform"
         };
     };
-    mask.registerHandler(":spinner", Compo({
+    mask.registerHandler(":pageActivity:spinner", Compo({
         onRenderStart: function(values, container, cntx) {
             this.currentPos = 0;
             this.tagName = "div";
@@ -10893,7 +10934,7 @@ include.getResource("/.reference/libjs/mask.animation/lib/mask.animation.js", "j
         tagName: "div",
         constructor: function() {
             this.compos = {
-                spinner: "compo: :spinner"
+                spinner: "compo: :pageActivity:spinner"
             };
         },
         onRenderStart: function() {
@@ -10905,7 +10946,7 @@ include.getResource("/.reference/libjs/mask.animation/lib/mask.animation.js", "j
                 bottom: "0px",
                 display: "none",
                 zIndex: 999999
-            }).append(":spinner").children().attr({
+            }).append(":pageActivity:spinner").children().attr({
                 image: "/public/image/128x128_spinner.png",
                 width: 128,
                 height: 128,
@@ -12864,10 +12905,11 @@ include.load("default.mask").done(function(resp) {
             tabs.setActive(name);
             return true;
         },
-        tab: function(info) {
+        tab: function(info, pageData) {
             if (!info.tab) info.tab = this.defaultTab || "info";
             this.showTab(info.tab);
             var hasSections = this.showSection(info.section);
+            if (pageData.menuHidden) hasSections = true;
             app.compos.navigation[hasSections ? "blur" : "focus"]();
             this.update(info);
         },
@@ -12925,7 +12967,7 @@ include.setCurrent({
     function load_View(manager, data, callback) {
         var controllerName = view_getController(data), viewName = view_getView(data), styleName = view_getStyle(data), view, controller, style;
         if ("default" !== controllerName) controller = "/public/view/" + viewName + "/" + controllerName + ".js";
-        if (styleName) controller = "/public/view/" + viewName + "/" + styleName + ".less";
+        if (styleName) style = "/public/view/" + viewName + "/" + styleName + ".less";
         view = "/public/view/" + viewName + "/" + viewName + ".mask::View";
         include.instance().load(view).js(controller).css(style).done(function(resp) {
             callback(viewName, controllerName, resp.load.View);
@@ -12973,7 +13015,7 @@ include.setCurrent({
             for (var path in this.model.pages) pages.add(path, this.model.pages[path]);
             app.compos.viewManager = that;
             ruta.add("/?:page/?:tab/?:section", function(route) {
-                var path = route.current.path, page = pages.get(path);
+                var path = route.current.path || "index", page = pages.get(path);
                 page = page && page.value;
                 if (null == page) {
                     console.warn("No page", path);
@@ -13010,7 +13052,7 @@ include.setCurrent({
             this.performShow(compo, data, page);
         },
         performShow: function(compo, params, page) {
-            compo.tab(params);
+            compo.tab(params, page);
             if (compo === _currentCompo) return;
             if (_currentCompo) _currentCompo.deactivate && _currentCompo.deactivate();
             if (this.$) Helper.doSwitch(_currentCompo.$, compo.$);

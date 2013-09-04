@@ -5,24 +5,16 @@ layout:view master='view-full' {
         .info.active {
             
             .-about-keyvisual > .content {
-                div style='
-                    font-size: 2em;
-                    line-height: 2em;
-                '
-                //> "['ᴧ:ᵻᴧ].js"
-                 {
-                    //span.-i-bracket > "["
-                    //span.-i-atma > "ᐲᒣᗑᐱ"
-                    span.-i-atma- > 'ATMA'
-                    //span.-i-bracket > "]"
-                    span.-i-js > ".js"
-                 }
+                img.-about-logo src='/images/logos/atmajs_white.png';
+                
                 
                 h4 style='padding-left: 50px;'
-                    > blockquote > '„Modern HTML5 Application via Component Composition”'
-                    
-                button > a x-dynamic href='/get/install' > 'Install'
+                    > blockquote > '„An Application with Javascript — client, server or both!”'
                 
+                button >
+                    a x-dynamic href='/get/install' >
+                        'Install'
+            
             }
             
             .-about-content {
@@ -37,83 +29,33 @@ layout:view master='view-full' {
 
                 p > "Here are first steps to get acquainted with the project."
 
-                ol.about-list {
-                     li {
-                        .about-title {
-                            a x-dynamic href='/class' > 'ClassJS'
+                ol.family-list {
+                    % each='family'  >
+                        li {
+                            % if='id != "animation"' >
+                                img src='/images/logos/~[id]_text.png';
+                            % else >
+                                div style='text-align:center' > :spinner autostart;
+                                
+                            .family-caption >
+                                '~[caption]'
+                            .family-description >
+                                '~[description]'
                         }
-                        .about-description {
-                            "[Business logic Layer]"
-                            br;
-                            "Class-Model Implementation with remote or local serialization/deserialization."
-                        }
-                    }
-                    
-                    li {
-                        .about-title {
-                            a x-dynamic href='/mask' > 'MaskJS'
-                        }
-                        .about-description {
-                            "[HMVC]"
-                            br;
-                            "Mask has in its core newer css/sass alike syntax for your templates, which are parsed into
-                            MaskDOM and then Document Fragment is created. You can extend it with custom tag handlers (controllers),
-                            attributes, etc.  MaskJS contains also jMask, Compo and Bindings libraries,
-                            so that it accomplishes all tasks you would expect from a powerful Javascript Framework. It is also 
-                            Model agnostic, that means you can use raw objects for the models (Data-Centric) or use any class library,
-                            like ClassJS or others.
-                            "
-                        }
-                    }
-
-
-                    li {
-                        .about-title {
-                            a x-dynamic href='/include' > "IncludeJS"
-                        }
-                        .about-description {
-                            "[Resource Loader]"
-                            br;
-                            "Loads components, moduls, styles, templates. You will definitely think, 
-                            that we could use any loader out there, like RequireJS.
-                            But there was plenty of features, that we missed. And we hope, you will like them too.
-                            "
-                        }
-                    }
-                    
-                    li {
-                        .about-title {
-                            a x-dynamic href='/utest' > "UTest"
-                        }
-                        .about-description {
-                            "[Unit Testing and Test Driven Development]"
-                            br;
-                            "Tool, that will help you easily to create unit tests, and start developing in a TDD manner"
-                        }
-                    }
-
-                    //li {
-                    //    .about-title {
-                    //        a href='#includeBuilder' > 'IncludeJS.Builder'
-                    //    }
-                    //    .about-description {
-                    //        "
-                    //        a big brother of IncludeJS. Combines all included resources.
-                    //        It also runs jshint, uglify, css-min and etc.
-                    //        "
-                    //    }
-                    //}
-                    //
-                    li {
-                        .about-title {
-                            a x-dynamic href='/mask-animation' > "Mask.Animation"
-                        }
-                        .about-description {
-                            "CSS3 Animation Library"
-                        }
-                    }
-                   
                 }
+                
+                ol.destiny {
+                    % each='destiny' >
+                        li {
+                            .center >
+                                img src='/images/figure/~[device]_black.png';
+                            
+                            .destiny-list >
+                                % each='list' > div > '~[.]'
+                            
+                        }
+                }
+                
             }
 
 

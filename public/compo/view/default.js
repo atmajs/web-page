@@ -155,7 +155,7 @@ include
 			return true;
 		},
 		
-		tab: function(info) {
+		tab: function(info, pageData) {
 			if (!info.tab) {
 				info.tab = this.defaultTab || 'info';
 			}
@@ -164,6 +164,10 @@ include
 			
 			
 			var hasSections = this.showSection(info.section);
+			
+			if (pageData.menuHidden) 
+				hasSections = true;
+			
 			
 			app
 				.compos
