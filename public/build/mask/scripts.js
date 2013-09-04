@@ -1,10 +1,9 @@
+include.pauseStack();
+
 include.register({
     load: [ {
         id: "/public/view/mask/mask.mask",
         url: "/public/view/mask/mask.mask"
-    }, {
-        id: "/public/view/mask/mask.example",
-        url: "/public/view/mask/mask.example"
     } ],
     js: [ {
         id: "/public/view/mask/mask.js",
@@ -26,7 +25,7 @@ include.setCurrent({
     url: "/public/view/mask/mask.js"
 });
 
-include.load("mask.example::Examples").done(function(resp) {
+include.ajax("mask.example::Examples").done(function(resp) {
     var Default = mask.getHandler(":view:default");
     mask.registerHandler(":view:mask", Class({
         Base: Default,
@@ -49,7 +48,7 @@ include.load("mask.example::Examples").done(function(resp) {
         },
         Override: {
             onRenderStart: function() {
-                var examples = resp.load.Examples;
+                var examples = resp.ajax.Examples;
                 this.model = {
                     examples: examples,
                     sideMenu: [ {
@@ -65,3 +64,5 @@ include.load("mask.example::Examples").done(function(resp) {
 });
 
 include.getResource("/public/view/mask/mask.js", "js").readystatechanged(3);
+
+include.resumeStack();

@@ -211,6 +211,119 @@
             }
         };
     }(document);
+    var ScriptStack = function() {
+        var head, currentResource, stack = [], _paused;
+        function loadScript(url, callback) {
+            var tag = document.createElement("script");
+            tag.type = "text/javascript";
+            tag.src = url;
+            if ("onreadystatechange" in tag) tag.onreadystatechange = function() {
+                ("complete" === this.readyState || "loaded" === this.readyState) && callback();
+            }; else tag.onload = tag.onerror = callback;
+            (head || (head = document.getElementsByTagName("head")[0])).appendChild(tag);
+        }
+        function loadByEmbedding() {
+            if (_paused || 0 === stack.length) return;
+            if (null != currentResource) return;
+            var resource = currentResource = stack[0];
+            if (1 === resource.state) return;
+            resource.state = 1;
+            global.include = resource;
+            global.iparams = resource.route.params;
+            function resourceLoaded(e) {
+                if (e && "error" === e.type) console.log("Script Loaded Error", resource.url);
+                var i = 0, length = stack.length;
+                for (;i < length; i++) if (stack[i] === resource) {
+                    stack.splice(i, 1);
+                    break;
+                }
+                if (i === length) {
+                    console.error("Loaded Resource not found in stack", resource);
+                    return;
+                }
+                resource.readystatechanged(3);
+                currentResource = null;
+                loadByEmbedding();
+            }
+            if (resource.source) {
+                __eval(resource.source, resource);
+                resourceLoaded();
+                return;
+            }
+            loadScript(resource.url, resourceLoaded);
+        }
+        function processByEval() {
+            if (_paused || 0 === stack.length) return;
+            if (null != currentResource) return;
+            var resource = stack[0];
+            if (resource.state < 2) return;
+            currentResource = resource;
+            resource.state = 1;
+            global.include = resource;
+            __eval(resource.source, resource);
+            for (var i = 0, x, length = stack.length; i < length; i++) {
+                x = stack[i];
+                if (x === resource) {
+                    stack.splice(i, 1);
+                    break;
+                }
+            }
+            resource.readystatechanged(3);
+            currentResource = null;
+            processByEval();
+        }
+        return {
+            load: function(resource, parent, forceEmbed) {
+                var added = false;
+                if (parent) for (var i = 0, length = stack.length; i < length; i++) if (stack[i] === parent) {
+                    stack.splice(i, 0, resource);
+                    added = true;
+                    break;
+                }
+                if (!added) stack.push(resource);
+                if (!cfg.eval || forceEmbed) {
+                    loadByEmbedding();
+                    return;
+                }
+                if (resource.source) {
+                    resource.state = 2;
+                    processByEval();
+                    return;
+                }
+                XHR(resource, function(resource, response) {
+                    if (!response) console.error("Not Loaded:", resource.url);
+                    resource.source = response;
+                    resource.state = 2;
+                    processByEval();
+                });
+            },
+            moveToParent: function(resource, parent) {
+                var length = stack.length, parentIndex = -1, resourceIndex = -1, i;
+                for (i = 0; i < length; i++) if (stack[i] === resource) {
+                    resourceIndex = i;
+                    break;
+                }
+                if (resourceIndex === -1) return;
+                for (i = 0; i < length; i++) if (stack[i] === parent) {
+                    parentIndex = i;
+                    break;
+                }
+                if (parentIndex === -1) return;
+                if (resourceIndex < parentIndex) return;
+                stack.splice(resourceIndex, 1);
+                stack.splice(parentIndex, 0, resource);
+            },
+            pause: function() {
+                _paused = true;
+            },
+            resume: function() {
+                _paused = false;
+                if (null != currentResource) return;
+                var fn = cfg.eval ? processByEval : loadByEmbedding;
+                fn();
+            }
+        };
+    }();
     var IncludeDeferred = function() {
         this.callbacks = [];
         this.state = -1;
@@ -359,13 +472,14 @@
             register: function(_bin) {
                 for (var key in _bin) for (var i = 0; i < _bin[key].length; i++) {
                     var id = _bin[key][i].id, url = _bin[key][i].url, namespace = _bin[key][i].namespace, resource = new Resource();
-                    resource.state = 4;
-                    resource.namespace = namespace;
-                    resource.type = key;
                     if (url) {
                         if ("/" === url[0]) url = url.substring(1);
                         resource.location = path_getDir(url);
                     }
+                    resource.state = 4;
+                    resource.namespace = namespace;
+                    resource.type = key;
+                    resource.url = url || id;
                     switch (key) {
                       case "load":
                       case "lazy":
@@ -375,6 +489,13 @@
                             break;
                         }
                         resource.exports = container.innerHTML;
+                        if (CustomLoader.exists(resource)) {
+                            resource.state = 3;
+                            CustomLoader.load(resource, function(resource, response) {
+                                resource.exports = response;
+                                resource.readystatechanged(4);
+                            });
+                        }
                     }
                     (bin[key] || (bin[key] = {}))[id] = resource;
                 }
@@ -424,7 +545,9 @@
             server: function() {
                 if (true !== cfg.server) stub_freeze(this);
                 return this;
-            }
+            },
+            pauseStack: ScriptStack.pause,
+            resumeStack: ScriptStack.resume
         });
         return Include;
         function embedPlugin(source) {
@@ -472,107 +595,6 @@
             proto["inject"] = proto.js;
         }
     }(IncludeDeferred);
-    var ScriptStack = function() {
-        var head, currentResource, stack = [], loadScript = function(url, callback) {
-            var tag = document.createElement("script");
-            tag.type = "text/javascript";
-            tag.src = url;
-            if ("onreadystatechange" in tag) tag.onreadystatechange = function() {
-                ("complete" === this.readyState || "loaded" === this.readyState) && callback();
-            }; else tag.onload = tag.onerror = callback;
-            (head || (head = document.getElementsByTagName("head")[0])).appendChild(tag);
-        }, loadByEmbedding = function() {
-            if (0 === stack.length) return;
-            if (null != currentResource) return;
-            var resource = currentResource = stack[0];
-            if (1 === resource.state) return;
-            resource.state = 1;
-            global.include = resource;
-            global.iparams = resource.route.params;
-            function resourceLoaded(e) {
-                if (e && "error" === e.type) console.log("Script Loaded Error", resource.url);
-                var i = 0, length = stack.length;
-                for (;i < length; i++) if (stack[i] === resource) {
-                    stack.splice(i, 1);
-                    break;
-                }
-                if (i === length) {
-                    console.error("Loaded Resource not found in stack", resource);
-                    return;
-                }
-                resource.readystatechanged(3);
-                currentResource = null;
-                loadByEmbedding();
-            }
-            if (resource.source) {
-                __eval(resource.source, resource);
-                resourceLoaded();
-                return;
-            }
-            loadScript(resource.url, resourceLoaded);
-        }, processByEval = function() {
-            if (0 === stack.length) return;
-            if (null != currentResource) return;
-            var resource = stack[0];
-            if (resource.state < 2) return;
-            currentResource = resource;
-            resource.state = 1;
-            global.include = resource;
-            __eval(resource.source, resource);
-            for (var i = 0, x, length = stack.length; i < length; i++) {
-                x = stack[i];
-                if (x === resource) {
-                    stack.splice(i, 1);
-                    break;
-                }
-            }
-            resource.readystatechanged(3);
-            currentResource = null;
-            processByEval();
-        };
-        return {
-            load: function(resource, parent, forceEmbed) {
-                var added = false;
-                if (parent) for (var i = 0, length = stack.length; i < length; i++) if (stack[i] === parent) {
-                    stack.splice(i, 0, resource);
-                    added = true;
-                    break;
-                }
-                if (!added) stack.push(resource);
-                if (!cfg.eval || forceEmbed) {
-                    loadByEmbedding();
-                    return;
-                }
-                if (resource.source) {
-                    resource.state = 2;
-                    processByEval();
-                    return;
-                }
-                XHR(resource, function(resource, response) {
-                    if (!response) console.error("Not Loaded:", resource.url);
-                    resource.source = response;
-                    resource.state = 2;
-                    processByEval();
-                });
-            },
-            moveToParent: function(resource, parent) {
-                var length = stack.length, parentIndex = -1, resourceIndex = -1, i;
-                for (i = 0; i < length; i++) if (stack[i] === resource) {
-                    resourceIndex = i;
-                    break;
-                }
-                if (resourceIndex === -1) return;
-                for (i = 0; i < length; i++) if (stack[i] === parent) {
-                    parentIndex = i;
-                    break;
-                }
-                if (parentIndex === -1) return;
-                if (resourceIndex < parentIndex) return;
-                stack.splice(resourceIndex, 1);
-                stack.splice(parentIndex, 0, resource);
-            }
-        };
-    }();
     var CustomLoader = function() {
         var JSONParser = {
             process: function(source, res) {
@@ -602,26 +624,33 @@
             }
             return cfg.loader[extension] = new Resource("js", Routes.resolve(namespace, path), namespace);
         }
-        function doLoad_completeDelegate(callback, resource) {
+        function loader_completeDelegate(callback, resource) {
             return function(response) {
                 callback(resource, response);
             };
         }
-        function doLoad(resource, loader, callback) {
+        function loader_process(source, resource, loader, callback) {
+            var delegate = loader_completeDelegate(callback, resource), syncResponse = loader.process(source, resource, delegate);
+            if ("undefined" !== typeof syncResponse) callback(resource, syncResponse);
+        }
+        function tryLoad(resource, loader, callback) {
+            if ("string" === typeof resource.exports) {
+                loader_process(resource.exports, resource, loader, callback);
+                return;
+            }
             XHR(resource, function(resource, response) {
-                var delegate = doLoad_completeDelegate(callback, resource), syncResponse = loader.process(response, resource, delegate);
-                if ("undefined" !== typeof syncResponse) callback(resource, syncResponse);
+                loader_process(response, resource, loader, callback);
             });
         }
         return {
             load: function(resource, callback) {
                 var loader = createLoader(resource.url);
                 if (loader.process) {
-                    doLoad(resource, loader, callback);
+                    tryLoad(resource, loader, callback);
                     return;
                 }
                 loader.done(function() {
-                    doLoad(resource, loader.exports, callback);
+                    tryLoad(resource, loader.exports, callback);
                 });
             },
             exists: function(resource) {
@@ -808,6 +837,8 @@ function __eval(source, include) {
     var iparams = include && include.route.params;
     return eval.call(window, source);
 }
+
+include.pauseStack();
 
 include.register({
     css: [ {
@@ -11880,6 +11911,7 @@ include.css();
             animation.start(callback, panel);
         },
         _getAnimation: function(ani) {
+            if (null == this.components) return null;
             var animation;
             for (var i = 0, x, imax = this.components.length; i < imax; i++) {
                 x = this.components[i];
@@ -13011,3 +13043,5 @@ include.load("userInfo.mask").done(function(resp) {
 });
 
 include.getResource("/public/compo/user/userInfo.js", "js").readystatechanged(3);
+
+include.resumeStack();

@@ -1,3 +1,5 @@
+include.pauseStack();
+
 include.register({
     load: [ {
         id: "/public/view/class/class.mask",
@@ -50,3 +52,5 @@ include.load("class.example::Examples").done(function(resp) {
 });
 
 include.getResource("/public/view/class/class.js", "js").readystatechanged(3);
+
+include.resumeStack();

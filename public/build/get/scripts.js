@@ -1,3 +1,5 @@
+include.pauseStack();
+
 include.register({
     load: [ {
         id: "/public/view/get/get.mask",
@@ -32,3 +34,5 @@ include.routes({
         show: function(tag) {}
     }));
 })();
+
+include.resumeStack();

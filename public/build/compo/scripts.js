@@ -1,3 +1,5 @@
+include.pauseStack();
+
 include.register({
     load: [ {
         id: "/public/view/compo/compo.mask",
@@ -91,3 +93,5 @@ include.load("tagApi.mask").done(function(resp) {
 });
 
 include.getResource("/public/view/compo/compo.js", "js").readystatechanged(3);
+
+include.resumeStack();
