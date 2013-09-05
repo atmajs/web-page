@@ -193,6 +193,10 @@
 				}
 				
 				that.show(route.current.params, page);
+				
+				if (typeof ga === 'function') {
+					ga('send', 'pageview', window.location.pathname);
+				}
 			});
 			
 			_currentCompo = this.components[0];

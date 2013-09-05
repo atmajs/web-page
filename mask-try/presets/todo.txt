@@ -1,0 +1,109 @@
+title:
+TODO
+----
+mask:
+
+h2 > 'Todo'
+:TodoCompo > div {
+    
+	span > :bind 
+				expression='remaining()' 
+				x-pipe-slot='todo.todoChanged';
+
+	span > ' of ~[bind: todos.length] remaining '
+	
+	'[' a x-signal='click:archive' > 'archive' ']'
+
+	ul {
+		%% each='todos' > li {
+			
+			input type=checkbox > 
+				:dualbind 	value='done'
+							x-pipe-signal='todo.todoChanged';
+
+			span.done-~[bind:done] > '~[text]'
+		
+		}
+	}
+	p {
+		input 	type = text
+				size = 30
+				placeholder='add new todo here' > 
+					:dualbind value='todoText';
+
+		button.btn-primary
+				x-signal='click: addTodo'
+				
+					> 'add';
+	}
+
+}
+
+----
+javascript:
+
+mask.registerHandler(':TodoCompo', Compo({
+	slots: {
+		addTodo: function(event) {
+			this.model.todos.push({
+				text: this.model.todoText,
+				done: false
+			});
+			this.model.todoText = '';
+
+			event.preventDefault();
+
+			// disable sample
+			var that = this;
+            that.slotState('addTodo', false);
+            
+            setTimeout(function(){
+                that.slotState('addTodo', true);
+            },2000)
+		},
+		archive: function() {
+			var arr = this.model.todos, 
+				i = arr.length;
+			while(--i !== -1) arr[i].done && arr.splice(i,1);
+			
+		}
+	},
+	remaining: function() {
+		var arr = this.model.todos, 
+			i = arr.length, 
+			count = 0;
+		while(--i !== -1) !arr[i].done && count++;
+		return count;
+	}
+}))
+
+----
+model:
+
+{
+	todos: [{
+		text: 'buy milk',
+		done: true
+	}, {
+		text: 'install includejs',
+		done: false
+	}]
+}
+
+----
+style:
+.done-true {
+	background: rgba(0,255,0,.4);
+}
+.done-false {
+	background: rgba(255,0,0,.4);
+}
+
+a {
+	color: blue;
+	cursor:pointer;
+}
+
+button:disabled{
+	opacity: .2;
+}

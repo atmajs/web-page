@@ -1,0 +1,378 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title></title>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+	
+
+
+
+    <script type="text/javascript" src="http://d1n0x3qji82z53.cloudfront.net/src-min-noconflict/ace.js" ignore="ignore"></script>
+
+    
+    
+
+    
+
+	
+
+    
+
+<link rel="stylesheet" href="index.build/style.css" /></head>
+<body>
+
+    <script type="mask/template" id="layout">
+		.-try-container {
+            tabs{
+                .header.radioButtons {
+					.toolbar {
+						button.small#setLink > '<link>';
+						button.small#getShortend > '<bitly>';
+						dropdownMenu.dropdownMenu {
+							button.caption > 'Presets'
+							.-ddmenu.items {
+								% each='presets' > .-ddmenu.item data-id='~[id]' > '~[title]'
+							}
+						}
+					}
+
+                    button.active name='mask' > 'MASK'
+					button name='model' > 'Model'
+                    button name='javascript' > 'JS'
+                    button name='style' > 'CSS'
+
+					span.hint {
+						'Shift+Tab'
+					}
+
+
+                }
+                .panels.editors {
+                    div#editor-mask.-try-editor.active name='mask';
+					div#editor-model.-try-editor name='model';
+                    div#editor-javascript.-try-editor name='javascript';
+                    div#editor-style.-try-editor name='style';
+
+                }
+            }
+
+            preview#preview;
+        }
+
+    </script>
+	
+		
+	<script>
+
+  	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  
+	ga('create', 'UA-43775038-1', 'atmajs.com');
+	ga('send', 'pageview');
+
+
+	
+	</script>
+
+<div id="build.release.xhr" style="display: none;" hidden="hidden"><script type="include/load" id="includejs-scriptshortenddialogshortenddialogmask" data-appuri="/script/shortend-dialog/shortend-dialog.mask"> .modalOverlay  > .modalPanel > .cell {
+
+    .shortend-container {
+	    .progress.active {
+	    	.title {
+	    		'Processing...'
+	    		.spinner;
+	    	}
+	    }
+
+	    .result {
+	    	.title > 'Link to this snippet:'
+	    	.value > input#shortendResult type='text';
+	    }
+	}
+}
+ </script>
+<script type="include/load" id="includejs-presetssimpletxt" data-appuri="preset.simple"> title:
+Simple
+
+----
+mask:
+
+.simple style="background:#6BA43C; color:#1E5043;" > "~[text]"
+
+----
+model:
+
+{
+    text: "Hello, World!"
+}
+ </script>
+<script type="include/load" id="includejs-presetsanimatetxt" data-appuri="preset.animate"> title:
+:animation
+----
+mask:
+
+.panel x-pipe-signal='click: ani.rotate' {
+    'Click Me'
+    :animation x-pipes='ani.rotate' {
+        @model > 'transform | translate(0px,0px) > translate(200px,200px) | 500ms linear'
+        @next > 'transform | rotate(0deg) > rotate(570deg) | 2s ease-in 200ms'
+    }
+}
+
+----
+style:
+
+.panel {
+    display: inline-block;
+    background: lime;
+}
+ </script>
+<script type="include/load" id="includejs-presetsbindingstxt" data-appuri="preset.bindings"> title:
+Binding
+----
+mask:
+
+table {
+    tr {
+        td > input type='text' {
+                :dualbind value='name' changeEvent='keyup'{
+                    :validate maxLength='10' message='MaxLength - 10';
+                    :validate minLength='2' message='MinLength - 2';
+                    :validate match='^([\w]+)$' message='Only characters';
+                }
+            }
+        td > div > '~[bind:name]';
+    }
+    tr {
+        td > textarea {
+            // paths array will be splited each per line
+            :dualbind value='paths' bindingProvider='pathsProvider';
+        }
+        td {
+            '[~[bind:paths]]'
+        }
+    }
+
+    tr {
+        td > :datePicker {
+            :dualbind value='date' getter='getDate' setter='setDate';
+        }
+        td > div > '~[bind: date.getDate() ]'
+    }
+
+    tr {
+        td > input type='text' {
+                :dualbind value='height' changeEvent='keyup' {
+                    :validate match='^([\d]+)$' message='Only digits';
+                    :validate check='>10' message='Min Height is 10px';
+                    :validate check='<500' message='Max Height is 500px';
+                }
+            }
+        td > div style='background:red; height:~[bind:height]px';
+    }
+
+    h5 > 'Hello ~[bind:name]!'
+    :customTag > button x-signal='click: clicked' > 'Click';
+}
+----
+javascript:
+
+mask.registerBinding('pathsProvider', {
+    domWay: {
+        get: function(provider){
+            return provider.element.value.split('\n');
+        },
+        set: function(provider, value){
+            provider.element.value = value.join('\n');
+        }
+    }
+});
+
+mask.registerHandler(':customTag',Compo({
+    slots: {
+        clicked: function(){
+            alert('Button Clicked');
+        }
+    }
+}));
+
+----
+model:
+{
+    name: 'Kirk',
+    paths: ['path1.html','path2.html'],
+    date: new Date,
+    height:10
+}
+-----
+ </script>
+<script type="include/load" id="includejs-presetscollapsetxt" data-appuri="preset.collapse"> title:
+Collapsible
+
+----
+mask:
+
+:collapsible.classA {
+    button.header > 'Toggle'
+    .content {
+        'Some Content, ~[name]!'
+    }
+}
+
+hr;
+
+:collapsible {
+	span.header style='background: gray' > 'Click'
+	span.content > '~[:name.toUpperCase()]'
+}
+
+----
+javascript:
+
+/** create custom Control: */
+mask.registerHandler(':collapsible', Compo({
+    constructor: function() {
+        this.tagName = 'div';
+    },
+	compos: {
+        container: '$: .content'
+    },
+    events: {
+       'click: .header': function(e){
+            this.compos.container.toggle();
+       }
+    }
+}));
+
+----
+model:
+
+{
+    name: 'World'
+}
+----
+style:
+
+.classA {
+    display:inline-block;
+    background-color: rgb(150,240,150);
+}
+.header{
+    cursor: pointer;
+    padding: 10px;
+    margin: 5px;
+    font-weight: bold;
+}
+ </script>
+<script type="include/load" id="includejs-presetstodotxt" data-appuri="preset.todo"> title:
+TODO
+----
+mask:
+
+h2 > 'Todo'
+:TodoCompo > div {
+    
+	span > :bind 
+				expression='remaining()' 
+				x-pipe-slot='todo.todoChanged';
+
+	span > ' of ~[bind: todos.length] remaining '
+	
+	'[' a x-signal='click:archive' > 'archive' ']'
+
+	ul {
+		%% each='todos' > li {
+			
+			input type=checkbox > 
+				:dualbind 	value='done'
+							x-pipe-signal='todo.todoChanged';
+
+			span.done-~[bind:done] > '~[text]'
+		
+		}
+	}
+	p {
+		input 	type = text
+				size = 30
+				placeholder='add new todo here' > 
+					:dualbind value='todoText';
+
+		button.btn-primary
+				x-signal='click: addTodo'
+				
+					> 'add';
+	}
+
+}
+
+----
+javascript:
+
+mask.registerHandler(':TodoCompo', Compo({
+	slots: {
+		addTodo: function(event) {
+			this.model.todos.push({
+				text: this.model.todoText,
+				done: false
+			});
+			this.model.todoText = '';
+
+			event.preventDefault();
+
+			// disable sample
+			var that = this;
+            that.slotState('addTodo', false);
+            
+            setTimeout(function(){
+                that.slotState('addTodo', true);
+            },2000)
+		},
+		archive: function() {
+			var arr = this.model.todos, 
+				i = arr.length;
+			while(--i !== -1) arr[i].done && arr.splice(i,1);
+			
+		}
+	},
+	remaining: function() {
+		var arr = this.model.todos, 
+			i = arr.length, 
+			count = 0;
+		while(--i !== -1) !arr[i].done && count++;
+		return count;
+	}
+}))
+
+----
+model:
+
+{
+	todos: [{
+		text: 'buy milk',
+		done: true
+	}, {
+		text: 'install includejs',
+		done: false
+	}]
+}
+
+----
+style:
+.done-true {
+	background: rgba(0,255,0,.4);
+}
+.done-false {
+	background: rgba(255,0,0,.4);
+}
+
+a {
+	color: blue;
+	cursor:pointer;
+}
+
+button:disabled{
+	opacity: .2;
+} </script></div><script type="text/javascript" src="index.build/script.js"></script></body>
+</html>

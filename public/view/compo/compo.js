@@ -55,18 +55,21 @@ include
 			}
 		},
 		onRenderStart: function(model, ctx){
-			Compo.pause(this, ctx);
-			
 			var that = this,
 				nodes = this.nodes;
-			load(ctx.page.query.tab, function(template){
-				
-				jmask(nodes)
-					.find('.tabPanel')
-					.mask(template);
-				
-				Compo.resume(that, ctx);
-			})
+			
+			if (ctx.page) {
+				Compo.pause(this, ctx);
+					
+				load(ctx.page.query.tab, function(template){
+					
+					jmask(nodes)
+						.find('.tabPanel')
+						.mask(template);
+					
+					Compo.resume(that, ctx);
+				});
+			}
 		},
 		onRenderEndServer: function(elements){
 			var $tag = elements[0].querySelector('.tagItem');

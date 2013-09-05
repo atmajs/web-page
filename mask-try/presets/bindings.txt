@@ -1,0 +1,78 @@
+title:
+Binding
+----
+mask:
+
+table {
+    tr {
+        td > input type='text' {
+                :dualbind value='name' changeEvent='keyup'{
+                    :validate maxLength='10' message='MaxLength - 10';
+                    :validate minLength='2' message='MinLength - 2';
+                    :validate match='^([\w]+)$' message='Only characters';
+                }
+            }
+        td > div > '~[bind:name]';
+    }
+    tr {
+        td > textarea {
+            // paths array will be splited each per line
+            :dualbind value='paths' bindingProvider='pathsProvider';
+        }
+        td {
+            '[~[bind:paths]]'
+        }
+    }
+
+    tr {
+        td > :datePicker {
+            :dualbind value='date' getter='getDate' setter='setDate';
+        }
+        td > div > '~[bind: date.getDate() ]'
+    }
+
+    tr {
+        td > input type='text' {
+                :dualbind value='height' changeEvent='keyup' {
+                    :validate match='^([\d]+)$' message='Only digits';
+                    :validate check='>10' message='Min Height is 10px';
+                    :validate check='<500' message='Max Height is 500px';
+                }
+            }
+        td > div style='background:red; height:~[bind:height]px';
+    }
+
+    h5 > 'Hello ~[bind:name]!'
+    :customTag > button x-signal='click: clicked' > 'Click';
+}
+----
+javascript:
+
+mask.registerBinding('pathsProvider', {
+    domWay: {
+        get: function(provider){
+            return provider.element.value.split('\n');
+        },
+        set: function(provider, value){
+            provider.element.value = value.join('\n');
+        }
+    }
+});
+
+mask.registerHandler(':customTag',Compo({
+    slots: {
+        clicked: function(){
+            alert('Button Clicked');
+        }
+    }
+}));
+
+----
+model:
+{
+    name: 'Kirk',
+    paths: ['path1.html','path2.html'],
+    date: new Date,
+    height:10
+}
+-----
