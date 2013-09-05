@@ -4182,13 +4182,23 @@ include.cfg({
     });
 })(window);
 
+include.setCurrent({
+    id: "/.reference/libjs/class/lib/class.js",
+    namespace: "",
+    url: "/.reference/libjs/class/lib/class.js"
+});
+
 (function(root, factory) {
     "use strict";
-    var _global, _exports;
-    if ("undefined" !== typeof exports && (root === exports || null == root)) _global = _exports = global;
+    var _isCommonJS = false, _global, _exports;
+    if ("undefined" !== typeof exports && (null == root || root === exports || root === global)) {
+        _global = global;
+        _isCommonJS = true;
+    }
     if (null == _global) _global = "undefined" === typeof window ? global : window;
     if (null == _exports) _exports = root || _global;
     factory(_global, _exports);
+    if (_isCommonJS) module.exports = _exports.Class;
 })(this, function(global, exports) {
     "use strict";
     var _Array_slice = Array.prototype.slice, _Array_sort = Array.prototype.sort;
@@ -5174,6 +5184,8 @@ include.cfg({
     })();
     exports.Class = Class;
 });
+
+include.getResource("/.reference/libjs/class/lib/class.js", "js").readystatechanged(3);
 
 include.setCurrent({
     id: "/.reference/libjs/mask/lib/mask.js",
@@ -13022,6 +13034,7 @@ include.setCurrent({
                     return;
                 }
                 that.show(route.current.params, page);
+                if ("function" === typeof ga) ga("send", "pageview", window.location.pathname);
             });
             _currentCompo = this.components[0];
         },
