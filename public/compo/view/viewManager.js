@@ -29,15 +29,15 @@
 			load;
 			
 		if (buildData.scripts) {
-			scripts = dir + '/scripts.js';
+			scripts = dir + 'scripts.js';
 		}
 		
 		if (buildData.styles) {
-			styles = dir + '/styles.css';
+			styles = dir + 'styles.css';
 		}
 		
 		if (buildData.load) {
-			load = dir + '/load.html';
+			load = dir + 'load.html';
 		}
 		
 		include

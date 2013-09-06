@@ -58,8 +58,9 @@
   width: 260px;
   padding: 10px 20px;
   text-align: left;
+  text-decoration: none;
 }
-.family-list > li > .family-description {
+.family-list > li .family-description {
   font-size: .95em;
   opacity: .9;
 }

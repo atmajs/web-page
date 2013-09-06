@@ -31,7 +31,7 @@ layout:view master='view-full' {
 
                 ol.family-list {
                     % each='family'  >
-                        li {
+                        li > a href='~[: href || id]' x-dynamic {
                             % if='id != "animation"' >
                                 img src='/images/logos/~[id]_text.png';
                             % else >

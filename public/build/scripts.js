@@ -212,7 +212,7 @@
         };
     }(document);
     var ScriptStack = function() {
-        var head, currentResource, stack = [], _paused;
+        var head, currentResource, stack = [], _cb_complete = [], _paused;
         function loadScript(url, callback) {
             var tag = document.createElement("script");
             tag.type = "text/javascript";
@@ -223,7 +223,11 @@
             (head || (head = document.getElementsByTagName("head")[0])).appendChild(tag);
         }
         function loadByEmbedding() {
-            if (_paused || 0 === stack.length) return;
+            if (_paused) return;
+            if (0 === stack.length) {
+                trigger_complete();
+                return;
+            }
             if (null != currentResource) return;
             var resource = currentResource = stack[0];
             if (1 === resource.state) return;
@@ -253,7 +257,11 @@
             loadScript(resource.url, resourceLoaded);
         }
         function processByEval() {
-            if (_paused || 0 === stack.length) return;
+            if (_paused) return;
+            if (0 === stack.length) {
+                trigger_complete();
+                return;
+            }
             if (null != currentResource) return;
             var resource = stack[0];
             if (resource.state < 2) return;
@@ -271,6 +279,11 @@
             resource.readystatechanged(3);
             currentResource = null;
             processByEval();
+        }
+        function trigger_complete() {
+            var i = -1, imax = _cb_complete.length;
+            while (++i < imax) _cb_complete[i]();
+            _cb_complete.length = 0;
         }
         return {
             load: function(resource, parent, forceEmbed) {
@@ -321,6 +334,13 @@
                 if (null != currentResource) return;
                 var fn = cfg.eval ? processByEval : loadByEmbedding;
                 fn();
+            },
+            complete: function(callback) {
+                if (false === _paused && 0 === stack.length) {
+                    callback();
+                    return;
+                }
+                _cb_complete.push(callback);
             }
         };
     }();
@@ -547,7 +567,8 @@
                 return this;
             },
             pauseStack: ScriptStack.pause,
-            resumeStack: ScriptStack.resume
+            resumeStack: ScriptStack.resume,
+            allDone: ScriptStack.complete
         });
         return Include;
         function embedPlugin(source) {
@@ -12962,9 +12983,9 @@ include.setCurrent({
             return;
         }
         var dir = "/public/build/" + viewName + "/", scripts, styles, load;
-        if (buildData.scripts) scripts = dir + "/scripts.js";
-        if (buildData.styles) styles = dir + "/styles.css";
-        if (buildData.load) load = dir + "/load.html";
+        if (buildData.scripts) scripts = dir + "scripts.js";
+        if (buildData.styles) styles = dir + "styles.css";
+        if (buildData.load) load = dir + "load.html";
         include.instance().css(styles).load(load).done(function(resp) {
             if (resp.load.load) {
                 var container = document.createElement("div");
