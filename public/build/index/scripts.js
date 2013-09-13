@@ -8,6 +8,9 @@ include.register({
     load: [ {
         id: "/public/view/index/index.mask",
         url: "/public/view/index/index.mask"
+    }, {
+        id: "/public/view/index/demos.mask",
+        url: "/public/view/index/demos.mask"
     } ],
     js: [ {
         id: "/public/view/index/index.js",
@@ -18,20 +21,36 @@ include.register({
 include.routes({
     "public": "/public/script/{0}.js",
     "public.compo": "/public/compo/{0}/{1}.js",
-    atma: "/.reference/libjs/{0}/lib/{1}.js",
-    "atma.compos": "/.reference/libjs/compos/{0}/lib/{1}.js",
+    atma: "/.reference/atma/{0}/lib/{1}.js",
+    "atma.compos": "/.reference/atma/compos/{0}/lib/{1}.js",
     view: "/public/view/{0}/{1}.js"
 });
 
-(function() {
+include.setCurrent({
+    id: "/public/view/index/index.js",
+    namespace: "",
+    url: "/public/view/index/index.js"
+});
+
+include.load("demos.mask").done(function(resp) {
     mask.registerHandler(":view:index", Class({
         Base: mask.getHandler(":view:default"),
+        compos: {
+            overlay: "compo: :overlay",
+            tmpl: "compo: #demo-task-tracker"
+        },
+        slots: {
+            demoTaskTracker: function() {
+                this.compos.overlay.show("task-tracker", resp.load.demos);
+            }
+        },
         Override: {
             activate: function() {
                 app.compos.navigation.blur();
             },
             deactivate: function() {}
         },
+        resource: include,
         onRenderStart: function() {
             this.model = {
                 family: [ {
@@ -74,8 +93,11 @@ include.routes({
             };
         },
         load: function(tag) {},
-        show: function(tag) {}
+        show: function(tag) {},
+        onRenderEnd: function() {}
     }));
-})();
+});
+
+include.getResource("/public/view/index/index.js", "js").readystatechanged(3);
 
 include.resumeStack();

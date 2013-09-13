@@ -1,0 +1,41 @@
+@import "/public/style/lesshat.less";
+
+.-sourceViewer {
+    .box-sizing(border-box);
+    position: absolute;
+    top: 50px;
+    left: 20px;
+    right: 20px;
+    bottom: 0px;
+    
+    
+    
+    background: #eee;
+}
+.-sourceViewer-tools {
+    min-height: 50px;
+    line-height: 50px;
+    vertical-align: middle;
+    text-align: center;
+}
+.-sourceViewer-tree {
+    float: left;
+    min-width: 200px;
+    max-width: 300px;
+    margin-right: 20px;
+}
+
+.-treeView-item.selected > .-treeView-head {
+    background: #F97732;
+    color: #fff;
+}
+
+.-treeView-item.__sub.selected > .-treeView-head {
+    background: inherit;
+    color: inherit;
+}
+
+.-sourceViewer-code {
+    height: 100%;
+    overflow: auto;
+}

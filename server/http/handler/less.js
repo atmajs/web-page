@@ -15,7 +15,7 @@ include.exports = Class({
 			.load(path + '::Less')
 			.done(function(resp){
 				
-				that.resolve(resp.load.Less, 200, 'text/css');
+				that.resolve(resp.load && resp.load.Less || '<error> view log', 200, 'text/css');
 			});
 		
 		return this;

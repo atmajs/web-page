@@ -200,6 +200,8 @@
 			});
 			
 			_currentCompo = this.components[0];
+			
+			
 		},
 		
 		

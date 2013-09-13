@@ -1,0 +1,32 @@
+li.list-group-item.~[bind: _hidden ? '__hidden'] {
+    
+    .task-progress style='width: ~[bind:complete]%';
+    
+    h5 > '~[bind:title]'
+    i > '~[bind: getFormatedRemainingTime(complete, time) || "Completed!"]'
+    
+    p.text-muted > '~[bind: description]'
+    
+    
+    .actions.clearfix > .btn-group.btn-group-xs {
+        button.btn.btn-danger x-signal='click: taskRemove' {
+            span.glyphicon.glyphicon-trash;
+            span > 'Remove'
+        }
+        button.btn.btn-primary x-signal='click: taskEdit' {
+            span.glyphicon.glyphicon-edit;
+            span > 'Edit'
+        }
+    }
+    
+    
+
+    :animation #task-remove {
+        @model {
+            'transform | > translateX(100%) scale(.8) | 200ms linear'
+        }
+        @next {
+            'display | > none'
+        }
+    }
+}

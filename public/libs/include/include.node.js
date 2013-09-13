@@ -1,3 +1,4 @@
+
 // source ../src/head.js
 (function (root, factory) {
     'use strict';
@@ -24,7 +25,8 @@
 }(this, function (global, exports, document) {
     'use strict';
 
-	// source ../src/1.scope-vars.js
+// end:source ../src/head.js
+	// source ../src/1.scope-vars.js 
 	
 	/**
 	 *	.cfg
@@ -48,11 +50,15 @@
 		},
 		handler = {},
 		hasOwnProp = {}.hasOwnProperty,
+		emptyResponse = {
+			load: {}
+		},
 		__array_slice = Array.prototype.slice,
 		
 		XMLHttpRequest = global.XMLHttpRequest;
 	
-		 
+		
+	// end:source ../src/1.scope-vars.js 
 	// source ../src/2.Helper.js
 	var Helper = { /** TODO: improve url handling*/
 		
@@ -73,6 +79,7 @@
 			xhr.send();
 		};
 	
+	// end:source ../src/2.Helper.js
 	
 	// source ../src/utils/fn.js
 	function fn_proxy(fn, ctx) {
@@ -86,6 +93,7 @@
 	function fn_doNothing(fn) {
 		typeof fn === 'function' && fn();
 	}
+	// end:source ../src/utils/fn.js
 	// source ../src/utils/object.js
 	function obj_inherit(target /* source, ..*/ ) {
 		if (typeof target === 'function') {
@@ -106,6 +114,7 @@
 		}
 		return target;
 	}
+	// end:source ../src/utils/object.js
 	// source ../src/utils/array.js
 	function arr_invoke(arr, args, ctx) {
 	
@@ -143,10 +152,14 @@
 		key = arr[imax];
 		return obj[key] || (obj[key] = []);
 	}
+	// end:source ../src/utils/array.js
 	// source ../src/utils/path.js
 	function path_getDir(url) {
 		var index = url.lastIndexOf('/');
-		return index === -1 ? '' : url.substring(index + 1, -index);
+		return index === -1
+			? ''
+			: url.substring(index + 1, -index)
+			;
 	}
 	
 	function path_resolveCurrent() {
@@ -159,8 +172,21 @@
 		var scripts = document.getElementsByTagName('script'),
 			last = scripts[scripts.length - 1],
 			url = last && last.getAttribute('src') || '';
-			
-		return (url[0] === '/') ? url : '/' + url;
+		
+		if (url[0] === '/') {
+			return url;
+		}
+		
+		var location = window
+			.location
+			.pathname
+			.replace(/\/[^\/]+\.\w+$/, '');
+		
+		if (location[location.length - 1] !== '/') {
+			location += '/';
+		}
+		
+		return location + url;
 	}
 	
 	function path_win32Normalize(path){
@@ -229,6 +255,7 @@
 		
 		return path.substring(path.lastIndexOf('.', query) + 1, query);
 	}
+	// end:source ../src/utils/path.js
 	
 	// source ../src/2.Routing.js
 	var RoutesLib = function() {
@@ -265,7 +292,14 @@
 			resolve: function(namespace, template) {
 				var questionMark = template.indexOf('?'),
 					aliasIndex = template.indexOf('::'),
-					alias, path, params, route, i, x, length, arr;
+					alias,
+					path,
+					params,
+					route,
+					i,
+					x,
+					length,
+					arr;
 					
 				
 				if (aliasIndex !== -1){
@@ -347,7 +381,6 @@
 				var key;
 	
 				if (includeData == null) {
-					console.error('Include Item has no Data', type, namespace);
 					return;
 				}
 	
@@ -415,6 +448,7 @@
 	
 	
 	*/
+	// end:source ../src/2.Routing.js
 	// source ../src/3.Events.js
 	var Events = (function(document) {
 		if (document == null) {
@@ -458,8 +492,280 @@
 			}
 		};
 	})(document);
-	 
-	// source ../src/4.IncludeDeferred.js
+	
+	// end:source ../src/3.Events.js
+    // source ../src/6.ScriptStack.js
+    /** @TODO Refactor loadBy* {combine logic} */
+    
+    var ScriptStack = (function() {
+    
+    	var head,
+    		currentResource,
+    		stack = [],
+    		
+    		_cb_complete = [],
+    		_paused;
+    		
+    		
+    	function loadScript(url, callback) {
+    		//console.log('load script', url);
+    		var tag = document.createElement('script');
+    		tag.type = 'text/javascript';
+    		tag.src = url;
+    
+    		if ('onreadystatechange' in tag) {
+    			tag.onreadystatechange = function() {
+    				(this.readyState === 'complete' || this.readyState === 'loaded') && callback();
+    			};
+    		} else {
+    			tag.onload = tag.onerror = callback;
+    		}
+    		
+    		;(head || (head = document.getElementsByTagName('head')[0])).appendChild(tag);
+    	}
+    
+    	function loadByEmbedding() {
+    		if (_paused) {
+    			return;
+    		}
+    		
+    		if (stack.length === 0){
+    			trigger_complete();
+    			return;
+    		}
+    
+    		if (currentResource != null) {
+    			return;
+    		}
+    
+    		var resource = (currentResource = stack[0]);
+    
+    		if (resource.state === 1) {
+    			return;
+    		}
+    
+    		resource.state = 1;
+    
+    		global.include = resource;
+    		global.iparams = resource.route.params;
+    
+    
+    		function resourceLoaded(e) {
+    
+    
+    			if (e && e.type === 'error') {
+    				console.log('Script Loaded Error', resource.url);
+    			}
+    
+    			var i = 0,
+    				length = stack.length;
+    
+    			for (; i < length; i++) {
+    				if (stack[i] === resource) {
+    					stack.splice(i, 1);
+    					break;
+    				}
+    			}
+    
+    			if (i === length) {
+    				console.error('Loaded Resource not found in stack', resource);
+    				return;
+    			}
+    
+    			resource.readystatechanged(3);
+    
+    			currentResource = null;
+    			loadByEmbedding();
+    		}
+    
+    		if (resource.source) {
+    			__eval(resource.source, resource);
+    
+    			resourceLoaded();
+    			return;
+    		}
+    
+    		loadScript(resource.url, resourceLoaded);
+    	}
+    	
+    	function processByEval() {
+    		if (_paused) {
+    			return;
+    		}
+    		
+    		if (stack.length === 0){
+    			trigger_complete();
+    			return;
+    		}
+    		
+    		if (currentResource != null) {
+    			return;
+    		}
+    
+    		var resource = stack[0];
+    
+    		if (resource.state < 2) {
+    			return;
+    		}
+    
+    		currentResource = resource;
+    
+    		resource.state = 1;
+    		global.include = resource;
+    
+    		//console.log('evaling', resource.url, stack.length);
+    		__eval(resource.source, resource);
+    
+    		for (var i = 0, x, length = stack.length; i < length; i++) {
+    			x = stack[i];
+    			if (x === resource) {
+    				stack.splice(i, 1);
+    				break;
+    			}
+    		}
+    
+    		resource.readystatechanged(3);
+    		currentResource = null;
+    		processByEval();
+    
+    	}
+    	
+    	
+    	function trigger_complete() {
+    		var i = -1,
+    			imax = _cb_complete.length;
+    		while (++i < imax) {
+    			_cb_complete[i]();
+    		}
+    		
+    		_cb_complete.length = 0;
+    	}
+    
+    	
+    
+    	return {
+    		load: function(resource, parent, forceEmbed) {
+    
+    			//console.log('LOAD', resource.url, 'parent:',parent ? parent.url : '');
+    
+    			var added = false;
+    			if (parent) {
+    				for (var i = 0, length = stack.length; i < length; i++) {
+    					if (stack[i] === parent) {
+    						stack.splice(i, 0, resource);
+    						added = true;
+    						break;
+    					}
+    				}
+    			}
+    
+    			if (!added) {
+    				stack.push(resource);
+    			}
+    
+    			// was already loaded, with custom loader for example
+    
+    			if (!cfg.eval || forceEmbed) {
+    				loadByEmbedding();
+    				return;
+    			}
+    
+    
+    			if (resource.source) {
+    				resource.state = 2;
+    				processByEval();
+    				return;
+    			}
+    
+    			XHR(resource, function(resource, response) {
+    				if (!response) {
+    					console.error('Not Loaded:', resource.url);
+    				}
+    
+    				resource.source = response;
+    				resource.state = 2;
+    
+    				processByEval();
+    			});
+    		},
+    		/* Move resource in stack close to parent */
+    		moveToParent: function(resource, parent) {
+    			var length = stack.length,
+    				parentIndex = -1,
+    				resourceIndex = -1,
+    				i;
+    
+    			for (i = 0; i < length; i++) {
+    				if (stack[i] === resource) {
+    					resourceIndex = i;
+    					break;
+    				}
+    			}
+    
+    			if (resourceIndex === -1) {
+    				// this should be not the case, but anyway checked.
+    				
+    				// - resource can load resources in done cb, and then it will be
+    				// already not in stack
+    				//-console.warn('Resource is not in stack', resource);
+    				return;
+    			}
+    
+    			for (i= 0; i < length; i++) {
+    				if (stack[i] === parent) {
+    					parentIndex = i;
+    					break;
+    				}
+    			}
+    
+    			if (parentIndex === -1) {
+    				//// - should be already in stack
+    				////if (parent == null) {
+    				////	stack.unshift(resource);
+    				////}
+    				return;
+    			}
+    
+    			if (resourceIndex < parentIndex) {
+    				return;
+    			}
+    
+    			stack.splice(resourceIndex, 1);
+    			stack.splice(parentIndex, 0, resource);
+    
+    
+    		},
+    		
+    		pause: function(){
+    			_paused = true;
+    		},
+    		resume: function(){
+    			_paused = false;
+    			
+    			if (currentResource != null) {
+    				return;
+    			}
+    			
+    			var fn = cfg.eval
+    				? processByEval
+    				: loadByEmbedding;
+    				
+    			fn();
+    		},
+    		complete: function(callback){
+    			if (_paused === false && stack.length === 0) {
+    				callback();
+    				return;
+    			}
+    			
+    			_cb_complete.push(callback);
+    		}
+    	};
+    })();
+    
+    // end:source ../src/6.ScriptStack.js
+    
+	// source ../src/4.IncludeDeferred.js 
 	
 	/**
 	 * STATES:
@@ -617,11 +923,12 @@
 	
 				}
 			}
-			callback(this.response);
+			callback(this.response || emptyResponse);
 		}
 	};
-	 
-	// source ../src/5.Include.js
+	
+	// end:source ../src/4.IncludeDeferred.js 
+	// source ../src/5.Include.js 
 	var Include = (function(IncludeDeferred) {
 	
 		function Include() {
@@ -638,7 +945,7 @@
 				}, data.namespace, null, null, data.id);
 	
 				if (resource.state !== 4) {
-					console.error("Current Resource should be loaded");
+					console.error("<include> Resource should be loaded", data);
 				}
 	
 				/**@TODO - probably state shoulb be changed to 2 at this place */
@@ -717,16 +1024,18 @@
 							namespace = _bin[key][i].namespace,
 							resource = new Resource();
 	
-						resource.state = 4;
-						resource.namespace = namespace;
-						resource.type = key;
-	
+						
 						if (url) {
 							if (url[0] === '/') {
 								url = url.substring(1);
 							}
 							resource.location = path_getDir(url);
 						}
+						
+						resource.state = 4;
+						resource.namespace = namespace;
+						resource.type = key;
+						resource.url = url || id;
 	
 						switch (key) {
 						case 'load':
@@ -734,9 +1043,18 @@
 							var container = document.querySelector('#includejs-' + id.replace(/\W/g, ''));
 							if (container == null) {
 								console.error('"%s" Data was not embedded into html', id);
-								return;
+								break;
 							}
 							resource.exports = container.innerHTML;
+							if (CustomLoader.exists(resource)){
+								
+								resource.state = 3;
+								CustomLoader.load(resource, function(resource, response){
+									
+									resource.exports = response;
+									resource.readystatechanged(4);
+								});
+							}
 							break;
 						}
 						
@@ -766,7 +1084,12 @@
 			},
 	
 			getResource: function(url, type) {
-				var id = (url[0] === '/' ? '' : '/') + url;
+				var id = url;
+				
+				if (url.charCodeAt(0) !== 47) {
+					// /
+					id = '/' + id;
+				}
 	
 				if (type != null){
 					return bin[type][id];
@@ -823,7 +1146,12 @@
 					stub_freeze(this);
 				
 				return this;
-			}
+			},
+			
+			pauseStack: ScriptStack.pause,
+			resumeStack: ScriptStack.resume,
+			
+			allDone: ScriptStack.complete
 		});
 		
 		
@@ -899,222 +1227,8 @@
 		}
 		
 	}(IncludeDeferred));
-	 
-	// source ../src/6.ScriptStack.js
-	/** @TODO Refactor loadBy* {combine logic} */
 	
-	var ScriptStack = (function() {
-	
-		var head, currentResource, stack = [],
-			loadScript = function(url, callback) {
-				//console.log('load script', url);
-				var tag = document.createElement('script');
-				tag.type = 'text/javascript';
-				tag.src = url;
-	
-				if ('onreadystatechange' in tag) {
-					tag.onreadystatechange = function() {
-						(this.readyState === 'complete' || this.readyState === 'loaded') && callback();
-					};
-				} else {
-					tag.onload = tag.onerror = callback;
-				}(head || (head = document.getElementsByTagName('head')[0])).appendChild(tag);
-			},
-	
-			loadByEmbedding = function() {
-				if (stack.length === 0) {
-					return;
-				}
-	
-				if (currentResource != null) {
-					return;
-				}
-	
-				var resource = (currentResource = stack[0]);
-	
-				if (resource.state === 1) {
-					return;
-				}
-	
-				resource.state = 1;
-	
-				global.include = resource;
-				global.iparams = resource.route.params;
-	
-	
-				function resourceLoaded(e) {
-	
-	
-					if (e && e.type === 'error') {
-						console.log('Script Loaded Error', resource.url);
-					}
-	
-					var i = 0,
-						length = stack.length;
-	
-					for (; i < length; i++) {
-						if (stack[i] === resource) {
-							stack.splice(i, 1);
-							break;
-						}
-					}
-	
-					if (i === length) {
-						console.error('Loaded Resource not found in stack', resource);
-						return;
-					}
-	
-					resource.readystatechanged(3);
-	
-					currentResource = null;
-					loadByEmbedding();
-				}
-	
-				if (resource.source) {
-					__eval(resource.source, resource);
-	
-					resourceLoaded();
-					return;
-				}
-	
-				loadScript(resource.url, resourceLoaded);
-			},
-			processByEval = function() {
-				if (stack.length === 0) {
-					return;
-				}
-				if (currentResource != null) {
-					return;
-				}
-	
-				var resource = stack[0];
-	
-				if (resource.state < 2) {
-					return;
-				}
-	
-				currentResource = resource;
-	
-				resource.state = 1;
-				global.include = resource;
-	
-				//console.log('evaling', resource.url, stack.length);
-				__eval(resource.source, resource);
-	
-				for (var i = 0, x, length = stack.length; i < length; i++) {
-					x = stack[i];
-					if (x === resource) {
-						stack.splice(i, 1);
-						break;
-					}
-				}
-	
-				resource.readystatechanged(3);
-				currentResource = null;
-				processByEval();
-	
-			};
-	
-	
-		return {
-			load: function(resource, parent, forceEmbed) {
-	
-				//console.log('LOAD', resource.url, 'parent:',parent ? parent.url : '');
-	
-				var added = false;
-				if (parent) {
-					for (var i = 0, length = stack.length; i < length; i++) {
-						if (stack[i] === parent) {
-							stack.splice(i, 0, resource);
-							added = true;
-							break;
-						}
-					}
-				}
-	
-				if (!added) {
-					stack.push(resource);
-				}
-	
-				// was already loaded, with custom loader for example
-	
-				if (!cfg.eval || forceEmbed) {
-					loadByEmbedding();
-					return;
-				}
-	
-				if (cfg.sync === true) {
-					currentResource = null;
-				}
-	
-	
-				if (resource.source) {
-					resource.state = 2;
-					processByEval();
-					return;
-				}
-	
-				XHR(resource, function(resource, response) {
-					if (!response) {
-						console.error('Not Loaded:', resource.url);
-					}
-	
-					resource.source = response;
-					resource.state = 2;
-	
-					processByEval();
-				});
-			},
-			/* Move resource in stack close to parent */
-			moveToParent: function(resource, parent) {
-				var length = stack.length,
-					parentIndex = -1,
-					resourceIndex = -1,
-					i;
-	
-				for (i = 0; i < length; i++) {
-					if (stack[i] === resource) {
-						resourceIndex = i;
-						break;
-					}
-				}
-	
-				if (resourceIndex === -1) {
-					// this should be not the case, but anyway checked.
-					
-					// - resource can load resources in done cb, and then it will be
-					// already not in stack
-					//-console.warn('Resource is not in stack', resource);
-					return;
-				}
-	
-				for (i= 0; i < length; i++) {
-					if (stack[i] === parent) {
-						parentIndex = i;
-						break;
-					}
-				}
-	
-				if (parentIndex === -1) {
-					//// - should be already in stack
-					////if (parent == null) {
-					////	stack.unshift(resource);
-					////}
-					return;
-				}
-	
-				if (resourceIndex < parentIndex) {
-					return;
-				}
-	
-				stack.splice(resourceIndex, 1);
-				stack.splice(parentIndex, 0, resource);
-	
-	
-			}
-		};
-	})();
-	
+	// end:source ../src/5.Include.js 
 	// source ../src/7.CustomLoader.js
 	var CustomLoader = (function() {
 	
@@ -1132,6 +1246,7 @@
 		};
 		
 		
+		// end:source loader/json.js
 	
 		cfg.loader = {
 			json : JSONParser
@@ -1167,22 +1282,30 @@
 			return (cfg.loader[extension] = new Resource('js', Routes.resolve(namespace, path), namespace));
 		}
 		
-		function doLoad_completeDelegate(callback, resource) {
+		function loader_completeDelegate(callback, resource) {
 			return function(response){
 				callback(resource, response);
 			};
 		}
 		
-		function doLoad(resource, loader, callback) {
+		function loader_process(source, resource, loader, callback) {
+			var delegate = loader_completeDelegate(callback, resource),
+				syncResponse = loader.process(source, resource, delegate);
+			
+			// match also null
+			if (typeof syncResponse !== 'undefined') {
+				callback(resource, syncResponse);
+			}
+		}
+		
+		function tryLoad(resource, loader, callback) {
+			if (typeof resource.exports === 'string') {
+				loader_process(resource.exports, resource, loader, callback);
+				return;
+			}
+			
 			XHR(resource, function(resource, response) {
-				var delegate = doLoad_completeDelegate(callback, resource),
-					syncResponse = loader.process(response, resource, delegate);
-				
-				// match also null
-				if (typeof syncResponse !== 'undefined') {
-					callback(resource, syncResponse);
-				}
-				
+				loader_process(response, resource, loader, callback);
 			});
 		}
 	
@@ -1192,12 +1315,12 @@
 				var loader = createLoader(resource.url);
 				
 				if (loader.process) {
-					doLoad(resource, loader, callback);
+					tryLoad(resource, loader, callback);
 					return;
 				}
 				
 				loader.done(function() {
-					doLoad(resource, loader.exports, callback);
+					tryLoad(resource, loader.exports, callback);
 				});
 			},
 			exists: function(resource) {
@@ -1234,6 +1357,7 @@
 		};
 	}());
 	
+	// end:source ../src/7.CustomLoader.js
 	// source ../src/8.LazyModule.js
 	var LazyModule = {
 		create: function(xpath, code) {
@@ -1267,6 +1391,7 @@
 			});
 		}
 	};
+	// end:source ../src/8.LazyModule.js
 	// source ../src/9.Resource.js
 	var Resource = (function(Include, Routes, ScriptStack, CustomLoader) {
 	
@@ -1445,12 +1570,42 @@
 				});
 	
 				return this;
+			},
+			
+			getNestedOfType: function(type){
+				return resource_getChildren(this.includes, type);
 			}
 		});
 	
 		return Resource;
 	
+		
+		function resource_getChildren(includes, type, out) {
+			if (includes == null) {
+				return null;
+			}
+			
+			if (out == null) {
+				out = [];
+			}
+			
+			for (var i = 0, x, imax = includes.length; i < imax; i++){
+				x = includes[i].resource;
+				
+				if (type === x.type) {
+					out.push(x);
+				}
+				
+				if (x.includes != null) {
+					resource_getChildren(x.includes, type, out);
+				}
+			}
+			
+			return out;
+		}
+		
 	}(Include, Routes, ScriptStack, CustomLoader));
+	// end:source ../src/9.Resource.js
 	
 	// source ../src/10.export.js
 	
@@ -1462,320 +1617,381 @@
 		ScriptStack: ScriptStack,
 		registerLoader: CustomLoader.register
 	};
+	// end:source ../src/10.export.js
 	
-	// source ../src/11.node.js
-	(function() {
-	
+	// source ../src/node/node.js
+	(function(){
+		
 		cfg.server = true;
-	
-		var fs = require('fs'),
-			vm = require('vm'),
-			Module = module.constructor,
+	    
+	    var vm = require('vm'),
+			Module = (global.module || module).constructor,
 			globalPath,
 			includePath;
-	
-	
-		XMLHttpRequest = function() {};
-		XMLHttpRequest.prototype = {
-			constructor: XMLHttpRequest,
-			open: function(method, url) {
-				this.url = url;
-			},
-			send: function() {
-	
-				if (this.url.indexOf('file://') !== -1) {
-					this.url = getFile(this.url);
-				}
-	
-				var that = this;
-				
-				file_read(this.url, function(err, data) {
-					if (err) {
-						console.error('>>', err.code, err.path);
-						data = '';
-					}
-					that.readyState = 4;
-					that.responseText = data;
-					that.onreadystatechange();
-					
-					if (err == null && cfg.autoreload) {
-						file_watch(that.url, bin_removeDelegate(that.url));
-					}
-				});
-			
-			}
-		};
+	    
+		// source utils/file.js
 		
-		function file_read(url, callback) {
-			if (cfg.sync) {
-				try {
-					var content = fs.readFileSync(url, 'utf8');
-					
-					callback(null, content);
-				} catch(error) {
-					console.error('File Read - ', error);
-				}
+		var file_read,
+		    file_watch;
+		    
+		(function(){
+		    var _fs = require('fs'),
+				_watchers = {};
 				
-				return;
-			}
-			fs.readFile(url, 'utf8', callback);
-		}
-		
-		var file_watch = (function(){
-			var _watchers = {};
-			
-			function _unbind(path) {
-				if (_watchers[path] == null)
-					return;
-				
-				_watchers[path].close();
-				_watchers[path] = null;
-			}
-			
-			return function(path, callback){
-				_unbind(path);
-				_watchers[path] = fs.watch(path, callback);
-			};
-		}());
-		
-		
-		function bin_removeDelegate(url) {
-			// use timeout as sys-file-change event is called twice
-			var timeout;
-			return function(){
-				if (timeout) 
-					clearTimeout(timeout);
-				
-				timeout = setTimeout(function(){
-					bin_remove(url);
-				}, 150);
-			};
-		}
-		function bin_remove(mix) {
-			if (mix == null) 
-				return;
-			
-			var type,
-				id,
-				index,
-				res;
-				
-			var isUrl = typeof mix === 'string',
-				url = isUrl ? mix : null;
-			
-			
-			for (type in bin) {
-				
-				for (id in bin[type]) {
-					
-					if (isUrl === false) {
-						if (bin[type][id] === mix) {
-							delete bin[type][id];
-							return;
-						}
-						continue;
-					}
-					
-					index = id.indexOf(url);
-					if (index !== -1 && index === id.length - url.length) {
-						
-						res = bin[type][id];
-				
-						delete bin[type][id];
-						
-						if (type === 'load') {
-							bin_remove(res.parent);
-						}
-						
-						return;
-					}
-				}
-				
-			}
-			console.warn('[bin_remove] Resource is not in cache', url);
-		}
-	
-		__eval = function(source, include, isGlobalCntx) {
-			module.exports = {};
-			
-			global.include = include;
-			global.require = require;
-			global.exports = module.exports;
-			global.__filename = getFile(include.url);
-			global.__dirname = getDir(global.__filename);
-			global.module = module;
-	
-			if (isGlobalCntx !== true) {
-				source = '(function(){ ' + source + ' }())';
-			}
-	
-			try {
-				vm.runInThisContext(source, global.__filename);
-			} catch(e) {
-				console.error('Module Evaluation Error', include.url);
-				console.error(e.stack);
-			}
-			
-			
-			
-			if (include.exports == null) {
-				var exports = module.exports;
-				
-				if (typeof exports !== 'object' || Object.keys(exports).length) {
-					include.exports = module.exports;
-				}
-			}
-	
-		};
-	
-	
-		function getFile(url) {
-			
-			url = url
-				.replace('file://', '')
-				.replace(/\\/g, '/')
-				.replace(/\?[^\n]+$/, '');
-			
-			if (/^\/\w+:\/[^\/]/i.test(url)){
-				// win32 drive
-				return url.substring(1);
-			}
-			
-			return url;
-		}
-	
-		function getDir(url) {
-			return url.substring(0, url.lastIndexOf('/'));
-		}
-		
-		obj_inherit(Resource, {
-			
-			path_getFile: function(){
-				return getFile(this.url);
-			},
-			
-			path_getDir: function(){
-				return getDir(getFile(this.url));
-			},
-		
-			inject: function() {
-				
-				var pckg = arguments.length === 1
-					? arguments[0]
-					: __array_slice.call(arguments);
-				
-				var current = this;
-				
-				current.state = current.state >= 3 ? 3 : 2;
-				
-				var bundle = current.create();
-				
-				bundle.url = this.url;
-				bundle.location = this.location;
-				bundle.load(pckg).done(function(resp){
-		
-					var sources = resp.load,
-						key,
-						resource;
-					
+		    file_read = function(url, callback){
+		        if (cfg.sync) {
 					try {
-						for(var i = 0; i< bundle.includes.length; i++){
-							//@TODO - refactor
-							
-							var resource = bundle.includes[i].resource,
-								source = resource.exports;
-		
-							
-							resource.exports = null;
-							resource.type = 'js';
-							resource.includes = null;
-							resource.state = 3;
-							
-							
-							for (var key in bin.load) {
-								if (bin.load[key] === resource) {
-									delete bin.load[key];
-									break;
-								}
-							}
-							
-		
-							__eval(source, resource, true);
-		
-							
-							resource.readystatechanged(3);
-		
-						}
-					} catch (e) {
-						console.error('Injected Script Error\n', e, key);
-					}
-		
-					
-					bundle.on(4, function(){
+						var content = _fs.readFileSync(url, 'utf8');
 						
-						current
-							.includes
-							.splice
-							.apply(current.includes, [bundle, 1].concat(bundle.includes));
-		
-						current.readystatechanged(3);
-					});
-				});
-		
-				return current;
-			},
-		
-			instance: function(currentUrl) {
-				if (typeof currentUrl === 'string') {
-		
-					var old = module,
-						next = new Module(currentUrl, old);
-		
-					next.filename = getFile(currentUrl);
-					next.paths = Module._nodeModulePaths(getDir(next.filename));
-		
-		
-					if (!globalPath) {
-						var delimiter = process.platform === 'win32' ? ';' : ':',
-							PATH = process.env.PATH || process.env.path;
-		
-						if (!PATH){
-							console.error('PATH not defined in env', process.env);
-						}
-		
-						var parts = PATH.split(delimiter),
-							globalPath = ruqq.arr.first(parts, function(x){
-								return /([\\\/]npm[\\\/])|([\\\/]npm$)/gi.test(x);
-							});
-		
-						if (globalPath){
-							globalPath = globalPath.replace(/\\/g, '/');
-							globalPath += (globalPath[globalPath.length - 1] !== '/' ? '/' : '') + 'node_modules';
-			
-							includePath = io.env.applicationDir.toLocalDir() + 'node_modules';
-						}else {
-							console.error('Could not resolve global NPM Directory from system path');
-							console.log('searched with pattern /npm in', PATH, delimiter);
-						}
+						callback(null, content);
+					} catch(error) {
+						console.error('File Read - ', error);
 					}
-		
-		
-					next.paths.unshift(includePath);
-					next.paths.unshift(globalPath);
-		
-					module = next;
-					require = next.require.bind(next);
+					
+					return;
 				}
+				_fs.readFile(url, 'utf8', callback);
+		    };
+		    
+		    file_watch =  function(path, callback){
+		        _unbind(path);
+		        _watchers[path] = _fs.watch(path, callback);
+		    };
+		    
+		    
+		    function _unbind(path) {
+		        if (_watchers[path] == null)
+		            return;
+		        
+		        _watchers[path].close();
+		        _watchers[path] = null;
+		    }
+		    
+		}());
+			
+			
+		// end:source utils/file.js
+		// source utils/path.js
 		
-				var res = new Resource();
-				res.state = 4;
-				return res;
-			}
+		function path_getFile(url) {
+		    
+		    url = url
+		        .replace('file://', '')
+		        .replace(/\\/g, '/')
+		        .replace(/\?[^\n]+$/, '');
+		    
+		    if (/^\/\w+:\/[^\/]/i.test(url)){
+		        // win32 drive
+		        return url.substring(1);
+		    }
+		    
+		    return url;
+		}
+		
+		function path_getDir(url) {
+		    return url.substring(0, url.lastIndexOf('/'));
+		}
+		// end:source utils/path.js
+		// source utils/bin.js
+		function bin_removeDelegate(url) {
+		    // use timeout as sys-file-change event is called twice
+		    var timeout;
+		    return function() {
+		        if (timeout)
+		            clearTimeout(timeout);
+		
+		        timeout = setTimeout(function() {
+		            var res = bin_load(bin_remove(url));
+		
+		            if (res && typeof cfg.autoreload === 'object') {
+		                cfg.autoreload.fileChanged(url);
+		            }
+		        }, 150);
+		    };
+		}
+		
+		function bin_remove(mix) {
+		    if (mix == null)
+		        return;
+		
+		    var type,
+		        id,
+		        index,
+		        res;
+		
+		    var isUrl = typeof mix === 'string',
+		        url = isUrl ? mix : mix.url;
+		
+		
+		    for (type in bin) {
+		
+		        for (id in bin[type]) {
+		            res = bin[type][id];
+		
+		            if (isUrl === false) {
+		                if (res === mix) {
+		                    delete bin[type][id];
+		                    return res;
+		                }
+		                continue;
+		            }
+		
+		            index = id.indexOf(url);
+		            if (index !== -1 && index === id.length - url.length) {
+		
+		                delete bin[type][id];
+		
+		                if (type === 'load') {
+		                    bin_remove(res.parent);
+		                }
+		
+		                return res;
+		            }
+		        }
+		
+		    }
+		    console.warn('<include:res:remove> Resource is not in cache', url);
+		}
+		
+		function bin_load(resource) {
+		    if (resource == null)
+		        return;
+		
+		    resource.content = null;
+		    resource.exports = null;
+		
+		    var parent = resource.parent;
+		    return parent
+		        .create(
+		            resource.type,
+		            resource.route,
+		            resource.namespace,
+		            resource.xpath
+		        )
+		        .on(4, parent.childLoaded);
+		
+		}
+		
+		function bin_tryReload(path, callback) {
+		    var res = bin_remove(path);
+		
+		    if (res == null) {
+		        callback && callback();
+		        return;
+		    }
+		
+		    return bin_load(res)
+		        .done(callback);
+		}
+		// end:source utils/bin.js
+		
+		
+	    // source xhr.js
+	    
+	    XMLHttpRequest = function() {};
+	    XMLHttpRequest.prototype = {
+	        constructor: XMLHttpRequest,
+	        open: function(method, url) {
+	            this.url = url;
+	        },
+	        send: function() {
+	    
+	            if (this.url.indexOf('file://') !== -1) {
+	                this.url = path_getFile(this.url);
+	            }
+	    
+	            var that = this;
+	            
+	            file_read(this.url, function(err, data) {
+	                if (err) {
+	                    console.error('>>', err.code, err.path);
+	                    data = '';
+	                }
+	                that.readyState = 4;
+	                that.responseText = data;
+	                that.onreadystatechange();
+	                
+	                if (err == null && cfg.autoreload) {
+	                    file_watch(that.url, bin_removeDelegate(that.url));
+	                }
+	            });
+	        
+	        }
+	    };
+	    // end:source xhr.js
+		// source eval.js
+		
+		__eval = function(source, include, isGlobalCntx) {
+		    module.exports = {};
+		    
+		    global.include = include;
+		    global.require = require;
+		    global.exports = module.exports;
+		    global.__filename = path_getFile(include.url);
+		    global.__dirname = path_getDir(global.__filename);
+		    global.module = module;
+		
+		    if (isGlobalCntx !== true) {
+		        source = '(function(){ ' + source + '\n}())';
+		    }
+		
+		    try {
+		        vm.runInThisContext(source, global.__filename);
+		    } catch(e) {
+		        console.error('Module Evaluation Error', include.url);
+		        console.error(e.stack);
+		    }
+		    
+		    
+		    
+		    if (include.exports == null) {
+		        var exports = module.exports;
+		        
+		        if (typeof exports !== 'object' || Object.keys(exports).length) {
+		            include.exports = module.exports;
+		        }
+		    }
+		
+		};
+		
+		// end:source eval.js
+		
+		
+		// source export-resource.js
+		obj_inherit(Resource, {
+		    bin_remove: bin_remove,
+		    bin_tryReload: bin_tryReload,
+		    path_getFile: function() {
+		        return path_getFile(this.url);
+		    },
+		
+		    path_getDir: function() {
+		        return path_getDir(path_getFile(this.url));
+		    },
+		
+		    inject: function() {
+		
+		        var pckg = arguments.length === 1 ? arguments[0] : __array_slice.call(arguments);
+		
+		        var current = this;
+		
+		        current.state = current.state >= 3 ? 3 : 2;
+		
+		        var bundle = current.create();
+		
+		        bundle.url = this.url;
+		        bundle.location = this.location;
+		        bundle.load(pckg)
+		            .done(function(resp) {
+		
+		            var sources = resp.load,
+		                key,
+		                resource;
+		
+		            try {
+		                for (var i = 0; i < bundle.includes.length; i++) {
+		                    //@TODO - refactor
+		
+		                    var resource = bundle.includes[i].resource,
+		                        source = resource.exports;
+		
+		
+		                    resource.exports = null;
+		                    resource.type = 'js';
+		                    resource.includes = null;
+		                    resource.state = 3;
+		
+		
+		                    for (var key in bin.load) {
+		                        if (bin.load[key] === resource) {
+		                            delete bin.load[key];
+		                            break;
+		                        }
+		                    }
+		
+		
+		                    __eval(source, resource, true);
+		
+		
+		                    resource.readystatechanged(3);
+		
+		                }
+		            } catch (e) {
+		                console.error('Injected Script Error\n', e, key);
+		            }
+		
+		
+		            bundle.on(4, function() {
+		
+		                current
+		                    .includes
+		                    .splice
+		                    .apply(current.includes, [bundle, 1].concat(bundle.includes));
+		
+		                current.readystatechanged(3);
+		            });
+		        });
+		
+		        return current;
+		    },
+		
+		    instance: function(currentUrl) {
+		        if (typeof currentUrl === 'string') {
+		
+		            var old = module,
+		                next = new Module(currentUrl, old);
+		
+		            next.filename = path_getFile(currentUrl);
+		            next.paths = Module._nodeModulePaths(path_getDir(next.filename));
+		
+		
+		            if (!globalPath) {
+		                var delimiter = process.platform === 'win32' ? ';' : ':',
+		                    PATH = process.env.PATH || process.env.path;
+		
+		                if (!PATH) {
+		                    console.error('PATH not defined in env', process.env);
+		                }
+		
+		                var parts = PATH.split(delimiter),
+		                    globalPath = ruqq.arr.first(parts, function(x) {
+		                        return /([\\\/]npm[\\\/])|([\\\/]npm$)/gi.test(x);
+		                    });
+		
+		                if (globalPath) {
+		                    globalPath = globalPath.replace(/\\/g, '/');
+		                    globalPath += (globalPath[globalPath.length - 1] !== '/' ? '/' : '') + 'node_modules';
+		
+		                    includePath = io.env.applicationDir.toLocalDir() + 'node_modules';
+		                } else {
+		                    console.error('Could not resolve global NPM Directory from system path');
+		                    console.log('searched with pattern /npm in', PATH, delimiter);
+		                }
+		            }
+		
+		
+		            next.paths.unshift(includePath);
+		            next.paths.unshift(globalPath);
+		
+		            module = next;
+		            require = next.require.bind(next);
+		        }
+		
+		        var res = new Resource();
+		        res.state = 4;
+		        return res;
+		    }
 		});
-	
-	
-	
+		// end:source export-resource.js
+		// source export-include.js
+		obj_inherit(Include, {
+		    bin_tryReload: bin_tryReload,
+		    bin_remove: bin_remove
+		});
+		// end:source export-include.js
+	    
 	}());
+	// end:source ../src/node/node.js
 
 }));
 
@@ -1800,3 +2016,4 @@ function __eval(source, include) {
 	*/
 	
 }
+// end:source ../src/global-vars.js

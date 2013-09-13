@@ -72,7 +72,10 @@
     function path_resolveCurrent() {
         if (null == document) return "undefined" === typeof module ? "" : path_win32Normalize(module.parent.filename);
         var scripts = document.getElementsByTagName("script"), last = scripts[scripts.length - 1], url = last && last.getAttribute("src") || "";
-        return "/" === url[0] ? url : "/" + url;
+        if ("/" === url[0]) return url;
+        var location = window.location.pathname.replace(/\/[^\/]+\.\w+$/, "");
+        if ("/" !== location[location.length - 1]) location += "/";
+        return location + url;
     }
     function path_win32Normalize(path) {
         path = path.replace(/\\/g, "/");
@@ -866,14 +869,29 @@ include.register({
         id: "/public/compo/spinner/spinner.less",
         url: "/public/compo/spinner/spinner.less"
     }, {
+        id: "/public/compo/pageActivity/pageActivity.less",
+        url: "/public/compo/pageActivity/pageActivity.less"
+    }, {
         id: "/public/compo/downloader/downloader.css",
         url: "/public/compo/downloader/downloader.css"
     }, {
-        id: "/.reference/libjs/compos/prism/lib/prism.lib.css",
-        url: "/.reference/libjs/compos/prism/lib/prism.lib.css"
+        id: "/public/compo/sourceViewer/sourceViewer.less",
+        url: "/public/compo/sourceViewer/sourceViewer.less"
     }, {
-        id: "/.reference/libjs/compos/tabs/lib/tabs.css",
-        url: "/.reference/libjs/compos/tabs/lib/tabs.css"
+        id: "/public/compo/sourceViewer/executor/executor.less",
+        url: "/public/compo/sourceViewer/executor/executor.less"
+    }, {
+        id: "/.reference/atma/compos/treeView/lib/treeView.less",
+        url: "/.reference/atma/compos/treeView/lib/treeView.less"
+    }, {
+        id: "/public/compo/overlay/overlay.less",
+        url: "/public/compo/overlay/overlay.less"
+    }, {
+        id: "/.reference/atma/compos/prism/lib/prism.lib.css",
+        url: "/.reference/atma/compos/prism/lib/prism.lib.css"
+    }, {
+        id: "/.reference/atma/compos/tabs/lib/tabs.css",
+        url: "/.reference/atma/compos/tabs/lib/tabs.css"
     }, {
         id: "/public/compo/navigation/navigation.less",
         url: "/public/compo/navigation/navigation.less"
@@ -888,6 +906,18 @@ include.register({
         id: "/public/compo/downloader/downloader.mask",
         url: "/public/compo/downloader/downloader.mask"
     }, {
+        id: "/public/compo/sourceViewer/sourceViewer.mask",
+        url: "/public/compo/sourceViewer/sourceViewer.mask"
+    }, {
+        id: "/public/compo/sourceViewer/executor/executor.mask",
+        url: "/public/compo/sourceViewer/executor/executor.mask"
+    }, {
+        id: "/.reference/atma/compos/treeView/lib/treeView.mask",
+        url: "/.reference/atma/compos/treeView/lib/treeView.mask"
+    }, {
+        id: "/public/compo/overlay/overlay.mask",
+        url: "/public/compo/overlay/overlay.mask"
+    }, {
         id: "/public/compo/navigation/navigation.mask",
         url: "/public/compo/navigation/navigation.mask"
     }, {
@@ -901,34 +931,34 @@ include.register({
         url: "/public/compo/user/userInfo.mask"
     } ],
     js: [ {
-        id: "/.reference/libjs/include/lib/include.js",
-        url: "/.reference/libjs/include/lib/include.js"
+        id: "/.reference/atma/include/lib/include.js",
+        url: "/.reference/atma/include/lib/include.js"
     }, {
         url: ""
     }, {
-        id: "/.reference/libjs/ruqq/lib/dom/jquery.js",
-        url: "/.reference/libjs/ruqq/lib/dom/jquery.js"
+        id: "/.reference/atma/ruqq/lib/dom/jquery.js",
+        url: "/.reference/atma/ruqq/lib/dom/jquery.js"
     }, {
-        id: "/.reference/libjs/class/lib/class.js",
-        url: "/.reference/libjs/class/lib/class.js"
+        id: "/.reference/atma/class/lib/class.js",
+        url: "/.reference/atma/class/lib/class.js"
     }, {
-        id: "/.reference/libjs/mask/lib/mask.js",
-        url: "/.reference/libjs/mask/lib/mask.js"
+        id: "/.reference/atma/mask/lib/mask.js",
+        url: "/.reference/atma/mask/lib/mask.js"
     }, {
-        id: "/.reference/libjs/ruqq/lib/ruqq.base.js",
-        url: "/.reference/libjs/ruqq/lib/ruqq.base.js"
+        id: "/.reference/atma/ruqq/lib/ruqq.base.js",
+        url: "/.reference/atma/ruqq/lib/ruqq.base.js"
     }, {
-        id: "/.reference/libjs/ruqq/lib/utils.js",
-        url: "/.reference/libjs/ruqq/lib/utils.js"
+        id: "/.reference/atma/ruqq/lib/utils.js",
+        url: "/.reference/atma/ruqq/lib/utils.js"
     }, {
-        id: "/.reference/libjs/mask.node/lib/mask.bootstrap.js",
-        url: "/.reference/libjs/mask.node/lib/mask.bootstrap.js"
+        id: "/.reference/atma/mask.node/lib/mask.bootstrap.js",
+        url: "/.reference/atma/mask.node/lib/mask.bootstrap.js"
     }, {
-        id: "/.reference/libjs/ruta/lib/ruta.js",
-        url: "/.reference/libjs/ruta/lib/ruta.js"
+        id: "/.reference/atma/ruta/lib/ruta.js",
+        url: "/.reference/atma/ruta/lib/ruta.js"
     }, {
-        id: "/.reference/libjs/mask.animation/lib/mask.animation.js",
-        url: "/.reference/libjs/mask.animation/lib/mask.animation.js"
+        id: "/.reference/atma/mask.animation/lib/mask.animation.js",
+        url: "/.reference/atma/mask.animation/lib/mask.animation.js"
     }, {
         id: "/public/compo/spinner/spinner.js",
         url: "/public/compo/spinner/spinner.js"
@@ -942,32 +972,45 @@ include.register({
         id: "/public/compo/downloader/downloader.js",
         url: "/public/compo/downloader/downloader.js"
     }, {
-        id: "/.reference/libjs/ruqq/lib/arr.js",
-        url: "/.reference/libjs/ruqq/lib/arr.js"
+        id: "/public/compo/sourceViewer/executor/executor.js",
+        url: "/public/compo/sourceViewer/executor/executor.js"
     }, {
-        id: "/.reference/libjs/compos/pre-indent/lib/pre-indent.js",
-        url: "/.reference/libjs/compos/pre-indent/lib/pre-indent.js"
+        id: "/.reference/atma/compos/treeView/lib/treeView.js",
+        url: "/.reference/atma/compos/treeView/lib/treeView.js",
+        namespace: "atma.compos.treeView"
     }, {
-        id: "/.reference/libjs/compos/prism/lib/prism.lib.js",
-        url: "/.reference/libjs/compos/prism/lib/prism.lib.js"
+        id: "/public/compo/sourceViewer/sourceViewer.js",
+        url: "/public/compo/sourceViewer/sourceViewer.js"
     }, {
-        id: "/.reference/libjs/compos/prism/lib/prism.js",
-        url: "/.reference/libjs/compos/prism/lib/prism.js"
+        id: "/public/compo/overlay/overlay.js",
+        url: "/public/compo/overlay/overlay.js"
     }, {
-        id: "/.reference/libjs/compos/layout/lib/layout.js",
-        url: "/.reference/libjs/compos/layout/lib/layout.js"
+        id: "/.reference/atma/ruqq/lib/arr.js",
+        url: "/.reference/atma/ruqq/lib/arr.js"
     }, {
-        id: "/.reference/libjs/compos/tabs/lib/tabs.js",
-        url: "/.reference/libjs/compos/tabs/lib/tabs.js"
+        id: "/.reference/atma/compos/pre-indent/lib/pre-indent.js",
+        url: "/.reference/atma/compos/pre-indent/lib/pre-indent.js"
     }, {
-        id: "/.reference/libjs/compos/radio/lib/radio.js",
-        url: "/.reference/libjs/compos/radio/lib/radio.js"
+        id: "/.reference/atma/compos/prism/lib/prism.lib.js",
+        url: "/.reference/atma/compos/prism/lib/prism.lib.js"
     }, {
-        id: "/.reference/libjs/compos/markdown/lib/marked.js",
-        url: "/.reference/libjs/compos/markdown/lib/marked.js"
+        id: "/.reference/atma/compos/prism/lib/prism.js",
+        url: "/.reference/atma/compos/prism/lib/prism.js"
     }, {
-        id: "/.reference/libjs/compos/markdown/lib/markdown.js",
-        url: "/.reference/libjs/compos/markdown/lib/markdown.js"
+        id: "/.reference/atma/compos/layout/lib/layout.js",
+        url: "/.reference/atma/compos/layout/lib/layout.js"
+    }, {
+        id: "/.reference/atma/compos/tabs/lib/tabs.js",
+        url: "/.reference/atma/compos/tabs/lib/tabs.js"
+    }, {
+        id: "/.reference/atma/compos/radio/lib/radio.js",
+        url: "/.reference/atma/compos/radio/lib/radio.js"
+    }, {
+        id: "/.reference/atma/compos/markdown/lib/marked.js",
+        url: "/.reference/atma/compos/markdown/lib/marked.js"
+    }, {
+        id: "/.reference/atma/compos/markdown/lib/markdown.js",
+        url: "/.reference/atma/compos/markdown/lib/markdown.js"
     }, {
         id: "/public/compo/scroller/scroller.js",
         url: "/public/compo/scroller/scroller.js"
@@ -989,8 +1032,8 @@ include.register({
 include.routes({
     "public": "/public/script/{0}.js",
     "public.compo": "/public/compo/{0}/{1}.js",
-    atma: "/.reference/libjs/{0}/lib/{1}.js",
-    "atma.compos": "/.reference/libjs/compos/{0}/lib/{1}.js",
+    atma: "/.reference/atma/{0}/lib/{1}.js",
+    "atma.compos": "/.reference/atma/compos/{0}/lib/{1}.js",
     view: "/public/view/{0}/{1}.js"
 });
 
@@ -1001,8 +1044,8 @@ include.cfg({
 }).routes({
     "public": "/public/script/{0}.js",
     "public.compo": "/public/compo/{0}/{1}.js",
-    atma: "/.reference/libjs/{0}/lib/{1}.js",
-    "atma.compos": "/.reference/libjs/compos/{0}/lib/{1}.js",
+    atma: "/.reference/atma/{0}/lib/{1}.js",
+    "atma.compos": "/.reference/atma/compos/{0}/lib/{1}.js",
     view: "/public/view/{0}/{1}.js"
 });
 
@@ -4204,9 +4247,9 @@ include.cfg({
 })(window);
 
 include.setCurrent({
-    id: "/.reference/libjs/class/lib/class.js",
+    id: "/.reference/atma/class/lib/class.js",
     namespace: "",
-    url: "/.reference/libjs/class/lib/class.js"
+    url: "/.reference/atma/class/lib/class.js"
 });
 
 (function(root, factory) {
@@ -4904,6 +4947,7 @@ include.setCurrent({
                 },
                 each: function(fn, cntx) {
                     for (var i = 0, imax = this.length; i < imax; i++) fn.call(cntx || this, this[i], i);
+                    return this;
                 },
                 where: function(mix) {
                     var collection = new this.constructor();
@@ -4928,15 +4972,32 @@ include.setCurrent({
                 },
                 first: function(mix) {
                     if (null == mix) return this[0];
-                    var imax = this.length, i = 0;
-                    while (--imax !== -1) if (check(this[i++], mix)) return this[i - 1];
-                    return null;
+                    var i = this.indexOf(mix);
+                    return i !== -1 ? this[i] : null;
                 },
                 last: function(mix) {
-                    if (null == mix) return this[0];
+                    if (null == mix) return this[this.length - 1];
+                    var i = this.lastIndexOf(mix);
+                    return i !== -1 ? this[i] : null;
+                },
+                indexOf: function(mix, index) {
+                    if (null == mix) return -1;
+                    if (null != index) {
+                        if (index < 0) index = 0;
+                        if (index >= this.length) return -1;
+                    } else index = 0;
                     var imax = this.length;
-                    while (--imax !== -1) if (check(this[imax], mix)) return this[imax];
-                    return null;
+                    for (;index < imax; index++) if (check(this[index], mix)) return index;
+                    return -1;
+                },
+                lastIndexOf: function(mix, index) {
+                    if (null == mix) return -1;
+                    if (null != index) {
+                        if (index >= this.length) index = this.length - 1;
+                        if (index < 0) return -1;
+                    } else index = this.length - 1;
+                    for (;index > -1; index--) if (check(this[index], mix)) return index;
+                    return -1;
                 }
             };
             return ArrayProto;
@@ -5206,12 +5267,12 @@ include.setCurrent({
     exports.Class = Class;
 });
 
-include.getResource("/.reference/libjs/class/lib/class.js", "js").readystatechanged(3);
+include.getResource("/.reference/atma/class/lib/class.js", "js").readystatechanged(3);
 
 include.setCurrent({
-    id: "/.reference/libjs/mask/lib/mask.js",
+    id: "/.reference/atma/mask/lib/mask.js",
     namespace: "",
-    url: "/.reference/libjs/mask/lib/mask.js"
+    url: "/.reference/atma/mask/lib/mask.js"
 });
 
 (function(root, factory) {
@@ -7126,6 +7187,7 @@ include.setCurrent({
             return (node = node[matcher.nextKey]) && find_findSingle(node, matcher);
         }
         function dom_addEventListener(element, event, listener) {
+            if (null != EventDecorator) event = EventDecorator(event);
             if (null != domLib) {
                 domLib(element).on(event, listener);
                 return;
@@ -7232,7 +7294,6 @@ include.setCurrent({
                     signal = handler.substring(++dot);
                     var Handler = _handler(pipe, signal);
                     !event && console.error("Signal: event type is not set", attrValue);
-                    if (null != EventDecorator) event = EventDecorator(event);
                     dom_addEventListener(element, event, Handler);
                 }
             });
@@ -7525,6 +7586,9 @@ include.setCurrent({
                         owner = owner.parent;
                     }
                     return include.instance();
+                },
+                Dom: {
+                    addEventListener: dom_addEventListener
                 }
             });
             (function() {
@@ -7620,8 +7684,8 @@ include.setCurrent({
                         cntx = arguments[0][1];
                         container = arguments[0][2];
                     }
-                    if ("function" === typeof this.onRenderStart) this.onRenderStart(model, cntx, container);
                     if (null == this.nodes) compo_ensureTemplate(this);
+                    if ("function" === typeof this.onRenderStart) this.onRenderStart(model, cntx, container);
                 },
                 renderEnd: function(elements, model, cntx, container) {
                     if (1 === arguments.length && false === elements instanceof Array) {
@@ -7731,7 +7795,6 @@ include.setCurrent({
                     var event = x.substring(0, x.indexOf(":")), handler = x.substring(x.indexOf(":") + 1).trim(), Handler = _createListener(controller, handler);
                     !event && console.error("Signal: event type is not set", attrValue);
                     if (Handler) {
-                        if (null != EventDecorator) event = EventDecorator(event);
                         signals += "," + handler + ",";
                         dom_addEventListener(element, event, Handler);
                     }
@@ -8172,7 +8235,7 @@ include.setCurrent({
                 return mask.stringify(node);
             },
             text: function(mix, cntx, controller) {
-                if ("string" === typeof mix) {
+                if ("string" === typeof mix && 1 === arguments.length) {
                     var node = [ new Dom.TextNode(mix) ];
                     for (var i = 0, x, imax = this.length; i < imax; i++) {
                         x = this[i];
@@ -8341,7 +8404,11 @@ include.setCurrent({
                     $wrapper = length > 0 ? $mask.clone() : $mask;
                     jmask_deepest($wrapper[0]).nodes = [ this[i] ];
                     result[i] = $wrapper[0];
-                    if (null != this[i].parent) this[i].parent.nodes = result[i];
+                    var parentNodes = this[i].parent && this[i].parent.nodes;
+                    if (null != parentNodes) for (var j = 0, jmax = parentNodes.length; j < jmax; j++) if (parentNodes[j] === this[i]) {
+                        parentNodes.splice(j, 1, result[i]);
+                        break;
+                    }
                 }
                 return jMask(result);
             },
@@ -8436,7 +8503,7 @@ include.setCurrent({
         return jMask;
     }(Mask);
     (function(mask, Compo) {
-        var domLib = global.jQuery || global.Zepto || global.$, __Compo = "undefined" !== typeof Compo ? Compo : mask.Compo || global.Compo, __array_slice = Array.prototype.slice;
+        var domLib = global.jQuery || global.Zepto || global.$, __Compo = "undefined" !== typeof Compo ? Compo : mask.Compo || global.Compo, __dom_addEventListener = __Compo.Dom.addEventListener, __mask_registerHandler = mask.registerHandler, __mask_registerAttrHandler = mask.registerAttrHandler, __mask_registerUtil = mask.registerUtil, __array_slice = Array.prototype.slice;
         function obj_ensure(obj, chain) {
             for (var i = 0, length = chain.length - 1; i < length; i++) {
                 var key = chain[i];
@@ -8463,50 +8530,92 @@ include.setCurrent({
             obj[chain[i]] = value;
         }
         function obj_addObserver(obj, property, callback) {
-            var parts = property.split("."), imax = parts.length, i = 0, at = 0, x = obj;
+            var parts = property.split("."), imax = parts.length, i = 0, x = obj;
             while (imax--) {
                 x = x[parts[i++]];
                 if (null == x) break;
                 if (null != x.__observers) {
-                    at = i;
-                    obj = x;
+                    var prop = parts.slice(i).join(".");
+                    if (x.__observers[prop]) {
+                        x.__observers[prop].push(callback);
+                        listener_push(obj, property, callback);
+                        return;
+                    }
                 }
             }
-            if (at > 0) property = parts.slice(at).join(".");
-            if (null == obj.__observers) Object.defineProperty(obj, "__observers", {
-                value: {
-                    __dirty: null
-                },
-                enumerable: false
-            });
-            var observers = obj.__observers;
-            if (null != observers[property]) {
-                observers[property].push(callback);
-                var value = obj_getProperty(obj, property);
-                if (arr_isArray(value)) arr_addObserver(value, callback);
-                return;
-            }
-            var callbacks = observers[property] = [ callback ], chain = property.split("."), length = chain.length, parent = length > 1 ? obj_ensure(obj, chain) : obj, key = chain[length - 1], currentValue = parent[key];
+            var listeners = listener_push(obj, property, callback);
+            if (1 === listeners.length) obj_attachProxy(obj, property, listeners, parts, true);
+            var value = obj_getProperty(obj, property);
+            if (arr_isArray(value)) arr_addObserver(value, callback);
+        }
+        function obj_attachProxy(obj, property, listeners, chain) {
+            var length = chain.length, parent = length > 1 ? obj_ensure(obj, chain) : obj, key = chain[length - 1], currentValue = parent[key];
+            if (length > 1) obj_defineCrumbs(obj, chain);
             if ("length" === key && arr_isArray(parent)) {
                 arr_addObserver(parent, callback);
-                return;
+                return currentValue;
             }
             Object.defineProperty(parent, key, {
                 get: function() {
                     return currentValue;
                 },
                 set: function(x) {
+                    var i = 0, imax = listeners.length;
                     if (x === currentValue) return;
                     currentValue = x;
-                    if (arr_isArray(x)) arr_addObserver(x, callback);
-                    if (null != observers.__dirties) {
-                        observers.__dirties[property] = 1;
+                    if (arr_isArray(x)) for (i = 0; i < imax; i++) arr_addObserver(x, listeners[i]);
+                    if (null != listeners.__dirties) {
+                        listeners.__dirties[property] = 1;
                         return;
                     }
-                    for (var i = 0, imax = callbacks.length; i < imax; i++) callbacks[i](x);
+                    for (i = 0; i < imax; i++) listeners[i](x);
+                },
+                configurable: true
+            });
+            return currentValue;
+        }
+        function obj_defineCrumbs(obj, chain) {
+            var rebinder = obj_crumbRebindDelegate(obj), path = "", key;
+            for (var i = 0, imax = chain.length - 1; i < imax; i++) {
+                key = chain[i];
+                path += key + ".";
+                obj_defineCrumb(path, obj, key, rebinder);
+                obj = obj[key];
+            }
+        }
+        function obj_defineCrumb(path, obj, key, rebinder) {
+            var value = obj[key], old;
+            Object.defineProperty(obj, key, {
+                get: function() {
+                    return value;
+                },
+                set: function(x) {
+                    if (x === value) return;
+                    old = value;
+                    value = x;
+                    rebinder(path, old);
                 }
             });
-            if (arr_isArray(currentValue)) arr_addObserver(currentValue, callback);
+        }
+        function obj_crumbRebindDelegate(obj) {
+            return function(path, oldValue) {
+                var observers = obj.__observers;
+                if (null == observers) return;
+                for (var property in observers) {
+                    if (0 !== property.indexOf(path)) continue;
+                    var listeners = observers[property].slice(0), imax = listeners.length, i = 0;
+                    if (0 === imax) continue;
+                    var val = obj_getProperty(obj, property), cb, oldProp;
+                    for (i = 0; i < imax; i++) {
+                        cb = listeners[i];
+                        obj_removeObserver(obj, property, cb);
+                        oldProp = property.substring(path.length);
+                        obj_removeObserver(oldValue, oldProp, cb);
+                    }
+                    for (i = 0; i < imax; i++) listeners[i](val);
+                    for (i = 0; i < imax; i++) obj_addObserver(obj, property, listeners[i]);
+                }
+            };
         }
         function obj_lockObservers(obj) {
             if (arr_isArray(obj)) {
@@ -8536,14 +8645,14 @@ include.setCurrent({
                 x = x[parts[i++]];
                 if (null == x) break;
                 if (null != x.__observers) {
-                    obj_removeObserver(obj, parts.slice(i).join("."), callback);
+                    obj_removeObserver(x, parts.slice(i).join("."), callback);
                     break;
                 }
             }
             if (null == obj.__observers || null == obj.__observers[property]) return;
             var currentValue = obj_getProperty(obj, property);
             if (2 === arguments.length) {
-                delete obj.__observers[property];
+                obj.__observers[property].length = 0;
                 return;
             }
             arr_remove(obj.__observers[property], callback);
@@ -8560,6 +8669,17 @@ include.setCurrent({
             var parts = path.split("."), imax = parts.length, i = 0;
             while (imax--) if (null == (obj = obj[parts[i++]])) return false;
             return true;
+        }
+        function listener_push(obj, property, callback) {
+            if (null == obj.__observers) Object.defineProperty(obj, "__observers", {
+                value: {
+                    __dirty: null
+                },
+                enumerable: false
+            });
+            var obs = obj.__observers;
+            if (null != obs[property]) obs[property].push(callback); else obs[property] = [ callback ];
+            return obs[property];
         }
         function arr_isArray(x) {
             return null != x && "object" === typeof x && null != x.length && "function" === typeof x.splice;
@@ -8588,10 +8708,12 @@ include.setCurrent({
             });
             var observers = arr.__observers.__array;
             if (null == observers) observers = arr.__observers.__array = [];
-            var i = 0, fns = [ "push", "unshift", "splice", "pop", "shift", "reverse", "sort" ], length = fns.length, method;
-            for (;i < length; i++) {
-                method = fns[i];
-                arr[method] = _array_createWrapper(arr, arr[method], method);
+            if (0 === observers.length) {
+                var i = 0, fns = [ "push", "unshift", "splice", "pop", "shift", "reverse", "sort" ], length = fns.length, method;
+                for (;i < length; i++) {
+                    method = fns[i];
+                    arr[method] = _array_createWrapper(arr, arr[method], method);
+                }
             }
             observers[observers.length++] = callback;
         }
@@ -8650,17 +8772,6 @@ include.setCurrent({
         }
         function dom_insertBefore(element, anchor) {
             return anchor.parentNode.insertBefore(element, anchor);
-        }
-        function dom_addEventListener(element, event, listener) {
-            if ("function" === typeof domLib) {
-                domLib(element).on(event, listener);
-                return;
-            }
-            if (null != element.addEventListener) {
-                element.addEventListener(event, listener, false);
-                return;
-            }
-            if (element.attachEvent) element.attachEvent("on" + event, listener);
         }
         function compo_fragmentInsert(compo, index, fragment) {
             if (null == compo.components) return dom_insertAfter(fragment, compo.placeholder);
@@ -9011,7 +9122,7 @@ include.setCurrent({
                         var element = provider.element;
                         for (var i = 0, x, imax = element.options.length; i < imax; i++) {
                             x = element.options[i];
-                            if (x.getAttribute("name") === value) {
+                            if (x.getAttribute("name") == value) {
                                 element.selectedIndex = i;
                                 return;
                             }
@@ -9027,7 +9138,7 @@ include.setCurrent({
                     var attr = provider.node.attr;
                     if (!attr["change-slot"] && !attr["change-pipe-event"]) {
                         var element = provider.element, eventType = attr["change-event"] || attr.changeEvent || "change", onDomChange = provider.domChanged.bind(provider);
-                        dom_addEventListener(element, eventType, onDomChange);
+                        __dom_addEventListener(element, eventType, onDomChange);
                     }
                 }
                 provider.objectChanged();
@@ -9045,7 +9156,7 @@ include.setCurrent({
             return BindingProvider;
         }();
         function VisibleHandler() {}
-        mask.registerHandler(":visible", VisibleHandler);
+        __mask_registerHandler(":visible", VisibleHandler);
         VisibleHandler.prototype = {
             constructor: VisibleHandler,
             refresh: function(model, container) {
@@ -9058,7 +9169,7 @@ include.setCurrent({
         };
         (function() {
             function Bind() {}
-            mask.registerHandler(":bind", Bind);
+            __mask_registerHandler(":bind", Bind);
             Bind.prototype = {
                 constructor: Bind,
                 renderEnd: function(els, model, cntx, container) {
@@ -9071,7 +9182,7 @@ include.setCurrent({
             };
         })();
         function DualbindHandler() {}
-        mask.registerHandler(":dualbind", DualbindHandler);
+        __mask_registerHandler(":dualbind", DualbindHandler);
         DualbindHandler.prototype = {
             constructor: DualbindHandler,
             renderEnd: function(elements, model, cntx, container) {
@@ -9080,8 +9191,17 @@ include.setCurrent({
                     x = this.components[i];
                     if (":validate" === x.compoName) (this.validations || (this.validations = [])).push(x);
                 }
-                if ("object" === typeof model.Validate && !this.attr["no-validation"]) {
-                    var validator = model.Validate[this.provider.value];
+                if (!this.attr["no-validation"] && !this.validations) {
+                    var Validate = model.Validate, prop = this.provider.value;
+                    if (null == Validate && prop.indexOf(".") !== -1) {
+                        var parts = prop.split("."), i = 0, imax = parts.length, obj = model[parts[0]];
+                        while (null == Validate && ++i < imax && obj) {
+                            Validate = obj.Validate;
+                            obj = obj[parts[i]];
+                        }
+                        prop = parts.slice(i).join(".");
+                    }
+                    var validator = Validate && Validate[prop];
                     if ("function" === typeof validator) {
                         validator = mask.getHandler(":validate").createCustom(container, validator);
                         (this.validations || (this.validations = [])).push(validator);
@@ -9104,9 +9224,10 @@ include.setCurrent({
                 Validators[type] = validator;
             };
             function Validate() {}
-            mask.registerHandler(":validate", Validate);
+            __mask_registerHandler(":validate", Validate);
             Validate.prototype = {
                 constructor: Validate,
+                attr: {},
                 renderStart: function(model, cntx, container) {
                     this.element = container;
                     if (this.attr.value) {
@@ -9163,7 +9284,7 @@ include.setCurrent({
             };
             Validate.createCustom = function(element, validator) {
                 var validate = new Validate();
-                validate.renderStart(null, element);
+                validate.element = element;
                 validate.validators = [ new Validator(validator) ];
                 return validate;
             };
@@ -9188,7 +9309,7 @@ include.setCurrent({
             function makeValid(element) {
                 return domLib(element).next("." + class_INVALID).hide();
             }
-            mask.registerHandler(":validate:message", Compo({
+            __mask_registerHandler(":validate:message", Compo({
                 template: "div." + class_INVALID + ' { span > "~[bind:message]" button > "~[cancel]" }',
                 onRenderStart: function(model) {
                     if ("string" === typeof model) model = {
@@ -9244,7 +9365,7 @@ include.setCurrent({
             };
         })();
         function ValidateGroup() {}
-        mask.registerHandler(":validate:group", ValidateGroup);
+        __mask_registerHandler(":validate:group", ValidateGroup);
         ValidateGroup.prototype = {
             constructor: ValidateGroup,
             validate: function() {
@@ -9273,7 +9394,7 @@ include.setCurrent({
         (function() {
             function attr_strReplace(attrValue, currentValue, newValue) {
                 if (!attrValue) return newValue;
-                if (!currentValue) return attrValue + " " + newValue;
+                if (null == currentValue || "" === currentValue) return attrValue + " " + newValue;
                 return attrValue.replace(currentValue, newValue);
             }
             function create_refresher(type, expr, element, currentValue, attrName) {
@@ -9307,7 +9428,7 @@ include.setCurrent({
                     expression_unbind(expr, model, controller, binder);
                 });
             }
-            mask.registerUtil("bind", {
+            __mask_registerUtil("bind", {
                 current: null,
                 element: null,
                 nodeRenderStart: function(expr, model, ctx, element, controller) {
@@ -9328,7 +9449,7 @@ include.setCurrent({
                 }
             });
         })();
-        mask.registerAttrHandler("xx-visible", function(node, attrValue, model, cntx, element, controller) {
+        __mask_registerAttrHandler("xx-visible", function(node, attrValue, model, cntx, element, controller) {
             var binder = expression_createBinder(attrValue, model, cntx, controller, function(value) {
                 element.style.display = value ? "" : "none";
             });
@@ -9337,6 +9458,13 @@ include.setCurrent({
                 expression_unbind(attrValue, model, controller, binder);
             });
             if (!expression_eval(attrValue, model, cntx, controller)) element.style.display = "none";
+        });
+        __mask_registerAttrHandler("x-toggle", "client", function(node, attrValue, model, ctx, element, controller) {
+            var event = attrValue.substring(0, attrValue.indexOf(":")), expression = attrValue.substring(event.length + 1), ref = expression_varRefs(expression);
+            __dom_addEventListener(element, event, function() {
+                var value = expression_eval(expression, model, ctx, controller);
+                obj_setProperty(model, ref, value);
+            });
         });
         (function(mask) {
             function Sys() {
@@ -9677,7 +9805,7 @@ include.setCurrent({
     return Mask;
 });
 
-include.getResource("/.reference/libjs/mask/lib/mask.js", "js").readystatechanged(3);
+include.getResource("/.reference/atma/mask/lib/mask.js", "js").readystatechanged(3);
 
 (function() {
     "use strict";
@@ -10355,9 +10483,9 @@ include.getResource("/.reference/libjs/mask/lib/mask.js", "js").readystatechange
 });
 
 include.setCurrent({
-    id: "/.reference/libjs/mask.animation/lib/mask.animation.js",
+    id: "/.reference/atma/mask.animation/lib/mask.animation.js",
     namespace: "",
-    url: "/.reference/libjs/mask.animation/lib/mask.animation.js"
+    url: "/.reference/atma/mask.animation/lib/mask.animation.js"
 });
 
 (function(root, factory) {
@@ -10848,7 +10976,7 @@ include.setCurrent({
     };
 });
 
-include.getResource("/.reference/libjs/mask.animation/lib/mask.animation.js", "js").readystatechanged(3);
+include.getResource("/.reference/atma/mask.animation/lib/mask.animation.js", "js").readystatechanged(3);
 
 (function() {
     var animation = {
@@ -10857,8 +10985,8 @@ include.getResource("/.reference/libjs/mask.animation/lib/mask.animation.js", "j
         c3: "transform | rotate(0deg) > rotate(360deg) | 8s linear"
     };
     mask.registerHandler(":spinner", Compo({
-        template: "._01;._02;._03",
         tagName: "div",
+        template: "._01;._02;._03",
         attr: {
             "class": "-spinner"
         },
@@ -10867,7 +10995,6 @@ include.getResource("/.reference/libjs/mask.animation/lib/mask.animation.js", "j
             c2: "$: ._02",
             c3: "$: ._03"
         },
-        onRenderStart: function() {},
         onRenderEnd: function() {
             if (this.attr.autostart) this.start();
         },
@@ -10886,114 +11013,25 @@ include.getResource("/.reference/libjs/mask.animation/lib/mask.animation.js", "j
 })();
 
 (function() {
-    var I = ruqq.info, vendor = null, initVendorStrings = function() {
-        vendor = {
-            TransitionProperty: I.prefix + "TransitionProperty",
-            Transform: I.prefix + "Transform",
-            Transition: I.prefix + "Transition",
-            cssTransform: I.cssprefix + "transform"
-        };
-    };
-    mask.registerHandler(":pageActivity:spinner", Compo({
-        onRenderStart: function(values, container, cntx) {
-            this.currentPos = 0;
-            this.tagName = "div";
-            var defaults = {
-                width: 32,
-                height: 32,
-                image: "",
-                top: "50%",
-                left: "50%",
-                marginLeft: -16,
-                marginTop: -16
-            };
-            Object.defaults(this.attr, defaults);
-            this.attr.marginTop = this.attr.height / -2;
-            this.attr.marginLeft = this.attr.width / -2;
-            if (I.supportTransitions) this.attr.image = this.attr.image.replace(".png", "-single.png");
-            var _ = [ "width:#{width}px;", "height:#{height}px;", "background:url(#{image}) 0 0 no-repeat;", "position:absolute;", "top:#{top};", "left:#{left};", "margin-left:#{marginLeft}px;", "margin-top:#{marginTop}px;", "z-index:9999999;", "display:none;" ];
-            this.attr.style = String.format(_.join(""), this.attr);
-            Object.clear(this.attr, defaults);
-        },
-        start: function() {
-            if (this.interval) return;
-            var style = this.$.get(0).style;
-            if (I.supportTransitions) {
-                if (null == vendor) initVendorStrings();
-                style[vendor.TransitionProperty] = "none";
-                style[vendor.Transform] = "rotate(0deg)";
-                setTimeout(function() {
-                    style[vendor.Transition] = vendor.cssTransform + " 3s linear";
-                    style[vendor.Transform] = "rotate(720deg)";
-                }, 1);
-                this.interval = setInterval(function() {
-                    style[vendor.TransitionProperty] = "none";
-                    style[vendor.Transform] = "rotate(0deg)";
-                    setTimeout(function() {
-                        style[vendor.Transition] = vendor.cssTransform + " 3s linear";
-                        style[vendor.Transform] = "rotate(720deg)";
-                    }, 0);
-                }, 3e3);
-            } else ;
-        },
-        stop: function() {
-            if (I.supportTransitions) {
-                var style = this.$.get(0).style;
-                style[vendor.TransitionProperty] = "none";
-                style[vendor.Transform] = "rotate(0deg)";
-            }
-            if (null == this.interval) {
-                console.warn("Stop spinner but interval is null !!!");
-                return;
-            }
-            clearInterval(this.interval);
-            this.interval = null;
-        },
-        show: function() {
-            this.start();
-            this.$.show();
-            return this;
-        },
-        hide: function() {
-            this.stop();
-            this.$.hide();
-            return this;
-        },
-        isActive: function() {
-            return null != this.interval;
-        }
-    }));
     mask.registerHandler(":pageActivity", Compo({
         tagName: "div",
-        constructor: function() {
-            this.compos = {
-                spinner: "compo: :pageActivity:spinner"
-            };
+        template: ":spinner speed=fast;",
+        attr: {
+            "class": "-pageActivity"
         },
-        onRenderStart: function() {
-            jmask(this).css({
-                position: "absolute",
-                top: "0px",
-                left: "0px",
-                right: "0px",
-                bottom: "0px",
-                display: "none",
-                zIndex: 999999
-            }).append(":pageActivity:spinner").children().attr({
-                image: "/public/image/128x128_spinner.png",
-                width: 128,
-                height: 128,
-                frames: 12
-            });
+        compos: {
+            spinner: "compo: :spinner"
+        },
+        constructor: function() {
+            if (null == window.compos) window.compos = {};
+            window.compos.pageActivity = this;
         },
         show: function() {
             this.$.show();
-            this.compos.spinner.show();
             return this;
         },
         hide: function() {
             this.$.hide();
-            this.compos.spinner.hide();
             return this;
         }
     }));
@@ -11053,6 +11091,12 @@ window.L = include.exports = {
             file: "mask/handlers/layout.js"
         } ]
     }, {
+        env: "both",
+        file: "ruta/ruta.js",
+        name: "RutaJS",
+        enabled: false,
+        exports: [ "ruta" ]
+    }, {
         env: "browser",
         file: "mask/mask.animation.js",
         name: "Mask.Animation",
@@ -11064,12 +11108,6 @@ window.L = include.exports = {
         name: "Ruqq.Arr",
         enabled: false,
         exports: [ "ruqq.arr" ]
-    }, {
-        env: "browser",
-        file: "ruqq/routes.js",
-        name: "Ruqq.Routes",
-        enabled: false,
-        exports: [ "routes" ]
     } ]
 };
 
@@ -11188,6 +11226,282 @@ include.js("Libraries.js").load("downloader.mask::Template").done(function(resp)
 });
 
 include.getResource("/public/compo/downloader/downloader.js", "js").readystatechanged(3);
+
+include.setCurrent({
+    id: "/public/compo/sourceViewer/executor/executor.js",
+    namespace: "",
+    url: "/public/compo/sourceViewer/executor/executor.js"
+});
+
+include.load("executor.mask::Template").done(function(resp) {
+    mask.registerHandler(":executor", Compo({
+        template: resp.load.Template,
+        events: {
+            "click: .-executor-switch": function() {
+                this.$.toggleClass("__show");
+            },
+            "resize: *": function() {
+                alert();
+            }
+        },
+        slots: {
+            iframeLoaded: function() {},
+            iframeResize: function() {
+                alert();
+            }
+        },
+        onRenderStart: function(model, cntx, container) {},
+        onRenderEnd: function(elements, cntx, container) {}
+    }));
+});
+
+include.getResource("/public/compo/sourceViewer/executor/executor.js", "js").readystatechanged(3);
+
+include.setCurrent({
+    id: "/.reference/atma/compos/treeView/lib/treeView.js",
+    namespace: "atma.compos.treeView",
+    url: "/.reference/atma/compos/treeView/lib/treeView.js"
+});
+
+include.load("treeView.mask").done(function(resp) {
+    mask.registerHandler(":treeView", Compo({
+        template: resp.load.treeView,
+        mode: "server",
+        events: {
+            "click: .-treeView-head": function(event) {
+                var node = event.currentTarget.parentNode, $node = $(node);
+                if ($node.hasClass("__sub")) {
+                    $(node).toggleClass("__sub-hidden");
+                    return;
+                }
+                if (false === $node.hasClass("selected")) {
+                    this.$.find(".selected").removeClass("selected");
+                    $node.addClass("selected");
+                    this.$.trigger("change", this, $node);
+                }
+            }
+        },
+        getSelectedPath: function() {
+            var $item = this.getSelectedItem(), path = "", $parent = $item;
+            while (1) {
+                path = $parent.data("tree-id") + (path ? "/" : "") + path;
+                if (false === $parent.parent().hasClass("-treeView-tree")) break;
+                $parent = $parent.parent().closest(".-treeView-item");
+                if (0 === $parent.length) break;
+            }
+            if (this.rootPath) return path_combine(this.rootPath, path);
+            return path;
+        },
+        getSelectedItem: function() {
+            return this.$.find(".selected");
+        },
+        add: function(path, model) {
+            tree_prepairModel(model);
+            var $item = node_getItem(this.$, path), $sub = $item.children(".-treeView-sub"), $ul = $sub.children("ul");
+            if (0 === $ul.length) {
+                $item.addClass("__sub");
+                $ul = $('<ul class="-treeView-tree">').appendTo($sub);
+            }
+            jmask(resp.load.treeView).filter("#treeView-item").children().appendTo($ul[0], model);
+        },
+        onRenderStart: function(model) {
+            this.model = arr_isArray(model) ? model : [ model ];
+            if ("string" === typeof this.model[0]) {
+                model = tree_fromPaths(this.model);
+                var rootPath = this.model[0], index = rootPath.indexOf(model[0].id);
+                if (index > -1) this.rootPath = rootPath.substring(0, index);
+                this.model = model;
+            }
+            var i = this.model.length;
+            while (--i > -1) tree_prepairModel(this.model[i]);
+            this.selectedItem = this.attr.selected || this.model[0].id;
+        }
+    }));
+    function tmpl_ensureItem(compo) {
+        if (compo.templateItem) return;
+        compo.templateItem = jmask(compo.nodes).find("#treeView-item").get(0).nodes;
+    }
+    function node_getItem($nodes, path) {
+        if (null == path || 0 === path.length || "/" === path) return $nodes;
+        var parts = "string" === typeof path ? path.split("/") : path;
+        var i = -1, imax = parts.length;
+        while ($nodes.length && ++i < imax - 1) $nodes = sel_child($nodes, formatSelector(), ".-treeView-sub", "ul");
+        return sel_child($nodes, formatSelector());
+        function formatSelector() {
+            return '[data-tree-name="' + parts[i] + '"]';
+        }
+    }
+    function sel_child($node) {
+        var $child = $node, i = 0, imax = arguments.length;
+        while (++i < imax) $child = $child.children(arguments[i]);
+        return $child;
+    }
+    function tree_prepairModel(model) {
+        if (null == model.id) model.id = model.title.toLowerCase();
+        if (null == model.title) model.title = model.id;
+        if (null == model.items) {
+            model.items = [];
+            return;
+        }
+        if (arr_isArray(model.items)) {
+            var i = model.items.length;
+            while (--i > -1) tree_prepairModel(model.items[i]);
+            return;
+        }
+        tree_prepairModel(model.items);
+        model.items = [ model.items ];
+    }
+    function tree_fromPaths(model) {
+        model = model.slice(0);
+        var index = -1, index_ = index, i = 0, imax = model.length;
+        for (;i < imax - 1; i++) {
+            index_ = str_lastSameIndex(model[i], model[++i]);
+            if (index === -1 || index > index_) index = index_;
+        }
+        if (1 === imax) model[0] = model[0].substring(model[0].lastIndexOf("/") + 1);
+        if (index > 0) {
+            index_ = model[0].lastIndexOf("/");
+            if (index_ < index) index = index_;
+            for (i = 0; i < imax; i++) {
+                model[i] = model[i].substring(index);
+                if ("/" === model[i][0]) model[i] = model[i].substring(1);
+            }
+        }
+        var tree = [], parts;
+        for (var i = 0, imax = model.length; i < imax; i++) tree_ensurePath(tree, model[i].split("/"));
+        return tree;
+    }
+    function tree_getItem(items, id) {
+        for (var i = 0, x, imax = items.length; i < imax; i++) {
+            x = items[i];
+            if (x.id === id) return x;
+        }
+        return null;
+    }
+    function tree_ensurePath(rootItems, parts) {
+        var items = rootItems, item_, item;
+        for (var i = 0, imax = parts.length; i < imax; i++) {
+            item_ = tree_getItem(items, parts[i]);
+            if (null == item_) {
+                item_ = {
+                    id: parts[i],
+                    items: []
+                };
+                items.push(item_);
+            }
+            items = item_.items;
+        }
+        return items;
+    }
+    function str_lastSameIndex(str, compare) {
+        var i = 0, imax = str.length < compare.length ? str.length : compare.length;
+        for (;i < imax; i++) if (str.charCodeAt(i) !== compare.charCodeAt(i)) break;
+        return i;
+    }
+    function path_combine(_1, _2) {
+        if ("/" === _1[_1.length - 1]) _1 = _1.substring(0, _1.length - 1);
+        if ("/" !== _2[0]) _2 = "/" + _2;
+        return _1 + _2;
+    }
+    function arr_isArray(array) {
+        return null != array && "number" === typeof array.length && "function" === typeof array.splice;
+    }
+});
+
+include.getResource("/.reference/atma/compos/treeView/lib/treeView.js", "js").readystatechanged(3);
+
+include.setCurrent({
+    id: "/public/compo/sourceViewer/sourceViewer.js",
+    namespace: "",
+    url: "/public/compo/sourceViewer/sourceViewer.js"
+});
+
+include.load("sourceViewer.mask::Template").js("executor/executor.js").js({
+    "atma.compos": "treeView"
+}).done(function(resp) {
+    mask.registerHandler(":sourceViewer", Compo({
+        template: resp.load.Template,
+        compos: {
+            tree: "compo: :treeView",
+            tabs: "compo: :tabs"
+        },
+        events: {
+            "change: .-treeView-tree": function(event, sender, $node) {
+                var path = sender.getSelectedPath();
+                this.compos.tabs.setActive(path);
+            }
+        },
+        onRenderStart: function(model, ctx, container) {
+            this.model = model;
+            if (this.attr.source) this.model = {
+                files: this.attr.source.trim().split(/\s*,\s*/)
+            };
+            this.model.execute = this.attr.execute;
+        },
+        onRenderEnd: function(elements, ctx, container) {
+            var path = this.compos.tree.getSelectedPath();
+            this.compos.tabs.setActive(path);
+        }
+    }));
+    mask.registerUtil("langFromFile", function(key, model) {
+        var ext = model.substring(model.lastIndexOf(".") + 1);
+        switch (ext) {
+          case "html":
+            return "markup";
+
+          case "css":
+          case "less":
+            return "css";
+
+          case "mask":
+            return "mask";
+        }
+        return "javascript";
+    });
+});
+
+include.getResource("/public/compo/sourceViewer/sourceViewer.js", "js").readystatechanged(3);
+
+include.setCurrent({
+    id: "/public/compo/overlay/overlay.js",
+    namespace: "",
+    url: "/public/compo/overlay/overlay.js"
+});
+
+include.load("overlay.mask::Template").done(function(resp) {
+    mask.registerHandler(":overlay", Compo({
+        template: resp.load.Template,
+        slots: {
+            close: function() {
+                this.hide();
+            }
+        },
+        onRenderStart: function(model, cntx, container) {},
+        onRenderEnd: function(elements, cntx, container) {},
+        show: function(id, template) {
+            var $container = this.$.children(".-overlay-content"), $children = $container.children().hide();
+            var $div = $children.filter('[name="' + id + '"]');
+            if (0 === $div.length) {
+                var ctx = {}, fragment = jmask(template).attr("name", id).render({}, ctx);
+                $container.append(fragment);
+                if (ctx.async) {
+                    compos.pageActivity.show();
+                    ctx.done(function() {
+                        compos.pageActivity.hide();
+                    });
+                }
+                $div = $(fragment);
+            }
+            window.X = $div.show();
+            this.animate("show");
+        },
+        hide: function() {
+            this.animate("hide");
+        }
+    }));
+});
+
+include.getResource("/public/compo/overlay/overlay.js", "js").readystatechanged(3);
 
 (function(global) {
     "use strict";
@@ -11406,9 +11720,9 @@ include.getResource("/public/compo/downloader/downloader.js", "js").readystatech
 })();
 
 include.setCurrent({
-    id: "/.reference/libjs/compos/prism/lib/prism.lib.js",
+    id: "/.reference/atma/compos/prism/lib/prism.lib.js",
     namespace: "",
-    url: "/.reference/libjs/compos/prism/lib/prism.lib.js"
+    url: "/.reference/atma/compos/prism/lib/prism.lib.js"
 });
 
 (function(root, factory) {
@@ -11682,6 +11996,86 @@ include.setCurrent({
             }
         }
     });
+    Prism.languages.mask = {
+        comment: {
+            pattern: /(^|[^\\])(\/\*[\w\W]*?\*\/|\/\/.*?(\r?\n|$))/g,
+            lookbehind: true
+        },
+        string: {
+            pattern: /(^\s*|[>;{}'"]\s*)("|')(\\?.)*?\2/g,
+            lookbehind: true,
+            inside: {
+                interpolation: {
+                    pattern: /~\[[^\]]+\]/g,
+                    inside: {
+                        expression: {
+                            pattern: /(~\[\w*:)([^\]]+)/i,
+                            lookbehind: true,
+                            inside: {
+                                rest: Prism.languages.javascript
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        punctuation: /[\{\};>]|(&gt;)/g,
+        node: {
+            pattern: /[^\s][^{;>]+/gi,
+            inside: {
+                interpolation: {
+                    pattern: /~\[[^\]]+\]/g,
+                    inside: {
+                        expression: {
+                            pattern: /(~\[\w*:)([^\]]+)/i,
+                            lookbehind: true,
+                            inside: {
+                                rest: Prism.languages.javascript
+                            }
+                        }
+                    }
+                },
+                compo: {
+                    pattern: /^[^\s\w\.#][\w\d:-]*/i
+                },
+                tag: {
+                    pattern: /^[\w\d:-]+/i
+                },
+                "attr-value": {
+                    pattern: /(=\s*\w+)|(("|')(\\?.)*?\3)/gi,
+                    inside: {
+                        punctuation: /=|&gt;|"/g
+                    }
+                },
+                "class": {
+                    pattern: /\.[\w\d-_]+/gi
+                },
+                id: {
+                    pattern: /#[\w\d-_]+/gi
+                },
+                punctuation: /=/g,
+                "attr-name": {
+                    pattern: /[\w:-]+/g,
+                    inside: {
+                        namespace: /^[\w-]+?:/
+                    }
+                }
+            }
+        },
+        ignore: /&(lt|gt|amp);/gi
+    };
+    if (Prism.languages.markup) Prism.languages.insertBefore("markup", "script", {
+        mask: {
+            pattern: /(&lt;|<)script type='text\/mask'[\w\W]*?(>|&gt;)[\w\W]*?(&lt;|<)\/script(>|&gt;)/gi,
+            inside: {
+                tag: {
+                    pattern: /(&lt;|<)script[\w\W]*?(>|&gt;)|(&lt;|<)\/script(>|&gt;)/gi,
+                    inside: Prism.languages.markup.tag.inside
+                },
+                rest: Prism.languages.mask
+            }
+        }
+    });
     (function() {
         var url = /\b([a-z]{3,7}:\/\/|tel:)[\w-+%~/.]+/, email = /\b\S+@[\w.]+[a-z]{2}/, linkMd = /\[([^\]]+)]\(([^)]+)\)/, candidates = [ "comment", "url", "attr-value", "string" ];
         for (var language in Prism.languages) {
@@ -11721,12 +12115,12 @@ include.setCurrent({
     return Prism;
 });
 
-include.getResource("/.reference/libjs/compos/prism/lib/prism.lib.js", "js").readystatechanged(3);
+include.getResource("/.reference/atma/compos/prism/lib/prism.lib.js", "js").readystatechanged(3);
 
 include.setCurrent({
-    id: "/.reference/libjs/compos/prism/lib/prism.js",
+    id: "/.reference/atma/compos/prism/lib/prism.js",
     namespace: "",
-    url: "/.reference/libjs/compos/prism/lib/prism.js"
+    url: "/.reference/atma/compos/prism/lib/prism.js"
 });
 
 include.js("prism.lib.js::Prism").done(function(resp) {
@@ -11736,19 +12130,23 @@ include.js("prism.lib.js::Prism").done(function(resp) {
         attr: {
             language: "javascript"
         },
-        renderStart: function(model, cntx) {
-            var _lang = this.attr.language, _class = "language-" + _lang, _code = jmask("pre." + _class + " > code." + _class).children().mask(this.nodes);
-            this.nodes = _code.end();
+        renderStart: function(model, ctx) {
+            var _lang = this.attr.language, _class = "language-" + _lang, _code;
             if (null != this.attr.src) {
                 var that = this;
-                Compo.pause(this, cntx);
-                Compo.resource(this).ajax(this.attr.src + "::Data").done(function(resp) {
-                    highlight(_code, resp.ajax.Data, _lang);
-                    Compo.resume(that, cntx);
+                this.nodes = jmask("pre." + _class + " > code." + _class);
+                _code = this.nodes.find("code");
+                Compo.pause(this, ctx);
+                var name = this.attr.src;
+                Compo.resource(this).ajax(this.attr.src + "::" + name).done(function(resp) {
+                    highlight(_code, resp.ajax[name], _lang);
+                    Compo.resume(that, ctx);
                 });
                 return;
             }
-            highlight(_code, str_trimTrailings(_code.text(model)), _lang);
+            _code = jmask("pre." + _class + " > code." + _class).children().mask(this.nodes);
+            this.nodes = _code.end();
+            highlight(_code, str_trimTrailings(_code.text(model, ctx, this)), _lang);
         }
     });
     mask.registerHandler("prism", PrismCompo);
@@ -11772,7 +12170,7 @@ include.js("prism.lib.js::Prism").done(function(resp) {
     }
 });
 
-include.getResource("/.reference/libjs/compos/prism/lib/prism.js", "js").readystatechanged(3);
+include.getResource("/.reference/atma/compos/prism/lib/prism.js", "js").readystatechanged(3);
 
 (function(root) {
     var mask = root.mask || Mask, tag_CONTENT = "@content", tag_PLACEHOLDER = "@placeholder", tag_PLACEHOLDER_ELSE = "@else", tag_layout_VIEW = "layout:view", tag_layout_MASTER = "layout:master", _masters = {};
@@ -11876,9 +12274,9 @@ include.getResource("/.reference/libjs/compos/prism/lib/prism.js", "js").readyst
 })(this);
 
 include.setCurrent({
-    id: "/.reference/libjs/compos/tabs/lib/tabs.js",
+    id: "/.reference/atma/compos/tabs/lib/tabs.js",
     namespace: "",
-    url: "/.reference/libjs/compos/tabs/lib/tabs.js"
+    url: "/.reference/atma/compos/tabs/lib/tabs.js"
 });
 
 include.css();
@@ -12078,7 +12476,7 @@ include.css();
     }));
 })();
 
-include.getResource("/.reference/libjs/compos/tabs/lib/tabs.js", "js").readystatechanged(3);
+include.getResource("/.reference/atma/compos/tabs/lib/tabs.js", "js").readystatechanged(3);
 
 (function() {
     function route_current(route, path) {
@@ -12144,9 +12542,9 @@ include.getResource("/.reference/libjs/compos/tabs/lib/tabs.js", "js").readystat
 })();
 
 include.setCurrent({
-    id: "/.reference/libjs/compos/markdown/lib/marked.js",
+    id: "/.reference/atma/compos/markdown/lib/marked.js",
     namespace: "",
-    url: "/.reference/libjs/compos/markdown/lib/marked.js"
+    url: "/.reference/atma/compos/markdown/lib/marked.js"
 });
 
 (function() {
@@ -12719,12 +13117,12 @@ include.setCurrent({
     return this || ("undefined" !== typeof window ? window : global);
 }());
 
-include.getResource("/.reference/libjs/compos/markdown/lib/marked.js", "js").readystatechanged(3);
+include.getResource("/.reference/atma/compos/markdown/lib/marked.js", "js").readystatechanged(3);
 
 include.setCurrent({
-    id: "/.reference/libjs/compos/markdown/lib/markdown.js",
+    id: "/.reference/atma/compos/markdown/lib/markdown.js",
     namespace: "",
-    url: "/.reference/libjs/compos/markdown/lib/markdown.js"
+    url: "/.reference/atma/compos/markdown/lib/markdown.js"
 });
 
 include.js("marked.js").done(function(resp) {
@@ -12779,7 +13177,7 @@ include.js("marked.js").done(function(resp) {
     });
 });
 
-include.getResource("/.reference/libjs/compos/markdown/lib/markdown.js", "js").readystatechanged(3);
+include.getResource("/.reference/atma/compos/markdown/lib/markdown.js", "js").readystatechanged(3);
 
 (function() {
     mask.registerHandler(":scroller", Compo({

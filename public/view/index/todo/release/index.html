@@ -1,0 +1,172 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+<link rel="stylesheet" href="src/style.css" /></head>
+
+<body>
+    
+    <script type="text/template" id="app-layout">
+        
+     
+        blockquote {
+            p > 'Learning never exhausts the mind.'
+            small > 'Leonardo da Vinci'
+        }
+        
+        
+        :tabs #pages {
+            @panels {
+                .-view.-show name='viewer' >
+                    :task:viewer;
+                
+                .-view name='editor'>
+                    :task:editor;
+            }
+            
+            :animation #hide {
+                @model {
+                    'transform | > scale(.8) translateY(50%) | 500ms ease-out'
+                    'opacity |  > 0 | 150ms ease-out'
+                }
+            }
+            
+            :animation #show {
+                @model {
+                    'transform | scale(.8) translateY(50%) > scale(1) translateY(0%) | 500ms ease-out'
+                    'opacity | 0 > 1 | 150ms ease-out'
+                }
+            }
+        }
+        
+    </script>
+    
+<div id="build.release.xhr" style="display: none;" hidden="hidden"><script type="include/load" id="includejs-scriptviewerviewermask" data-appuri="/script/viewer/viewer.mask"> 
+nav.navbar.navbar-default {
+	ul.nav.navbar-nav {
+		li > :bs:dropdown {
+			a href='#' {
+			
+				span {
+					'I have ( ' i > '~[bind:settings.time]' ' ) '
+				}
+				
+				b.caret;
+			}
+			@select {
+				a href='#' > em > 'none'
+				
+				% each='timings' >
+					a href='#' data-value='~[.]' >
+						'~[formatTime:.]'
+			}
+		}
+		
+		li > a href='#' x-toggle='click: settings.sort.time == "asc" ? "desc" : "asc"' {
+			span > 'Duration '
+			
+			
+			.glyphicon.~[bind:settings.sort.time == "asc"
+					? "glyphicon-sort-by-attributes"
+					: "glyphicon-sort-by-attributes-alt"
+			];
+		
+		}
+	}
+	ul.nav.navbar-right.navbar-form >
+		button.btn.btn-success x-signal='click: taskCreate' >
+			'Create'
+
+}
+
+.-vw-list-group filter='~[bind: applyFilter() && settings.time && settings.sort.time]' >
+	%% each='tasks' >
+	    :viewer:item;
+ </script>
+<script type="include/load" id="includejs-scriptviewertasktaskmask" data-appuri="/script/viewer/task/task.mask"> li.list-group-item.~[bind: _hidden ? '__hidden'] {
+    
+    .task-progress style='width: ~[bind:complete]%';
+    
+    h5 > '~[bind:title]'
+    i > '~[bind: getFormatedRemainingTime(complete, time) || "Completed!"]'
+    
+    p.text-muted > '~[bind: description]'
+    
+    
+    .actions.clearfix > .btn-group.btn-group-xs {
+        button.btn.btn-danger x-signal='click: taskRemove' {
+            span.glyphicon.glyphicon-trash;
+            span > 'Remove'
+        }
+        button.btn.btn-primary x-signal='click: taskEdit' {
+            span.glyphicon.glyphicon-edit;
+            span > 'Edit'
+        }
+    }
+    
+    
+
+    :animation #task-remove {
+        @model {
+            'transform | > translateX(100%) scale(.8) | 200ms linear'
+        }
+        @next {
+            'display | > none'
+        }
+    }
+} </script>
+<script type="include/load" id="includejs-scripteditoreditormask" data-appuri="/script/editor/editor.mask"> 
+.-editor {
+	
+    .form-group > 
+		input.form-control placeholder='Task' >
+            :dualbind value='task.title';
+	
+    
+    .form-group >
+        textarea.form-control placeholder='Description' >
+            :dualbind value='task.description';
+    
+    .form-group >
+        select.form-control x-tooltip='Estimate required time for the task' {
+            % each=timings >
+                option name='~[.]' > '~[formatTime:.]'
+            
+			:dualbind value='task.time';
+        }
+    
+	.form-group {
+		input.form-control
+			type=range
+			min=0
+			max=100
+			step=1
+			x-tooltip='Task completion (percantage)' >
+				:dualbind value='task.complete';
+				
+		span.help-block >
+			'~[bind:task.complete] %'
+	}
+    
+    .form-group.__right {
+        button.btn.btn-danger
+            x-signal='click: abortEdit'
+            x-tooltip='Abort task editing, and return to the list'
+            >
+            'Cancel'
+            
+        button.btn.btn-primary x-signal='click: taskSave'
+            >
+            'Save'
+    }
+}
+ </script></div><script type="text/javascript" src="src/script.js"></script></body>
+</html>

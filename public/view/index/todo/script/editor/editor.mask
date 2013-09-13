@@ -1,0 +1,45 @@
+
+.-editor {
+	
+    .form-group > 
+		input.form-control placeholder='Task' >
+            :dualbind value='task.title';
+	
+    
+    .form-group >
+        textarea.form-control placeholder='Description' >
+            :dualbind value='task.description';
+    
+    .form-group >
+        select.form-control x-tooltip='Estimate required time for the task' {
+            % each=timings >
+                option name='~[.]' > '~[formatTime:.]'
+            
+			:dualbind value='task.time';
+        }
+    
+	.form-group {
+		input.form-control
+			type=range
+			min=0
+			max=100
+			step=1
+			x-tooltip='Task completion (percantage)' >
+				:dualbind value='task.complete';
+				
+		span.help-block >
+			'~[bind:task.complete] %'
+	}
+    
+    .form-group.__right {
+        button.btn.btn-danger
+            x-signal='click: abortEdit'
+            x-tooltip='Abort task editing, and return to the list'
+            >
+            'Cancel'
+            
+        button.btn.btn-primary x-signal='click: taskSave'
+            >
+            'Save'
+    }
+}

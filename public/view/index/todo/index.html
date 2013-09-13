@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <link rel='stylesheet' href='/.reference/bootstrap/less/bootstrap.less' />
+    <link rel='stylesheet' href='style/main.less' />
+    
+    <script src='/.reference/atma/ruqq/lib/dom/jquery.js'></script>
+    <script src='/.reference/atma/atma.libs/browser/globals-dev.js'></script>
+    
+    <script src='script/main.js'></script>
+    
+</head>
+<body>
+    <script type='text/mask' id='app-layout'>
+        
+        blockquote {
+            p > 'Learning never exhausts the mind.'
+            small > 'Leonardo da Vinci'
+        }
+        
+        :tabs #pages {
+            @panels {
+                .-view.-show name='viewer' >
+                    :task:viewer;
+                
+                .-view name='editor'>
+                    :task:editor;
+            }
+            
+            :animation #hide {
+                @model {
+                    'transform | > scale(.8) translateY(50%) | 500ms ease-out'
+                    'opacity |  > 0 | 150ms ease-out'
+                }
+            }
+            
+            :animation #show {
+                @model {
+                    'transform | scale(.8) translateY(50%) > scale(1) translateY(0%) | 500ms ease-out'
+                    'opacity | 0 > 1 | 150ms ease-out'
+                }
+            }
+        }
+        
+    </script>
+</body>
+</html>

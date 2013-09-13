@@ -119,6 +119,94 @@
 	
 }
  </script>
+<script type='include/load' id='includejs-publiccomposourceViewersourceViewermask' data-appuri='/public/compo/sourceViewer/sourceViewer.mask'> 
+.-sourceViewer {
+	
+	.-sourceViewer-tree {
+		% use='files' > :treeView;
+	}
+	.-sourceViewer-code {
+		:tabs {
+			
+			@panels {
+				% each='files' >
+					div name='~[.]' >
+						:prism language='~[langFromFile:.]' src='~[.]';
+			}
+		}
+	}
+	
+	:executor;
+}
+ </script>
+<script type='include/load' id='includejs-publiccomposourceViewerexecutorexecutormask' data-appuri='/public/compo/sourceViewer/executor/executor.mask'> 
+% if='execute' >
+	.-executor {
+		
+		:animation #show {
+			
+		}
+		
+		.-executor-switch > '⇄'
+		
+		iframe.-executor-frame
+			height='100%'
+			onresize='alert("1")'
+			x-signal='resize: iframeResize'
+			src='~[execute]';
+	}
+ </script>
+<script type='include/load' id='includejs-referenceatmacompostreeViewlibtreeViewmask' data-appuri='/.reference/atma/compos/treeView/lib/treeView.mask'> 
+:template #treeView-item {
+    li
+        .-treeView-item
+        .~[: items.length ? '__sub' ]
+        .~[: selectedItem == id ? 'selected' ]
+        data-tree-id='~[id]' {
+        
+        .-treeView-head {
+            .-treeView-arrow > '▼'
+            .-treeView-knob > '•'
+        
+            .-treeView-title >
+                '~[title]'
+        }
+        
+        .-treeView-sub >
+            % if='items.length' >
+                % use='items' >
+                    :import #treeView-tree;
+    }
+}
+
+
+:template #treeView-tree {
+    ul.-treeView-tree >
+        % each='.' >
+            :import #treeView-item;
+}
+
+:import #treeView-tree; </script>
+<script type='include/load' id='includejs-publiccompooverlayoverlaymask' data-appuri='/public/compo/overlay/overlay.mask'> 
+.-overlay {
+	.close x-signal='click: close';
+	
+	.-overlay-content;
+	
+	:animation #show {
+		@model > 'display | > block'
+		@next  > 'transform | translateY(-100%) > translateY(0%) | ease-in 150ms'
+	}
+	:animation #hide {
+		
+		@model > 'opacity | 1 > 0 | ease-in 150ms'
+		@next  {
+			'display | > none'
+			'opacity | > 1 | 0ms'
+		}
+	}
+}
+ </script>
 <script type='include/load' id='includejs-publiccomponavigationnavigationmask' data-appuri='/public/compo/navigation/navigation.mask'> 
 :template #menuItemTemplate {
 	li.~[class] {

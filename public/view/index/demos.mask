@@ -1,0 +1,22 @@
+.-about-sample-container >
+        .-about-sample {
+            :sourceViewer
+                source='
+                    /public/view/index/todo/index.html,
+                    /public/view/index/todo/script/main.js,
+                    /public/view/index/todo/script/model.js,
+                    /public/view/index/todo/script/compo/dropdown.js,
+                    /public/view/index/todo/script/compo/tooltip.js,
+                    /public/view/index/todo/script/viewer/task/task.js,
+                    /public/view/index/todo/script/viewer/task/task.less,
+                    /public/view/index/todo/script/viewer/task/task.mask,
+                    /public/view/index/todo/script/viewer/Settings.js,
+                    /public/view/index/todo/script/viewer/viewer.js,
+                    /public/view/index/todo/script/viewer/viewer.less,
+                    /public/view/index/todo/script/viewer/viewer.mask,
+                    /public/view/index/todo/script/editor/editor.js,
+                    /public/view/index/todo/script/editor/editor.mask
+                '
+                execute='/public/view/index/todo/index.html'
+            ;
+        }

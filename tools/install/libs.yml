@@ -1,0 +1,25 @@
+# FROM {atma}/ : TO /public/libs/
+
+class/lib/class.js : class/class.js
+class/lib/class.min.js : class/class.min.js
+
+include/lib/include.js : include/include.js
+include/lib/include.min.js : include/include.min.js
+
+include/lib/include.node.js : include/include.node.js
+
+
+mask/lib/mask.js : mask/mask.js
+mask/lib/mask.min.js : mask/mask.min.js
+mask/lib/mask.node.js : mask/mask.node.js
+compos/layout/lib/layout.js : mask/handlers/layout.js
+
+mask.animation/lib/mask.animation.js : mask/mask.animation.js
+mask.animation/lib/mask.animation.min.js : mask/mask.animation.min.js
+
+ruta/lib/ruta.js: ruta/ruta.js
+ruta/lib/ruta.min.js: ruta/ruta.min.js
+
+ruqq/lib/arr.js : ruqq/arr.js
+ruqq/lib/utils.js : ruqq/utils.js
+

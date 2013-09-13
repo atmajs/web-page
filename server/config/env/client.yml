@@ -4,7 +4,7 @@
 client:
 	
 	include:
-		src: '/.reference/libjs/include/lib/include.js'
+		src: '/.reference/atma/include/lib/include.js'
 		
 		
 	scripts:
@@ -26,6 +26,8 @@ client:
 			- spinner
 			- pageActivity
 			- downloader
+			- sourceViewer
+			- overlay
 		
 	styles:
 		- '/public/style/main.less'

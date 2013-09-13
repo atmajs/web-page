@@ -86,16 +86,56 @@
 	margin: 0;
 	margin-top: 20px;
 	padding: 0;
-	padding-top: 20px;
+	
 	width: 100%;
 	
 	border-top: 1px solid @color_Black;
 	
 	li {
+		padding: 20px 0px;
 		text-align: center;
 		vertical-align: top;
 		width: 33%;
 		display: inline-block;
+		
+		&:first-child {
+			border-right: 1px solid #333;
+		}
+	}
+}
+
+.-about-demos {
+	border-top: 1px solid #333;
+	
+	> .-about-demo {
+		display: inline-block;
+		width: 66%;
+		padding: 20px 0;
+		text-align: center;
+		
+		position: relative;
+		
+		&:first-child {
+			width: 33%;
+			border-right: 1px solid #333;
+		}
+		
+		&:after {
+			content: 'Source Code Demo';
+			padding: 3px 5px;
+			font-size: small;
+			position: absolute;
+			top: -10%;
+			left: 0px;
+			//background: #333;
+			border: 1px solid #ddd;
+			color: @color_Selected;
+			
+			//.opacity(.5);
+			.rotate(-20deg);
+			
+			.border-radius(4px);
+		}
 	}
 }
 
@@ -123,7 +163,23 @@
 }
 
 
-
+.-about-sample-container {
+	.box-sizing(border-box);
+	max-width: 100%;
+	height: 100%;
+	
+	
+	
+	> .-about-sample {
+		
+		padding: 0px 20px;
+		max-width: 1280px;
+		margin: 0 auto;
+		
+		height: 99.5%;
+		position: relative;
+	}
+}
 
 
 

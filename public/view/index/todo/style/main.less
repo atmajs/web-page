@@ -1,0 +1,33 @@
+@import "lesshat.less";
+
+body {
+	font-family: sans-serif;
+	margin: 0;
+	
+	max-width: 768px;
+	margin: 0 auto;
+	position: relative;
+	background: #fff;
+}
+
+.-view {
+	position: absolute;
+	width: 100%;
+	
+	
+	background: inherit;
+}
+
+
+.form-group {
+	.box-sizing(border-box);
+	padding: 5px;
+	
+	> button {
+		margin: 0 5px;
+	}
+	
+	&.__right {
+		text-align: right;
+	}
+}

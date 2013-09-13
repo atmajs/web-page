@@ -1,16 +1,23 @@
 (function(root, factory){
 	"use strict";
 
-	var _global, _exports;
+	var _isCommonJS = false,
+		_global,
+		_exports;
 	
-	if (typeof exports !== 'undefined' && (root === exports || root == null)){
+	if (typeof exports !== 'undefined' && (root == null || root === exports || root === global)){
 		// raw nodejs module
-    	_global = _exports = global;
+        _global = global;
+		_isCommonJS = true;
     }
 	
 	if (_global == null) {
-		_global = typeof window === 'undefined' ? global : window;
+		_global = typeof window === 'undefined'
+			? global
+			: window
+			;
 	}
+	
 	if (_exports == null) {
 		_exports = root || _global;
 	}
@@ -18,12 +25,39 @@
 	
 	factory(_global, _exports);
 	
+	if (_isCommonJS) {
+		module.exports = _exports.Class;
+	}
+	
 }(this, function(global, exports){
 	"use strict";
 	
 	var _Array_slice = Array.prototype.slice,
 		_Array_sort = Array.prototype.sort;
 	
+	// source ../src/util/is.js
+	function is_Function(x) {
+		return typeof x === 'function';
+	}
+	
+	function is_Object(x) {
+		return x != null &&  typeof x === 'object';
+	}
+	
+	function is_Array(x) {
+		return x != null
+			&& typeof x.length === 'number'
+			&& typeof x.slice === 'function';
+	}
+	
+	function is_String(x) {
+		return typeof x === 'string';
+	}
+	
+	function is_notEmptyString(x) {
+		return typeof x === 'string' && x !== '';
+	}
+	// end:source ../src/util/is.js
 	// source ../src/util/array.js
 	function arr_each(array, callback) {
 		
@@ -58,6 +92,7 @@
 			return array.length !== void 0 && typeof array.slice === 'function';
 		};
 	}
+	// end:source ../src/util/array.js
 	// source ../src/util/proto.js
 	
 	
@@ -238,6 +273,7 @@
 			}
 		}
 	}
+	// end:source ../src/util/proto.js
 	// source ../src/util/object.js
 	function obj_inherit(target /* source, ..*/ ) {
 		if (typeof target === 'function') {
@@ -350,6 +386,7 @@
 		}
 	};
 	
+	// end:source ../src/util/object.js
 	// source ../src/util/function.js
 	function fn_proxy(fn, cntx) {
 	
@@ -383,8 +420,10 @@
 			};
 			
 			return fn.apply(cntx, arguments);
-		};
+		}
 	}
+	// end:source ../src/util/function.js
+	
 	
 	// source ../src/xhr/XHR.js
 	var XHR = {};
@@ -416,6 +455,7 @@
 	});
 	
 	
+	// end:source ../src/xhr/XHR.js
 	// source ../src/xhr/promise.js
 	/*
 	 *  Copyright 2012-2013 (c) Pierre Duquesne <stackp@online.fr>
@@ -561,7 +601,7 @@
 	        function onTimeout() {
 	            xhr.abort();
 	            p.done(exports.promise.ETIMEOUT, "");
-	        };
+	        }
 	
 	        var timeout = exports.promise.ajaxTimeout;
 	        if (timeout) {
@@ -628,19 +668,26 @@
 	
 	
 	})(XHR);
+	// end:source ../src/xhr/promise.js
 	
 	// source ../src/business/Serializable.js
 	function Serializable(data) {
 		
-		if (data == null || typeof data !== 'object')
-			return;
-		
-		for (var key in data) {
-			if (data[key] == null)
-				continue;
+		if (this === Class || this == null || this === global) {
 			
-			this[key] = data[key];
+			var Ctor = function(data){
+				Serializable.call(this, data);
+			};
+			
+			Ctor.prototype._props = data;
+			
+			obj_extend(Ctor.prototype, Serializable.prototype);
+			
+			return Ctor;
 		}
+		
+		if (data != null)
+			this.deserialize(data);
 		
 	}
 	
@@ -653,18 +700,44 @@
 		
 		deserialize: function(json) {
 			
-			if (typeof json === 'string') 
+			if (is_String(json)) 
 				json = JSON.parse(json);
 			
+			var props = this._props,
+				key,
+				Mix;
 			
-			for (var key in json) 
+			for (key in json) {
+				
+				if (props != null) {
+					Mix = props[key];
+					
+					if (Mix != null) {
+						
+						if (is_Function(Mix)) {
+							this[key] = new Mix(json[key]);
+							continue;
+						}
+						
+						var deserialize = Mix.deserialize;
+						
+						if (is_Function(deserialize)) {
+							this[key] = deserialize(json[key]);
+							continue;
+						}
+						
+					}
+				}
+				
 				this[key] = json[key];
+			}
 			
 			return this;
 		}
 	};
 	
 	
+	// end:source ../src/business/Serializable.js
 	// source ../src/business/Route.js
 	/**
 	 *	var route = new Route('/user/:id');
@@ -676,7 +749,7 @@
 		
 		function Route(route){
 			this.route = route_parse(route);
-		};
+		}
 		
 		Route.prototype = {
 			constructor: Route,
@@ -791,6 +864,7 @@
 		
 		return Route;
 	}());
+	// end:source ../src/business/Route.js
 	// source ../src/business/Deferred.js
 	var DeferredProto = {
 		_isAsync: true,
@@ -814,20 +888,20 @@
 				imax = cbs && cbs.length,
 				i = 0;
 			if (cbs) {
+				this._done = null;
 				while (imax-- !== 0) {
 					cbs[i++].apply(this, arguments);
 				}
-				this._done = null;
 			}
 	
 			cbs = this._always;
 			imax = cbs && cbs.length,
 			i = 0;
 			if (cbs) {
+				this._always = null;
 				while (imax-- !== 0) {
 					cbs[i++].apply(this, this);
 				}
-				this._always = null;
 			}
 	
 			return this;
@@ -840,20 +914,20 @@
 				imax = cbs && cbs.length,
 				i = 0;
 			if (cbs) {
+				this._fail = null;
 				while (imax-- !== 0) {
 					cbs[i++].apply(this, arguments);
 				}
-				this._fail = null;
 			}
 	
 			cbs = this._always;
 			imax = cbs && cbs.length,
 			i = 0;
 			if (cbs) {
+				this._always = null;
 				while (imax-- !== 0) {
 					cbs[i++].apply(this, this);
 				}
-				this._always = null;
 			}
 	
 			return this;
@@ -888,6 +962,7 @@
 			return this;
 		},
 	};
+	// end:source ../src/business/Deferred.js
 	// source ../src/business/EventEmitter.js
 	var EventEmitter = (function(){
 	 
@@ -936,7 +1011,7 @@
 					if (fn._once === true){
 						fns.splice(i,1);
 						i--;
-						length--;
+						imax--;
 					}
 				}
 			
@@ -956,7 +1031,7 @@
 						arr.splice(i, 1);
 					
 					i--;
-					length--;
+					imax--;
 				}
 			
 	            return this;
@@ -967,6 +1042,7 @@
 	    
 	}());
 	
+	// end:source ../src/business/EventEmitter.js
 	// source ../src/business/Validation.js
 	var Validation = (function(){
 		
@@ -1020,6 +1096,7 @@
 		};
 		
 	}());
+	// end:source ../src/business/Validation.js
 	
 	
 	// source ../src/collection/Collection.js
@@ -1227,8 +1304,8 @@
 					for (var i = 0, imax = this.length; i < imax; i++){
 						
 						fn.call(cntx || this, this[i], i);
-						
 					}
+		            return this;
 				},
 				
 				
@@ -1269,24 +1346,67 @@
 					if (mix == null)
 						return this[0];
 					
-					var imax = this.length,
-						i = 0;
-					while (--imax !== -1) {
-						if (check(this[i++], mix))
-							return this[i - 1];
-					}
-					return null;
+					var i = this.indexOf(mix);
+					return i !== -1
+						? this[i]
+						: null;
+						
 				},
 				last: function(mix){
 					if (mix == null)
-						return this[0];
+						return this[this.length - 1];
+					
+					var i = this.lastIndexOf(mix);
+					return i !== -1
+						? this[i]
+						: null;
+				},
+				indexOf: function(mix, index){
+					if (mix == null)
+						return -1;
+					
+					if (index != null) {
+						if (index < 0) 
+							index = 0;
+							
+						if (index >= this.length) 
+							return -1;
+						
+					}
+					else{
+						index = 0;
+					}
+					
 					
 					var imax = this.length;
-					while (--imax !== -1) {
-						if (check(this[imax], mix))
-							return this[imax];
+					for(; index < imax; index++) {
+						if (check(this[index], mix))
+							return index;
 					}
-					return null;
+					return -1;
+				},
+				lastIndexOf: function(mix, index){
+					if (mix == null)
+						return -1;
+					
+					if (index != null) {
+						if (index >= this.length) 
+							index = this.length - 1;
+						
+						if (index < 0) 
+							return -1;
+					}
+					else {
+						index = this.length - 1;
+					}
+					
+					
+					for (; index > -1; index--) {
+						if (check(this[index], mix))
+							return index;
+					}
+					
+					return -1;
 				}
 			};
 			
@@ -1294,6 +1414,7 @@
 			return ArrayProto;
 		}());
 		
+		// end:source ArrayProto.js
 		
 		function create(Constructor, mix) {
 			
@@ -1377,6 +1498,7 @@
 		
 		return Collection;
 	}());
+	// end:source ../src/collection/Collection.js
 	
 	// source ../src/store/Store.js
 	var StoreProto = {
@@ -1412,6 +1534,7 @@
 			}
 		}
 	};
+	// end:source ../src/store/Store.js
 	// source ../src/store/Remote.js
 	/**
 	 *	Alpha - Test - End
@@ -1470,6 +1593,7 @@
 		};
 		
 	}());
+	// end:source ../src/store/Remote.js
 	// source ../src/store/LocalStore.js
 	var LocalStore = (function(){
 		
@@ -1489,7 +1613,7 @@
 					return this;
 				}
 				
-				if (typeof object === 'string'){
+				if (is_String(object)){
 					try {
 						object = JSON.parse(object);
 					} catch(e) {
@@ -1532,7 +1656,6 @@
 		var Constructor = function(route){
 			
 			return new LocalStore(route);
-			
 		};
 		
 		Constructor.prototype = LocalStore.prototype;
@@ -1541,6 +1664,7 @@
 		return Constructor;
 	
 	}());
+	// end:source ../src/store/LocalStore.js
 	
 	
 	// source ../src/Class.js
@@ -1576,10 +1700,10 @@
 			
 			if (_extends == null) {
 				_extends = _store;
-			} else if (Array.isArray(_extends)) {
-				_extends.push(_store)
+			} else if (is_Array(_extends)) {
+				_extends.unshift(_store)
 			} else {
-				_extends = [_extends, _store];
+				_extends = [_store, _extends];
 			}
 			
 			delete data.Store;
@@ -1670,6 +1794,7 @@
 	
 		return _class;
 	};
+	// end:source ../src/Class.js
 	// source ../src/Class.Static.js
 	/**
 	 * Can be used in Constructor for binding class's functions to class's context
@@ -1697,6 +1822,7 @@
 	Class.EventEmitter = EventEmitter;
 	
 	Class.validate = Validation.validate;
+	// end:source ../src/Class.Static.js
 	
 	
 	// source ../src/fn/fn.js
@@ -1804,6 +1930,7 @@
 			
 			
 		
+		// end:source memoize.js
 		
 		Class.Fn = {
 			memoize: fn_memoize,
@@ -1811,6 +1938,7 @@
 		};
 		
 	}());
+	// end:source ../src/fn/fn.js
 	
 	exports.Class = Class;
 	

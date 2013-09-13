@@ -1,9 +1,21 @@
-(function() {
+include
+	.load('demos.mask')
+	.done(function(resp) {
 
 	
 	mask.registerHandler(':view:index', Class({
 		Base: mask.getHandler(':view:default'),
-		
+		compos: {
+			overlay: 'compo: :overlay',
+			tmpl : 'compo: #demo-task-tracker'
+		},
+		slots: {
+			demoTaskTracker: function(){
+				
+				
+				this.compos.overlay.show('task-tracker', resp.load.demos);
+			}
+		},
 		Override: {
 			
 			activate: function(){
@@ -16,7 +28,7 @@
 				//app.compos.navigation.focus();
 			}
 		},
-		
+		resource: include,
 		onRenderStart: function(){
 			
 			this.model = {
@@ -81,9 +93,13 @@
 		
 		},
 		show: function(tag) {
-			//window.compos.menu.blur();
+			
+		},
+		
+		onRenderEnd: function(){
+			
 		}
 	}));
 
 
-}());
+});

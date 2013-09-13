@@ -9,8 +9,8 @@ include
     }
 
     mask.registerHandler(':spinner', Compo({
-        template: '._01;._02;._03',
         tagName: 'div',
+        template: '._01;._02;._03',
         attr: {
             'class': '-spinner'
         },
@@ -19,14 +19,11 @@ include
             c2: '$: ._02',
             c3: '$: ._03'
         },
-        onRenderStart: function() {
-
-        },
-
+        
         onRenderEnd: function() {
-            if (this.attr.autostart) {
+            
+            if (this.attr.autostart) 
                 this.start();
-            }
         },
         
         start: function(){

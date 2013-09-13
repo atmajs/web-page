@@ -18,6 +18,12 @@ compos-info:
 		
 	':pageActivity' :
 		mode: client
+	
+	':overlay' :
+		mode: client
+
+	':sourceViewer' :
+		mode: client
 
 	':spinner' :
 		mode: client

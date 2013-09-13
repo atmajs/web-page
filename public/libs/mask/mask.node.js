@@ -6,8 +6,9 @@
     var _global, _exports, _document;
 
     
-	if (typeof exports !== 'undefined' && (root === exports || root == null)){
+	if (typeof exports !== 'undefined' && (root == null || root === exports || root === global)){
 		// raw nodejs module
+        root = exports;
     	_global = global;
     }
 	
@@ -35,7 +36,7 @@
     };
 
     
-    if (typeof module !== 'undefined') {
+    if (typeof exports !== 'undefined' && exports === root) {
         module.exports = construct();
         return;
     }
@@ -58,6 +59,7 @@
 }(this, function (global, exports, document) {
     'use strict';
 
+// end:source ../src/umd-head.js
 
 
 
@@ -71,8 +73,17 @@
 			';': /\\>/g
 		},
 		hasOwnProp = {}.hasOwnProperty,
-		listeners = null;
+		listeners = null,
+		
+		__cfg = {
+			
+			/*
+			 * Relevant to node.js only, to enable compo caching
+			 */
+			allowCache: true
+		};
 	
+	// end:source ../src/scope-vars.js
 	// source ../src/util/util.js
 	function util_extend(target, source) {
 	
@@ -192,6 +203,28 @@
 		return array == null ? string : array;
 	}
 	
+	// end:source ../src/util/util.js
+    // source ../src/util/attr.js
+    function attr_extend(target, source) {
+        if (target == null) 
+            target = {};
+        
+        if (source == null) 
+            return target;
+        
+        for (var key in source) {
+            
+            if (key === 'class' && typeof target[key] === 'string') {
+                target[key] += ' ' + source[key];
+                continue;
+            }
+            
+            target[key] = source[key];
+        }
+        
+        return target;
+    }
+    // end:source ../src/util/attr.js
 	// source ../src/util/template.js
 	function Template(template) {
 		this.template = template;
@@ -264,6 +297,7 @@
 	
 	};
 	
+	// end:source ../src/util/template.js
 	// source ../src/util/string.js
 	function str_trim(str) {
 	
@@ -293,10 +327,12 @@
 			? str
 			: str.substring(i, j + 1);
 	}
+	// end:source ../src/util/string.js
 	// source ../src/util/function.js
 	function fn_isFunction(x) {
 		return typeof x === 'function';
 	}
+	// end:source ../src/util/function.js
 	// source ../src/util/condition.js
 	/**
 	 *	ConditionUtil
@@ -618,6 +654,7 @@
 		};
 	}());
 	
+	// end:source ../src/util/condition.js
 	// source ../src/expression/exports.js
 	/**
 	 * ExpressionUtil
@@ -701,6 +738,7 @@
 		precedence[op_LogicalAnd] = 6;
 		precedence[op_LogicalOr] = 6;
 		
+		// end:source 1.scope-vars.js
 		// source 2.ast.js
 		function Ast_Body(parent) {
 			this.parent = parent;
@@ -864,6 +902,7 @@
 		
 		}
 		
+		// end:source 2.ast.js
 		// source 3.util.js
 		function _throw(message, token) {
 			console.error('Expression parser:', message, token, template.substring(index));
@@ -939,6 +978,7 @@
 			return value;
 		}
 		
+		// end:source 3.util.js
 		// source 4.parser.helper.js
 		function parser_skipWhitespace() {
 			var c;
@@ -1148,6 +1188,7 @@
 			_throw('Unexpected / Unsupported directive');
 			return null;
 		}
+		// end:source 4.parser.helper.js
 		// source 5.parser.js
 		function expression_parse(expr) {
 		
@@ -1376,6 +1417,7 @@
 		
 			return ast;
 		}
+		// end:source 5.parser.js
 		// source 6.eval.js
 		function expression_evaluate(mix, model, cntx, controller) {
 		
@@ -1507,6 +1549,7 @@
 			return result;
 		}
 		
+		// end:source 6.eval.js
 		// source 7.vars.helper.js
 		var refs_extractVars = (function() {
 		
@@ -1706,6 +1749,7 @@
 		
 		}());
 		
+		// end:source 7.vars.helper.js
 	
 	
 		return {
@@ -1733,6 +1777,7 @@
 	
 	}());
 	
+	// end:source ../src/expression/exports.js
 	// source ../src/custom.js
 	var custom_Utils = {
 		condition: ConditionUtil.condition,
@@ -1782,6 +1827,7 @@
 		// use on server to define reserved tags and its meta info
 		custom_Tags_defs = {};
 	
+	// end:source ../src/custom.js
 	// source ../src/dom/dom.js
 	
 	var Dom = {
@@ -1857,6 +1903,7 @@
 		modelRef: null
 	};
 	
+	// end:source ../src/dom/dom.js
 	// source ../src/parse/parser.js
 	var Parser = (function(Node, TextNode, Fragment, Component) {
 	
@@ -2365,6 +2412,7 @@
 		};
 	}(Node, TextNode, Fragment, Component));
 	
+	// end:source ../src/parse/parser.js
 
 	// source ../src/build/html/builder.js
 	var builder_build = (function() {
@@ -2569,6 +2617,7 @@
 		
 		}
 		
+		// end:source stringify.js
 		// source util.js
 		
 		var html_SingleTags = {
@@ -2647,6 +2696,7 @@
 		}
 		
 		
+		// end:source util.js
 		// source html_dom.js
 		
 		util_extend(Dom, {
@@ -2718,6 +2768,7 @@
 			}
 		};
 		
+		// end:source html_dom.js
 		// source handlers/document.js
 		(function() {
 		
@@ -2797,6 +2848,7 @@
 		
 		}());
 		
+		// end:source handlers/document.js
 	
 	
 		var _controllerID = 0;
@@ -2893,6 +2945,7 @@
 				
 				container = tag;
 				
+				// end:source ../type.node.js
 			}
 	
 			if (type === 2 /* Dom.TEXTNODE */) {
@@ -2940,6 +2993,7 @@
 					container.appendChild(document.createTextNode(content));
 				}
 				
+				// end:source ../type.textNode.js
 				return container;
 			}
 	
@@ -2955,7 +3009,7 @@
 					*/
 				
 					handler.compoName = node.tagName;
-					handler.attr = attr = util_extend(handler.attr, node.attr);
+					handler.attr = attr = attr_extend(handler.attr, node.attr);
 				
 				
 					for (key in attr) {
@@ -3026,6 +3080,7 @@
 					return container;
 				}
 				
+				// end:source ../type.component.js
 			}
 	
 			var nodes = node.nodes;
@@ -3066,6 +3121,7 @@
 	
 	}());
 	
+	// end:source ../src/build/html/builder.js
 	
 	// source ../src/mask.js
 	
@@ -3348,6 +3404,30 @@
 			
 			compoIndex: function(index){
 				_controllerID = index;
+			},
+			
+			cfg: function(){
+				var args = arguments;
+				if (args.length === 0) {
+					return __cfg;
+				}
+				
+				var key, value;
+				
+				if (args.length === 2) {
+					key = args[0];
+					
+					__cfg[key] = args[1];
+					return;
+				}
+				
+				var obj = args[0];
+				if (typeof obj === 'object') {
+					
+					for (key in obj) {
+						__cfg[key] = obj[key]
+					}
+				}
 			}
 		};
 	
@@ -3360,6 +3440,7 @@
 	 **/
 	Mask.renderDom = Mask.render;
 	
+	// end:source ../src/mask.js
 
 
 
@@ -3559,11 +3640,13 @@
 			};
 		}());
 		
+		// end:source stringify.js
 	
 		mask.stringify = stringify;
 	
 	}(Mask));
 	
+	// end:source ../src/formatter/stringify.lib.js
 
 
 	/* Handlers */
@@ -3747,6 +3830,7 @@
 	
 	}(Mask));
 	
+	// end:source ../src/handlers/sys.js
 	// source ../src/handlers/utils.js
 	(function(mask) {
 	
@@ -3854,6 +3938,7 @@
 	
 	}(Mask));
 	
+	// end:source ../src/handlers/utils.js
 
 	// source ../src/libs/compo.js
 	
@@ -3877,6 +3962,7 @@
 			console.warn('jQuery / Zepto etc. was not loaded before compo.js, please use Compo.config.setDOMLibrary to define dom engine');
 		}
 		
+		// end:source ../src/scope-vars.js
 	
 		// source ../src/util/object.js
 		function obj_extend(target, source){
@@ -3904,6 +3990,7 @@
 			return copy;
 		}
 		
+		// end:source ../src/util/object.js
 		// source ../src/util/function.js
 		function fn_proxy(fn, context) {
 			
@@ -3912,6 +3999,7 @@
 			};
 			
 		}
+		// end:source ../src/util/function.js
 		// source ../src/util/selector.js
 		function selector_parse(selector, type, direction) {
 			if (selector == null){
@@ -3933,7 +4021,7 @@
 					break;
 				case '.':
 					key = 'class';
-					selector = new RegExp('\\b' + selector.substring(1) + '\\b');
+					selector = sel_hasClassDelegate(selector.substring(1));
 					prop = 'attr';
 					break;
 				default:
@@ -3969,11 +4057,17 @@
 				return false;
 			}
 		
+			if (typeof selector.selector === 'function') {
+				return selector.selector(obj[selector.key]);
+			}
+			
 			if (selector.selector.test != null) {
 				if (selector.selector.test(obj[selector.key])) {
 					return true;
 				}
-			} else {
+			}
+			
+			else {
 				// == - to match int and string
 				if (obj[selector.key] == selector.selector) {
 					return true;
@@ -3983,6 +4077,40 @@
 			return false;
 		}
 		
+		
+		
+		function sel_hasClassDelegate(matchClass) {
+			return function(className){
+				return sel_hasClass(className, matchClass);
+			};
+		}
+		
+		// [perf] http://jsperf.com/match-classname-indexof-vs-regexp/2
+		function sel_hasClass(className, matchClass, index) {
+			if (typeof className !== 'string')
+				return false;
+			
+			if (index == null) 
+				index = 0;
+				
+			index = className.indexOf(matchClass, index);
+		
+			if (index === -1)
+				return false;
+		
+			if (index > 0 && className.charCodeAt(index - 1) > 32)
+				return sel_hasClass(className, matchClass, index + 1);
+		
+			var class_Length = className.length,
+				match_Length = matchClass.length;
+				
+			if (index < class_Length - match_Length && className.charCodeAt(index + match_Length) > 32)
+				return sel_hasClass(className, matchClass, index + 1);
+		
+			return true;
+		}
+		
+		// end:source ../src/util/selector.js
 		// source ../src/util/traverse.js
 		function find_findSingle(node, matcher) {
 			if (node instanceof Array) {
@@ -4002,8 +4130,13 @@
 			return (node = node[matcher.nextKey]) && find_findSingle(node, matcher);
 		}
 		
+		// end:source ../src/util/traverse.js
 		// source ../src/util/dom.js
 		function dom_addEventListener(element, event, listener) {
+			
+			if (EventDecorator != null) {
+				event = EventDecorator(event);
+			}
 			
 			// allows custom events - in x-signal, for example
 			if (domLib != null) {
@@ -4020,6 +4153,7 @@
 			}
 		}
 		
+		// end:source ../src/util/dom.js
 		// source ../src/util/domLib.js
 		/**
 		 *	Combine .filter + .find
@@ -4040,6 +4174,7 @@
 			return $set;
 		}
 		
+		// end:source ../src/util/domLib.js
 	
 		// source ../src/compo/children.js
 		var Children_ = {
@@ -4103,6 +4238,7 @@
 			}
 		};
 		
+		// end:source ../src/compo/children.js
 		// source ../src/compo/events.js
 		var Events_ = {
 			on: function(component, events, $element) {
@@ -4152,6 +4288,7 @@
 		},
 			EventDecorator = null;
 		
+		// end:source ../src/compo/events.js
 		// source ../src/compo/events.deco.js
 		var EventDecos = (function() {
 		
@@ -4198,6 +4335,7 @@
 		
 		}());
 		
+		// end:source ../src/compo/events.deco.js
 		// source ../src/compo/pipes.js
 		var Pipes = (function() {
 		
@@ -4231,10 +4369,6 @@
 					!event && console.error('Signal: event type is not set', attrValue);
 					// endif
 		
-		
-					if (EventDecorator != null) {
-						event = EventDecorator(event);
-					}
 		
 					dom_addEventListener(element, event, Handler);
 		
@@ -4357,6 +4491,7 @@
 		
 		}());
 		
+		// end:source ../src/compo/pipes.js
 	
 		// source ../src/compo/anchor.js
 		
@@ -4430,6 +4565,7 @@
 		
 		}());
 		
+		// end:source ../src/compo/anchor.js
 		// source ../src/compo/Compo.js
 		var Compo = (function() {
 		
@@ -4602,6 +4738,7 @@
 				};
 			}
 			
+			// end:source Compo.util.js
 			// source Compo.static.js
 			obj_extend(Compo, {
 				create: function(controller){
@@ -4791,10 +4928,15 @@
 					}
 					
 					return include.instance();
+				},
+				
+				Dom: {
+					addEventListener: dom_addEventListener
 				}
 			});
 			
 			
+			// end:source Compo.static.js
 			// source async.js
 			(function(){
 				
@@ -4909,6 +5051,7 @@
 				};
 				
 			}());
+			// end:source async.js
 		
 			var Proto = {
 				type: Dom.CONTROLLER,
@@ -4935,11 +5078,6 @@
 						container = arguments[0][2];
 					}
 		
-		
-					if (typeof this.onRenderStart === 'function'){
-						this.onRenderStart(model, cntx, container);
-					}
-		
 					// - do not override with same model
 					//if (this.model == null){
 					//	this.model = model;
@@ -4947,6 +5085,10 @@
 		
 					if (this.nodes == null){
 						compo_ensureTemplate(this);
+					}
+					
+					if (typeof this.onRenderStart === 'function'){
+						this.onRenderStart(model, cntx, container);
 					}
 		
 				},
@@ -4995,9 +5137,14 @@
 					var parent;
 		
 					if (this.$ == null) {
-						var dom = typeof template === 'string' ? mask.compile(template) : template;
+						var dom = typeof template === 'string'
+							? mask.compile(template)
+							: template;
 		
-						parent = selector ? find_findSingle(this, selector_parse(selector, Dom.CONTROLLER, 'down')) : this;
+						parent = selector
+							? find_findSingle(this, selector_parse(selector, Dom.CONTROLLER, 'down'))
+							: this;
+							
 						if (parent.nodes == null) {
 							this.nodes = dom;
 							return this;
@@ -5007,15 +5154,20 @@
 		
 						return this;
 					}
-					var array = mask.render(template, model, null, compo_containerArray(), this);
+					
+					var fragment = mask.render(template, model, null, null, this);
 		
-					parent = selector ? this.$.find(selector) : this.$;
-					for (var i = 0; i < array.length; i++) {
-						parent.append(array[i]);
-					}
-		
+					parent = selector
+						? this.$.find(selector)
+						: this.$;
+						
+					
+					parent.append(fragment);
+					
+					
+					// @todo do not emit to created compos before
 					this.emitIn('domInsert');
-					//- Shots.emit(this, 'DOMInsert');
+					
 					return this;
 				},
 				find: function(selector){
@@ -5110,6 +5262,7 @@
 			return Compo;
 		}());
 		
+		// end:source ../src/compo/Compo.js
 		// source ../src/compo/signals.js
 		(function() {
 		
@@ -5138,10 +5291,6 @@
 					// endif
 		
 					if (Handler) {
-		
-						if (EventDecorator != null) {
-							event = EventDecorator(event);
-						}
 		
 						signals += ',' + handler + ',';
 						dom_addEventListener(element, event, Handler);
@@ -5389,6 +5538,7 @@
 		
 		}());
 		
+		// end:source ../src/compo/signals.js
 	
 		// source ../src/jcompo/jCompo.js
 		(function(){
@@ -5426,6 +5576,7 @@
 		
 		}());
 		
+		// end:source ../src/jcompo/jCompo.js
 	
 		// source ../src/handler/slot.js
 		
@@ -5449,12 +5600,14 @@
 			}
 		};
 		
+		// end:source ../src/handler/slot.js
 	
 	
 		return Compo;
 	
 	}(Mask));
 	
+	// end:source ../src/libs/compo.js
 	// source ../src/libs/jmask.js
 	
 	var jmask = exports.jmask = (function(mask){
@@ -5475,6 +5628,7 @@
 		}
 		
 		
+		// end:source ../src/scope-vars.js
 	
 		// source ../src/util/object.js
 		function util_extend(target, source){
@@ -5492,6 +5646,7 @@
 			return target;
 		}
 		
+		// end:source ../src/util/object.js
 		// source ../src/util/array.js
 		function arr_each(array, fn) {
 			for (var i = 0, length = array.length; i < length; i++) {
@@ -5563,6 +5718,7 @@
 		}());
 		
 		
+		// end:source ../src/util/array.js
 		// source ../src/util/selector.js
 		
 		var sel_key_UP = 'parent',
@@ -5693,7 +5849,7 @@
 		
 		// [perf] http://jsperf.com/match-classname-indexof-vs-regexp/2
 		function sel_hasClass(className, matchClass, index) {
-			if (className == null) 
+			if (typeof className !== 'string')
 				return false;
 			
 			if (index == null) 
@@ -5788,6 +5944,7 @@
 			return matched;
 		}
 		
+		// end:source ../src/util/selector.js
 		// source ../src/util/utils.js
 		
 		function jmask_filter(arr, matcher) {
@@ -5928,6 +6085,7 @@
 		////////}
 		
 		
+		// end:source ../src/util/utils.js
 	
 		// source ../src/jmask/jmask.js
 		function jMask(mix) {
@@ -6082,7 +6240,7 @@
 			},
 		
 			text: function(mix, cntx, controller){
-				if (typeof mix === 'string') {
+				if (typeof mix === 'string' && arguments.length === 1) {
 					var node = [new Dom.TextNode(mix)];
 		
 					for(var i = 0, x, imax = this.length; i < imax; i++){
@@ -6152,6 +6310,7 @@
 		
 		});
 		
+		// end:source ../src/jmask/jmask.js
 		// source ../src/jmask/manip.attr.js
 		(function() {
 			arr_each(['add', 'remove', 'toggle', 'has'], function(method) {
@@ -6355,6 +6514,7 @@
 		
 		}());
 		
+		// end:source ../src/jmask/manip.attr.js
 		// source ../src/jmask/manip.dom.js
 		
 		
@@ -6384,9 +6544,16 @@
 		
 					result[i] = $wrapper[0];
 		
-					if (this[i].parent != null){
-						this[i].parent.nodes = result[i];
-					}
+					var parentNodes = this[i].parent && this[i].parent.nodes;
+		            if (parentNodes != null){
+		                for(var j = 0, jmax = parentNodes.length; j < jmax; j++){
+		                    if (parentNodes[j] === this[i]){
+		                        
+		                        parentNodes.splice(j, 1, result[i]);
+		                        break;
+		                    }
+		                }
+		            }
 				}
 		
 				return jMask(result);
@@ -6432,6 +6599,7 @@
 			};
 		});
 		
+		// end:source ../src/jmask/manip.dom.js
 		// source ../src/jmask/traverse.js
 		util_extend(jMask.prototype, {
 			each: function(fn, cntx) {
@@ -6518,6 +6686,7 @@
 		
 		});
 		
+		// end:source ../src/jmask/traverse.js
 	
 	
 	
@@ -6525,6 +6694,7 @@
 	
 	}(Mask));
 	
+	// end:source ../src/libs/jmask.js
 
 
 	return Mask;

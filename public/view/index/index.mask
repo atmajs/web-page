@@ -17,10 +17,10 @@ layout:view master='view-full' {
             
             }
             
-            .-about-content {
+          
             
-            div style='text-align:justify; padding-right: 15px;' {
-                div >
+            .-about-content {
+               div >
                     "As we do not want to keep things tight together as one monolith framework,
                     this Project is split into stand-alone libraries, which cover all app layers of scalable, performant and testable 
                     Node.js or HTML5 applications.
@@ -56,9 +56,20 @@ layout:view master='view-full' {
                         }
                 }
                 
+                .-about-demos {
+                    .-about-demo {
+                        button disabled > i > '... in dev'
+                    }
+                    
+                    .-about-demo {
+                        button x-signal='click: demoTaskTracker' > 'Task Tracker'
+                    }
+                }
+                
             }
+            
 
-
+            .-about-content {
                 p {
                     h3 > 'Component Oriented Programming'
                     div > 'Main Feature of MaskJS, beyond its simple markup and fast parsers, is the MaskDOM and Custom Tags. With it you develop not the application,
@@ -71,7 +82,6 @@ layout:view master='view-full' {
                             h4 > 'Encapsulation'
                             'Usually dialogs markup looks as such:'
                             prism language="markup" > pre:indent {"
-        
                                 <div class='overlay'>
                                     <div class='container'>
                                         <div class='dialog'>
@@ -81,7 +91,7 @@ layout:view master='view-full' {
                             "}
                             
                             'With MaskJS it could be:'
-                            prism language="css" > pre:indent {"
+                            :prism language="mask" > pre:indent {"
                                 :dialog {
                                     // content
                                 }
@@ -92,8 +102,8 @@ layout:view master='view-full' {
         
                             'E.g. : Additional tool in responsible design'
         
-                            prism > ':screen small="Compo1" big="Compo2" { <!-- template --> }'
-                            prism > "mask.registerHandler(':myCompo', Info.smallScreen ? Compo1 : Compo2); "
+                            :prism language=mask > ''':screen small="Compo1" big="Compo2";'''
+                            :prism > "mask.registerHandler(':myCompo', Info.smallScreen ? Compo1 : Compo2); "
                         }
                         li {
                             h4 > 'Inheritance'
@@ -117,3 +127,6 @@ layout:view master='view-full' {
     }
 
 }
+
+:overlay;
+

@@ -54,6 +54,14 @@ window.L = include.exports = {
 				}
 			]
 		},
+		
+		{
+			env: 'both',
+			file: 'ruta/ruta.js',
+			name: 'RutaJS',
+			enabled: false,
+			exports: ['ruta']
+		},
 		{
 			env: 'browser',
 			file: 'mask/mask.animation.js',
@@ -67,13 +75,6 @@ window.L = include.exports = {
 			name: 'Ruqq.Arr',
 			enabled: false,
 			exports: ['ruqq.arr']
-		},
-		{
-			env: 'browser',
-			file: 'ruqq/routes.js',
-			name: 'Ruqq.Routes',
-			enabled: false,
-			exports: ['routes']
 		},
 		
 	]

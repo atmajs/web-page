@@ -1,0 +1,23 @@
+% if='execute' {
+	.-sourceViewer-tools {
+		button x-signal='click: toggleCode' > 'Run'
+	}
+}
+.-sourceViewer {
+	
+	.-sourceViewer-tree {
+		% use='files' > :treeView;
+	}
+	.-sourceViewer-code {
+		:tabs {
+			
+			@panels {
+				% each='files' >
+					div name='~[.]' >
+						:prism language='~[langFromFile:.]' src='~[.]';
+			}
+		}
+	}
+	
+	:executor;
+}

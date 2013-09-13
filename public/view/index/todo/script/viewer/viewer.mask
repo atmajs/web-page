@@ -1,0 +1,41 @@
+
+nav.navbar.navbar-default {
+	ul.nav.navbar-nav {
+		li > :bs:dropdown {
+			a href='#' {
+			
+				span {
+					'I have ( ' i > '~[bind:settings.time]' ' ) '
+				}
+				
+				b.caret;
+			}
+			@select {
+				a href='#' > em > 'none'
+				
+				% each='timings' >
+					a href='#' data-value='~[.]' >
+						'~[formatTime:.]'
+			}
+		}
+		
+		li > a href='#' x-toggle='click: settings.sort.time == "asc" ? "desc" : "asc"' {
+			span > 'Duration '
+			
+			
+			.glyphicon.~[bind:settings.sort.time == "asc"
+					? "glyphicon-sort-by-attributes"
+					: "glyphicon-sort-by-attributes-alt"
+			];
+		
+		}
+	}
+	ul.nav.navbar-right.navbar-form >
+		button.btn.btn-success x-signal='click: taskCreate' >
+			'Create'
+
+}
+
+.-vw-list-group filter='~[bind: applyFilter() && settings.time && settings.sort.time]' >
+	%% each='tasks' >
+	    :viewer:item;
