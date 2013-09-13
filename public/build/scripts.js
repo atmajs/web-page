@@ -11236,19 +11236,14 @@ include.setCurrent({
 include.load("executor.mask::Template").done(function(resp) {
     mask.registerHandler(":executor", Compo({
         template: resp.load.Template,
-        events: {
-            "click: .-executor-switch": function() {
-                this.$.toggleClass("__show");
-            },
-            "resize: *": function() {
-                alert();
-            }
+        show: function() {
+            this.$.addClass("__show");
         },
-        slots: {
-            iframeLoaded: function() {},
-            iframeResize: function() {
-                alert();
-            }
+        hide: function() {
+            this.$.removeClass("__show");
+        },
+        toggle: function() {
+            return this.$.toggleClass("__show").hasClass("__show");
         },
         onRenderStart: function(model, cntx, container) {},
         onRenderEnd: function(elements, cntx, container) {}
@@ -11423,12 +11418,19 @@ include.load("sourceViewer.mask::Template").js("executor/executor.js").js({
         template: resp.load.Template,
         compos: {
             tree: "compo: :treeView",
-            tabs: "compo: :tabs"
+            tabs: "compo: :tabs",
+            executor: "compo: :executor"
         },
         events: {
             "change: .-treeView-tree": function(event, sender, $node) {
                 var path = sender.getSelectedPath();
                 this.compos.tabs.setActive(path);
+            }
+        },
+        slots: {
+            toggleCode: function(event) {
+                var visible = this.compos.executor.toggle();
+                event.target.textContent = visible ? "Hide" : "Run";
             }
         },
         onRenderStart: function(model, ctx, container) {

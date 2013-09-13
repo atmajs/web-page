@@ -119,7 +119,11 @@
 	
 }
  </script>
-<script type='include/load' id='includejs-publiccomposourceViewersourceViewermask' data-appuri='/public/compo/sourceViewer/sourceViewer.mask'> 
+<script type='include/load' id='includejs-publiccomposourceViewersourceViewermask' data-appuri='/public/compo/sourceViewer/sourceViewer.mask'> % if='execute' {
+	.-sourceViewer-tools {
+		button x-signal='click: toggleCode' > 'Run'
+	}
+}
 .-sourceViewer {
 	
 	.-sourceViewer-tree {
@@ -146,8 +150,6 @@
 		:animation #show {
 			
 		}
-		
-		.-executor-switch > '⇄'
 		
 		iframe.-executor-frame
 			height='100%'

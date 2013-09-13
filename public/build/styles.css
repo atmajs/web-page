@@ -105,19 +105,22 @@
 
 .-downloader .modules { padding-left: 20px; }
 .-downloader .modules.disabled { opacity: .6; }
-/**
- * sourceViewer Styles
- *
- * example:
- *
- * .-sourceViewer 
- *
- */
 .-sourceViewer {
-  position: relative;
-  max-width: 100%;
-  height: 100%;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  position: absolute;
+  top: 50px;
+  left: 20px;
+  right: 20px;
+  bottom: 0px;
   background: #eee;
+}
+.-sourceViewer-tools {
+  min-height: 50px;
+  line-height: 50px;
+  vertical-align: middle;
+  text-align: center;
 }
 .-sourceViewer-tree {
   float: left;
@@ -148,16 +151,21 @@
  */
 .-executor {
   position: absolute;
-  width: 90%;
-  height: 90%;
-  left: 5%;
-  top: 5%;
+  width: 100%;
+  height: 100%;
+  top: 0px;
+  left: 0px;
   -webkit-transition: -webkit-transform 200ms ease-out;
   -moz-transition: -moz-transform 200ms ease-out;
   -o-transition: -o-transform 200ms ease-out;
   -ms-transition: -ms-transform 200ms ease-out;
   transition: transform 200ms ease-out;
-  display: none;
+  -webkit-transform: translateX(105%);
+  -moz-transform: translateX(105%);
+  -o-transform: translateX(105%);
+  -ms-transform: translateX(105%);
+  transform: translateX(105%);
+  opacity: 0;
 }
 .-executor.__show {
   -webkit-transform: translateX(0%);
@@ -166,32 +174,12 @@
   -ms-transform: translateX(0%);
   transform: translateX(0%);
   opacity: 1;
-  -webkit-box-shadow: 0px 0px 5px #000;
-  -moz-box-shadow: 0px 0px 5px #000;
-  box-shadow: 0px 0px 5px #000;
 }
 .-executor > iframe {
   border: none;
   background: #eee;
   width: 100%;
   height: 100%;
-}
-.-executor > .-executor-switch {
-  font-size: 40px;
-  line-height: 36px;
-  position: absolute;
-  left: -56px;
-  text-shadow: 1px 0px 1px #000;
-  cursor: pointer;
-  color: white;
-  background: #333;
-  border: 1px solid #111;
-  -webkit-box-shadow: 0px 0px 4px #fff;
-  -moz-box-shadow: 0px 0px 4px #fff;
-  box-shadow: 0px 0px 4px #fff;
-}
-.-executor > .-executor-switch:hover {
-  color: #f97732;
 }
 
 .-treeView-tree {
