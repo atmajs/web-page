@@ -17,6 +17,6 @@
                     /public/view/index/todo/script/editor/editor.js,
                     /public/view/index/todo/script/editor/editor.mask
                 '
-                execute='/public/view/index/todo/index.html'
+                execute='/public/view/index/todo/release/index.html'
             ;
         }

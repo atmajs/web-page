@@ -19,17 +19,19 @@ Style.prototype = {
 			return;
 		}
 		
-		this.model = ['/public/build/styles.css'];
+		
 		
 		var pageData = ctx.page.data,
 			id = pageData.id,
-			data = app.config.build[id];
+			data = app.config.build[id],
+			version = app.config.buildVersion;
 			
-					
+		this.model = ['/public/build/styles.css?v=' + version];
+		
 		if (data.styles) {
 			this
 				.model
-				.push('/public/build/' + id  + '/styles.css');
+				.push('/public/build/' + id  + '/styles.css?v=' + version);
 		}
 		
 		

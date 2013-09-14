@@ -106,7 +106,7 @@ function initialize() {
 					
 					new io
 						.File('public/build/stats.json')
-						.write(JSON.stringify({build: Stats}, null, 4));
+						.write(JSON.stringify({build: Stats, buildVersion: Date.now()}, null, 4));
 					
 					console.log('DONE'.green.bold);
 				});
