@@ -5,14 +5,14 @@ module.exports = {
 		file: "index.html",
 		outputMain: "release/index.html",
 		outputSources: "release/src",
-		minify: true,
+		minify: false,
 		/** UglifyJS compressor settings */
 		uglify: {},
 		/** is used in UglifJS:def_globals and in conditional comment derectives */
 		defines: {
 			DEBUG: false
 		},
-		jshint: JSHint()
+		//jshint: JSHint()
 	}
 };
 
