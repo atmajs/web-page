@@ -26,6 +26,7 @@ both:
 			- tabs
 			- radio
 			- markdown
+			- lazy
 			
 		public.compo:
 			- scroller

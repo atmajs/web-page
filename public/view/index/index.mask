@@ -58,7 +58,7 @@ layout:view master='view-full' {
                 
                 .-about-demos {
                     .-about-demo {
-                        button disabled > i > '... in dev'
+                        button x-signal='click: demoNote' > 'Notes'
                     }
                     
                     .-about-demo {
@@ -66,6 +66,29 @@ layout:view master='view-full' {
                     }
                 }
                 
+                p {
+                    h4 > 'Notes'
+                    i > 'Server side application demo. There is no javascript on the client.'
+                    div > 'Some advantages of the atma-server library:'
+                    ul {
+                        li > 'Component Driven Development for the server side'
+                        li > 'Deliver rendered HTML to the client (SEO / users with disabled Javascript)'
+                        li > 'Hot Autoreload - Server and Client ( Server is not restarted, but the changed file is replaced )'
+                        li > 'Hide sensitive data from the frontend in server-only components'
+                    }
+                    
+                    h4 > 'Tasks'
+                    i > 'Client side application demo. There is no server required, but there is a built-in static file server'
+                    
+                    h4 > 'Hybrid application'
+                    i > 'It is possible to merge this two application types from above.'
+                    
+                    ul {
+                        li > 'Decide if the component is rendered on the server side, on the client or both'
+                        li > 'Great code reuse'
+                    }
+                    
+                }
             }
             
 

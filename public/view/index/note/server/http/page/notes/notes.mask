@@ -1,0 +1,11 @@
+layout:view master='default' {
+	@content #body {
+		
+		header >
+			h4 > 'My Notes'
+		
+		hr;
+		
+		:notes;
+	}
+}

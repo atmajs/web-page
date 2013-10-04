@@ -14,8 +14,7 @@
     "atma-io": ">0.0.0",
     "atma-libs": ">0.0.0",
     "atma-logger": ">0.0.0",
-    "atma-server": ">0.0.0",
-    "mongodb": ">0.0.0"
+    "atma-server": ">0.0.0"
   },
   
   "keywords": [],

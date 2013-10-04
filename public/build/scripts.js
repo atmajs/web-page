@@ -1012,6 +1012,9 @@ include.register({
         id: "/.reference/atma/compos/markdown/lib/markdown.js",
         url: "/.reference/atma/compos/markdown/lib/markdown.js"
     }, {
+        id: "/.reference/atma/compos/lazy/lib/lazy.js",
+        url: "/.reference/atma/compos/lazy/lib/lazy.js"
+    }, {
         id: "/public/compo/scroller/scroller.js",
         url: "/public/compo/scroller/scroller.js"
     }, {
@@ -4433,25 +4436,35 @@ include.setCurrent({
             return obj;
         }
     };
-    function fn_proxy(fn, cntx) {
+    function fn_proxy(fn, ctx) {
         return function() {
             switch (arguments.length) {
               case 1:
-                return fn.call(cntx, arguments[0]);
+                return fn.call(ctx, arguments[0]);
 
               case 2:
-                return fn.call(cntx, arguments[0], arguments[1]);
+                return fn.call(ctx, arguments[0], arguments[1]);
 
               case 3:
-                return fn.call(cntx, arguments[0], arguments[1], arguments[2]);
+                return fn.call(ctx, arguments[0], arguments[1], arguments[2]);
 
               case 4:
-                return fn.call(cntx, arguments[0], arguments[1], arguments[2], arguments[3]);
+                return fn.call(ctx, arguments[0], arguments[1], arguments[2], arguments[3]);
 
               case 5:
-                return fn.call(cntx, arguments[0], arguments[1], arguments[2], arguments[3], arguments[4]);
+                return fn.call(ctx, arguments[0], arguments[1], arguments[2], arguments[3], arguments[4]);
             }
-            return fn.apply(cntx, arguments);
+            return fn.apply(ctx, arguments);
+        };
+    }
+    function fn_isFunction(fn) {
+        return "function" === typeof fn;
+    }
+    function fn_createDelegate(fn) {
+        var args = Array.prototype.slice.call(arguments, 1);
+        return function() {
+            if (arguments.length > 0) args = args.concat(arguments);
+            return fn.apply(null, args);
         };
     }
     var XHR = {};
@@ -4719,32 +4732,37 @@ include.setCurrent({
         resolve: function() {
             this._fail = null;
             this._resolved = arguments;
-            var cbs = this._done, imax = cbs && cbs.length, i = 0;
-            if (cbs) {
-                this._done = null;
-                while (0 !== imax--) cbs[i++].apply(this, arguments);
+            var _done = this._done, _always = this._always, imax, i;
+            this._done = null;
+            this._always = null;
+            if (null != _done) {
+                imax = _done.length;
+                i = 0;
+                while (0 !== imax--) _done[i++].apply(this, arguments);
+                _done.length = 0;
             }
-            cbs = this._always;
-            imax = cbs && cbs.length, i = 0;
-            if (cbs) {
-                this._always = null;
-                while (0 !== imax--) cbs[i++].apply(this, this);
+            if (null != _always) {
+                imax = _always.length;
+                i = 0;
+                while (0 !== imax--) _always[i++].call(this, this);
             }
             return this;
         },
         reject: function() {
             this._done = null;
             this._rejected = arguments;
-            var cbs = this._fail, imax = cbs && cbs.length, i = 0;
-            if (cbs) {
-                this._fail = null;
-                while (0 !== imax--) cbs[i++].apply(this, arguments);
+            var _fail = this._fail, _always = this._always, imax, i;
+            this._fail = null;
+            this._always = null;
+            if (null != _fail) {
+                imax = _fail.length;
+                i = 0;
+                while (0 !== imax--) _fail[i++].apply(this, arguments);
             }
-            cbs = this._always;
-            imax = cbs && cbs.length, i = 0;
-            if (cbs) {
-                this._always = null;
-                while (0 !== imax--) cbs[i++].apply(this, this);
+            if (null != _always) {
+                imax = _always.length;
+                i = 0;
+                while (0 !== imax--) _always[i++].call(this, this);
             }
             return this;
         },
@@ -4757,7 +4775,7 @@ include.setCurrent({
             return this;
         },
         always: function(callback) {
-            if (null != this._rejected || null != this._resolved) callback.apply(this, this); else (this._always || (this._always = [])).push(callback);
+            if (null != this._rejected || null != this._resolved) callback.call(this, this); else (this._always || (this._always = [])).push(callback);
             return this;
         }
     };
@@ -4799,10 +4817,15 @@ include.setCurrent({
                 return this;
             },
             off: function(event, callback) {
-                if (null == this._listeners[event]) return this;
-                var arr = this._listeners[event], imax = arr.length, i = 0;
+                var listeners = this._listeners[event];
+                if (null == listeners) return this;
+                if (1 === arguments.length) {
+                    listeners.length = 0;
+                    return this;
+                }
+                var imax = listeners.length, i = 0;
                 for (;i < imax; i++) {
-                    if (arr[i] === callback) arr.splice(i, 1);
+                    if (listeners[i] === callback) listeners.splice(i, 1);
                     i--;
                     imax--;
                 }
@@ -4835,7 +4858,64 @@ include.setCurrent({
             validate: val_process
         };
     }();
-    var Collection = function() {
+    var Class = function(data) {
+        var _base = data.Base, _extends = data.Extends, _static = data.Static, _construct = data.Construct, _class = null, _store = data.Store, _self = data.Self, _overrides = data.Override, key;
+        if (null != _base) delete data.Base;
+        if (null != _extends) delete data.Extends;
+        if (null != _static) delete data.Static;
+        if (null != _self) delete data.Self;
+        if (null != _construct) delete data.Construct;
+        if (null != _store) {
+            if (null == _extends) _extends = _store; else if (is_Array(_extends)) _extends.unshift(_store); else _extends = [ _store, _extends ];
+            delete data.Store;
+        }
+        if (null != _overrides) delete data.Override;
+        if (data.toJSON === void 0) data.toJSON = JSONHelper.toJSON;
+        if (null == _base && null == _extends && null == _self) {
+            if (null == _construct) _class = function() {}; else _class = _construct;
+            data.constructor = _class.prototype.constructor;
+            if (null != _static) for (key in _static) _class[key] = _static[key];
+            _class.prototype = data;
+            return _class;
+        }
+        _class = function() {
+            if (null != _extends) {
+                var isarray = _extends instanceof Array, length = isarray ? _extends.length : 1, x = null;
+                for (var i = 0; isarray ? i < length : i < 1; i++) {
+                    x = isarray ? _extends[i] : _extends;
+                    if ("function" === typeof x) x.apply(this, arguments);
+                }
+            }
+            if (null != _base) _base.apply(this, arguments);
+            if (null != _self) for (var key in _self) this[key] = fn_proxy(_self[key], this);
+            if (null != _construct) {
+                var r = _construct.apply(this, arguments);
+                if (null != r) return r;
+            }
+            return this;
+        };
+        if (null != _static) for (key in _static) _class[key] = _static[key];
+        if (null != _base) class_inheritStatics(_class, _base);
+        if (null != _extends) class_inheritStatics(_class, _extends);
+        class_extendProtoObjects(data, _base, _extends);
+        class_inherit(_class, _base, _extends, data, _overrides);
+        data = null;
+        _static = null;
+        return _class;
+    };
+    Class.bind = function(cntx) {
+        var arr = arguments, i = 1, length = arguments.length, key;
+        for (;i < length; i++) {
+            key = arr[i];
+            cntx[key] = cntx[key].bind(cntx);
+        }
+        return cntx;
+    };
+    Class.Serializable = Serializable;
+    Class.Deferred = DeferredProto;
+    Class.EventEmitter = EventEmitter;
+    Class.validate = Validation.validate;
+    Class.Collection = function() {
         var ArrayProto = function() {
             function check(x, mix) {
                 if (null == mix) return false;
@@ -5007,28 +5087,6 @@ include.setCurrent({
             return new Constructor(mix);
         }
         var CollectionProto = {
-            serialize: function() {
-                return JSON.stringify(this.toArray());
-            },
-            deserialize: function(mix) {
-                for (var i = 0, imax = mix.length; i < imax; i++) this[this.length++] = create(this._constructor, mix[i]);
-                return this;
-            },
-            del: function(mix) {
-                if (null == mix && 0 !== arguments.length) {
-                    console.error("Collection.del - selector is specified, but is undefined");
-                    return this;
-                }
-                if (null == mix) {
-                    for (var i = 0, imax = this.length; i < imax; i++) this[i] = null;
-                    this.length = 0;
-                    LocalStore.prototype.del.call(this);
-                    return this;
-                }
-                var array = this.remove(mix);
-                if (0 === array.length) return this;
-                return this.save();
-            },
             toArray: function() {
                 var array = new Array(this.length);
                 for (var i = 0, imax = this.length; i < imax; i++) array[i] = this[i];
@@ -5053,11 +5111,17 @@ include.setCurrent({
     var StoreProto = {
         deserialize: function(json) {
             if ("string" === typeof json) json = JSON.parse(json);
+            if (arr_isArray(json) && typeof fn_isFunction(this.push)) {
+                for (var i = 0, imax = json.length; i < imax; i++) this.push(json[i]);
+                return this;
+            }
             for (var key in json) this[key] = json[key];
             return this;
         },
         serialize: function() {
-            return JSON.stringify(this);
+            var json = this;
+            if (fn_isFunction(json.toArray)) json = json.toArray();
+            return JSON.stringify(json);
         },
         fetch: null,
         save: null,
@@ -5070,7 +5134,7 @@ include.setCurrent({
             }
         }
     };
-    var Remote = function() {
+    Class.Remote = function() {
         var XHRRemote = function(route) {
             this._route = new Route(route);
         };
@@ -5081,9 +5145,11 @@ include.setCurrent({
             },
             save: function(callback) {
                 XHR.post(this._route.create(this), this.serialize(), callback);
+                return this;
             },
             del: function(callback) {
                 XHR.del(this._route.create(this), this.serialize(), callback);
+                return this;
             },
             onSuccess: function(response) {
                 var json;
@@ -5106,7 +5172,7 @@ include.setCurrent({
             return new XHRRemote(route);
         };
     }();
-    var LocalStore = function() {
+    Class.LocalStore = function() {
         var LocalStore = function(route) {
             this._route = new Route(route);
         };
@@ -5131,10 +5197,24 @@ include.setCurrent({
                 callback && callback();
                 return this;
             },
-            del: function(data) {
-                var path = this._route.create(data || this);
-                localStorage.removeItem(path);
-                return this;
+            del: function(mix) {
+                if (null == mix && 0 !== arguments.length) {
+                    console.error("<localStore:del> - selector is specified, but is undefined");
+                    return this;
+                }
+                if (false === arr_isArray(this)) {
+                    store_del(this._route, mix || this);
+                    return this;
+                }
+                if (null == mix) {
+                    for (var i = 0, imax = this.length; i < imax; i++) this[i] = null;
+                    this.length = 0;
+                    store_del(this._route, this);
+                    return this;
+                }
+                var array = this.remove(mix);
+                if (0 === array.length) return this;
+                return this.save();
             },
             onError: function(error) {
                 this.reject({
@@ -5142,72 +5222,16 @@ include.setCurrent({
                 });
             }
         });
+        function store_del(route, data) {
+            var path = route.create(data);
+            localStorage.removeItem(path);
+        }
         var Constructor = function(route) {
             return new LocalStore(route);
         };
         Constructor.prototype = LocalStore.prototype;
         return Constructor;
     }();
-    var Class = function(data) {
-        var _base = data.Base, _extends = data.Extends, _static = data.Static, _construct = data.Construct, _class = null, _store = data.Store, _self = data.Self, _overrides = data.Override, key;
-        if (null != _base) delete data.Base;
-        if (null != _extends) delete data.Extends;
-        if (null != _static) delete data.Static;
-        if (null != _self) delete data.Self;
-        if (null != _construct) delete data.Construct;
-        if (null != _store) {
-            if (null == _extends) _extends = _store; else if (is_Array(_extends)) _extends.unshift(_store); else _extends = [ _store, _extends ];
-            delete data.Store;
-        }
-        if (null != _overrides) delete data.Override;
-        if (data.toJSON === void 0) data.toJSON = JSONHelper.toJSON;
-        if (null == _base && null == _extends && null == _self) {
-            if (null == _construct) _class = function() {}; else _class = _construct;
-            data.constructor = _class.prototype.constructor;
-            if (null != _static) for (key in _static) _class[key] = _static[key];
-            _class.prototype = data;
-            return _class;
-        }
-        _class = function() {
-            if (null != _extends) {
-                var isarray = _extends instanceof Array, length = isarray ? _extends.length : 1, x = null;
-                for (var i = 0; isarray ? i < length : i < 1; i++) {
-                    x = isarray ? _extends[i] : _extends;
-                    if ("function" === typeof x) x.apply(this, arguments);
-                }
-            }
-            if (null != _base) _base.apply(this, arguments);
-            if (null != _self) for (var key in _self) this[key] = fn_proxy(_self[key], this);
-            if (null != _construct) {
-                var r = _construct.apply(this, arguments);
-                if (null != r) return r;
-            }
-            return this;
-        };
-        if (null != _static) for (key in _static) _class[key] = _static[key];
-        if (null != _base) class_inheritStatics(_class, _base);
-        if (null != _extends) class_inheritStatics(_class, _extends);
-        class_extendProtoObjects(data, _base, _extends);
-        class_inherit(_class, _base, _extends, data, _overrides);
-        data = null;
-        _static = null;
-        return _class;
-    };
-    Class.bind = function(cntx) {
-        var arr = arguments, i = 1, length = arguments.length, key;
-        for (;i < length; i++) {
-            key = arr[i];
-            cntx[key] = cntx[key].bind(cntx);
-        }
-        return cntx;
-    };
-    Class.Remote = Remote;
-    Class.LocalStore = LocalStore;
-    Class.Collection = Collection;
-    Class.Serializable = Serializable;
-    Class.Deferred = DeferredProto;
-    Class.EventEmitter = EventEmitter;
-    Class.validate = Validation.validate;
     (function() {
         function args_match(a, b) {
             if (a.length !== b.length) return false;
@@ -6709,7 +6733,7 @@ include.setCurrent({
                 return container;
             }
             if (null != controller.model) model = controller.model;
-            if (null != handler && null != handler.tagName && handler.tagName !== node.compoName) handler.nodes = {
+            if (null != handler && null != handler.tagName) handler.nodes = {
                 tagName: handler.tagName,
                 attr: handler.attr,
                 nodes: handler.nodes,
@@ -6950,7 +6974,7 @@ include.setCurrent({
             visible: null,
             model: null,
             constructor: Sys,
-            renderStart: function(model, cntx, container) {
+            renderStart: function(model, ctx, container) {
                 var attr = this.attr;
                 if (null != attr["use"]) {
                     var use = attr["use"];
@@ -6963,7 +6987,7 @@ include.setCurrent({
                     return;
                 }
                 if (null != attr["visible"]) {
-                    var state = ExpressionUtil.eval(attr.visible, model, cntx, this.parent);
+                    var state = ExpressionUtil.eval(attr.visible, model, ctx, this.parent);
                     if (!state) this.nodes = null;
                     return;
                 }
@@ -6972,10 +6996,9 @@ include.setCurrent({
                     console.log("Key: %s, Value: %s", key, value);
                     return;
                 }
-                if (null != attr["repeat"]) repeat(this, model, cntx, container);
+                if (null != attr["repeat"]) repeat(this, model, ctx, container);
                 if (null != attr["if"]) {
-                    var check = attr["if"];
-                    this.state = ConditionUtil.isCondition(check, model);
+                    this.state = ExpressionUtil.eval(attr["if"], model, ctx, this.parent);
                     if (!this.state) this.nodes = null;
                     return;
                 }
@@ -6988,7 +7011,7 @@ include.setCurrent({
                     console.error("Previous Node should be \"% if='condition'\"", prev, this.parent);
                     return;
                 }
-                if (null != attr["each"] || null != attr["foreach"]) each(this, model, cntx, container);
+                if (null != attr["each"] || null != attr["foreach"]) each(this, model, ctx, container);
             },
             render: null
         };
@@ -10114,10 +10137,13 @@ include.getResource("/.reference/atma/mask/lib/mask.js", "js").readystatechanged
         var meta = Meta.parse(metaContent);
         if (meta.modelID) model = __models[meta.modelID];
         if ("a" === meta.type) {
-            var handler = custom_Attributes[meta.name];
-            var element = trav_getElement(node);
+            var handler = custom_Attributes[meta.name], element = trav_getElement(node);
             if (null == handler) {
-                console.log("Custom Attribute Handler was not defined", meta.name);
+                console.warn("Custom Attribute Handler was not defined", meta.name);
+                return;
+            }
+            if (null == element) {
+                console.error("Browser has cut off nested tag for the comment", node);
                 return;
             }
             handler(null, meta.value, model, cntx, element, controller, container);
@@ -10250,6 +10276,15 @@ include.getResource("/.reference/atma/mask/lib/mask.js", "js").readystatechanged
         for (key in params) query = (query ? delimiter : "") + key + "=" + encodeURIComponent(params[key]);
         return query;
     }
+    function rgx_fromString(str, flags) {
+        return new RegExp(str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&"), flags);
+    }
+    function rgx_aliasMatcher(str) {
+        if ("^" === str[0]) return new RegExp(str);
+        var groups = str.split("|");
+        for (var i = 0, imax = groups.length; i < imax; i++) groups[i] = "^" + groups[i] + "$";
+        return new RegExp(groups.join("|"));
+    }
     var Routes = function() {
         function route_parseDefinition(route, definition) {
             if ("!" === definition[0]) {
@@ -10258,33 +10293,36 @@ include.getResource("/.reference/atma/mask/lib/mask.js", "js").readystatechanged
             }
             var parts = definition.split("/"), i = 0, imax = parts.length, x, c0, index, c1;
             var matcher = "", alias = null, strictCount = 0;
-            var gettingMatcher = true, isConditional, isAlias;
+            var gettingMatcher = true, isOptional, isAlias, rgx;
             var array = [];
             for (;i < imax; i++) {
                 x = parts[i];
                 if ("" === x) continue;
                 c0 = x.charCodeAt(0);
                 c1 = x.charCodeAt(1);
-                isConditional = 63 === c0;
-                isAlias = 58 === (isConditional ? c1 : c0);
+                isOptional = 63 === c0;
+                isAlias = 58 === (isOptional ? c1 : c0);
                 index = 0;
-                if (isConditional) index++;
+                if (isOptional) index++;
                 if (isAlias) index++;
                 if (0 !== index) x = x.substring(index);
-                !isConditional && !gettingMatcher && console.log("Strict route part found after conditional", definition);
-                if (isConditional) gettingMatcher = false;
-                if (gettingMatcher) {
-                    strictCount += 1;
-                    matcher += "/" + (isAlias ? regexp_var : x);
+                !isOptional && !gettingMatcher && console.log("Strict route part found after optional", definition);
+                if (isOptional) gettingMatcher = false;
+                var bracketIndex = x.indexOf("(");
+                if (isAlias && bracketIndex !== -1) {
+                    var end = x.length - 1;
+                    if (")" !== x[end]) end += 1;
+                    rgx = new RegExp(rgx_aliasMatcher(x.substring(bracketIndex + 1, end)));
+                    x = x.substring(0, bracketIndex);
                 }
-                if (isAlias) (alias || (alias = {}))[index] = x;
-                if (!isConditional && !isAlias) {
+                if (!isOptional && !isAlias) {
                     array.push(x);
                     continue;
                 }
                 if (isAlias) array.push({
                     alias: x,
-                    optional: isConditional
+                    matcher: rgx,
+                    optional: isOptional
                 });
             }
             route.parts = array;
@@ -10332,6 +10370,7 @@ include.getResource("/.reference/atma/mask/lib/mask.js", "js").readystatechanged
                     if (parts[i] === x) continue;
                     return false;
                 }
+                if (x.matcher && false === x.matcher.test(parts[i])) return false;
                 if (x.optional) return true;
                 if (x.alias) continue;
                 return false;
@@ -10515,7 +10554,7 @@ include.setCurrent({
         var el = document.createElement("div"), transitions = {
             transition: "transitionend",
             OTransition: "oTransitionEnd",
-            MSTransition: "msTransitionEnd",
+            msTransition: "msTransitionEnd",
             MozTransition: "transitionend",
             WebkitTransition: "webkitTransitionEnd"
         }, event = null;
@@ -10526,8 +10565,6 @@ include.setCurrent({
         getTransitionEndEvent = function() {
             return event;
         };
-        el = null;
-        transitions = null;
         return getTransitionEndEvent();
     }, I = {
         prop: vendorPrfx + "transition-property",
@@ -10535,7 +10572,18 @@ include.setCurrent({
         timing: vendorPrfx + "transition-timing-function",
         delay: vendorPrfx + "transition-delay"
     };
-    var env_isMoz = "MozTransition" in style;
+    var env_isMoz = "MozTransition" in style, env_isMs = "msTransition" in style;
+    function arr_isArray(arr) {
+        return arr instanceof Array;
+    }
+    function fn_isFunction(fn) {
+        return "function" === typeof fn;
+    }
+    function fn_proxy(ctx, fn) {
+        return function() {
+            return fn.apply(ctx, arguments);
+        };
+    }
     var TransformModel = function() {
         var regexp = /([\w]+)\([^\)]+\)/g;
         function extract(str) {
@@ -10599,7 +10647,7 @@ include.setCurrent({
             this.parent = parent;
             this.transformModel = parent && parent.transformModel || new TransformModel();
             var model = data.model || data;
-            if (model instanceof Array) {
+            if (arr_isArray(model)) {
                 this.model = [];
                 for (var i = 0, length = model.length; i < length; i++) this.model.push(new ModelData(model[i], this));
             } else if (model instanceof Object) {
@@ -10615,24 +10663,34 @@ include.setCurrent({
             }
             if (null != data.next) this.next = new ModelData(data.next, this);
             this.state = 0;
-            this.modelCount = this.model instanceof Array ? this.model.length : 1;
             this.nextCount = 0;
-            if (null != this.next) this.nextCount = this.next instanceof Array ? this.next.length : 1;
+            this.modelCount = arr_isArray(this.model) ? this.model.length : 1;
+            if (null != this.next) this.nextCount = arr_isArray(this.next) ? this.next.length : 1;
         }
         function model_resetMany(model) {
-            var isarray = model instanceof Array, length = isarray ? model.length : 1, x = null, i = 0;
+            var isarray = arr_isArray(model), length = isarray ? model.length : 1, x = null, i = 0;
             for (;isarray ? i < length : i < 1; i++) {
                 x = isarray ? model[i] : model;
                 x.reset && x.reset();
             }
         }
+        function model_getDuration(model) {
+            var isarray = arr_isArray(model), length = isarray ? model.length : 1, x = null, i = 0, max = 0;
+            for (;isarray ? i < length : i < 1; i++) {
+                x = isarray ? model[i] : model;
+                var ms;
+                if (fn_isFunction(x.getDuration)) ms = x.getDuration(); else if (model.duration.indexOf("ms") !== -1) ms = parseInt(model.duration); else if (model.duration.indexOf("s") !== -1) ms = 1e3 * parseInt(model.duration);
+                if (ms > max) max = ms;
+            }
+            return max;
+        }
         ModelData.prototype = {
             constructor: ModelData,
             reset: function() {
                 this.state = 0;
-                this.modelCount = this.model instanceof Array ? this.model.length : 1;
                 this.nextCount = 0;
-                if (null != this.next) this.nextCount = this.next instanceof Array ? this.next.length : 1;
+                this.modelCount = arr_isArray(this.model) ? this.model.length : 1;
+                if (null != this.next) this.nextCount = arr_isArray(this.next) ? this.next.length : 1;
                 this.model && model_resetMany(this.model);
                 this.next && model_resetMany(this.next);
             },
@@ -10649,6 +10707,12 @@ include.setCurrent({
                 if (2 === this.state && this.nextCount > 0) --this.nextCount;
                 if (2 === this.state && 0 === this.nextCount && this.parent) return this.parent.getNext && this.parent.getNext();
                 return null;
+            },
+            getDuration: function() {
+                var ms = 0;
+                if (this.model) ms += model_getDuration(this.model);
+                if (this.next) ms += model_getDuration(this.next);
+                return ms;
             }
         };
         return ModelData;
@@ -10663,7 +10727,7 @@ include.setCurrent({
                 if (null == modelData) return false;
                 var next = modelData.getNext(), result = false, length, i;
                 if (null == next) return false;
-                if (next instanceof Array) {
+                if (arr_isArray(next)) {
                     for (i = 0, length = next.length; i < length; i++) if (true === this.put(next[i])) result = true;
                     return result;
                 }
@@ -10698,7 +10762,7 @@ include.setCurrent({
                 for (key in I) css[I[key]] = css[I[key]].join(",");
             },
             clear: function() {
-                this.arr = [];
+                this.arr.length = 0;
             }
         };
         return Stack;
@@ -10733,7 +10797,10 @@ include.setCurrent({
         function Model(models) {
             this.stack = new Stack();
             this.model = new ModelData(models);
-            this.transitionEnd = this.transitionEnd.bind(this);
+            this.duration = this.model.getDuration();
+            this.transitionEnd = fn_proxy(this, this.transitionEnd);
+            this.finish = fn_proxy(this, this.finish);
+            this.finishTimeout = null;
         }
         Model.prototype = {
             constructor: Model,
@@ -10747,7 +10814,15 @@ include.setCurrent({
                 element.addEventListener(getTransitionEndEvent(), this.transitionEnd, false);
                 this.element = element;
                 this.apply(startCss, css);
-                if (onComplete && false === supportTransitions) onComplete();
+                if (onComplete && false === supportTransitions) {
+                    onComplete();
+                    return;
+                }
+                this.finishTimeout = setTimeout(this.finish, this.duration);
+            },
+            finish: function() {
+                this.element.removeEventListener(getTransitionEndEvent(), this.transitionEnd, false);
+                if (fn_isFunction(this.onComplete)) this.onComplete();
             },
             transitionEnd: function(event) {
                 if (event.target !== event.currentTarget) return;
@@ -10757,16 +10832,12 @@ include.setCurrent({
                     this.apply(startCss, css);
                     return;
                 }
-                if (this.stack.arr.length < 1) {
-                    this.element.removeEventListener(getTransitionEndEvent(), this.transitionEnd, false);
-                    this.onComplete && this.onComplete();
-                }
             },
             apply: function(startCss, css) {
                 startCss[vendorPrfx + "transition"] = "none";
                 var style = this.element.style, element = this.element;
                 if (null != startCss) for (var key in startCss) style.setProperty(key, startCss[key], "");
-                if (true === env_isMoz) getComputedStyle(element).width;
+                if (env_isMoz || env_isMs) getComputedStyle(element).width;
                 setTimeout(function() {
                     var fire;
                     for (var key in css) {
@@ -11494,7 +11565,6 @@ include.load("overlay.mask::Template").done(function(resp) {
                 }
                 $div = $(fragment);
             }
-            window.X = $div.show();
             this.animate("show");
         },
         hide: function() {
@@ -13180,6 +13250,35 @@ include.js("marked.js").done(function(resp) {
 });
 
 include.getResource("/.reference/atma/compos/markdown/lib/markdown.js", "js").readystatechanged(3);
+
+(function(mask) {
+    if (null == mask) mask = atma.mask;
+    mask.registerHandler(":lazy", mask.Compo({
+        mode: "server",
+        _deferredNodes: null,
+        onRenderStart: function(model, ctx, container) {
+            this._deferredNodes = this.nodes;
+            this.nodes = null;
+            this.model = model;
+            this.ctx = ctx;
+            this.container = container;
+            this.placeholder = document.createComment("");
+            container.appendChild(this.placeholder);
+        },
+        lazyShow: function() {
+            this.lazyShow = function() {};
+            var fragment = mask.render(this._deferredNodes, this.model, this.ctx, null, this), that = this;
+            if (this.ctx.async) this.ctx.done(function(fragment) {
+                that._appendLazy(fragment);
+            });
+            that._appendLazy(fragment);
+            that.emitIn("domInsert");
+        },
+        _appendLazy: function(fragment) {
+            this.placeholder.parentNode.insertBefore(fragment, this.placeholder);
+        }
+    }));
+})("undefined" === typeof mask ? null : mask);
 
 (function() {
     mask.registerHandler(":scroller", Compo({

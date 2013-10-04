@@ -1,0 +1,15 @@
+
+server:
+
+
+	routes:
+		server_compo : '/server/compo/{0}/{1}.js'
+		model: '/server/model/{0}.js'
+		
+	scripts:
+
+		server_compo:
+			- styles
+			- notes
+			- editor
+

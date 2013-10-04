@@ -1,0 +1,17 @@
+
+.-notes {
+	
+	ul >
+		% each='notes' >
+			li {
+				p > '~[text]'
+				
+				a href='/note/~[_id]/edit' > 'Edit'
+			}
+			
+	.actions {
+		button >
+			a href='/note/create' >
+				'Create'
+	}
+}

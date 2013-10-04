@@ -1,0 +1,30 @@
+
+
+page:
+	
+	# defaults -
+	#location:
+	#	controller: '/server/http/page/{0}/{1}.js'
+	#	template: '/server/http/page/{0}/{1}.mask'
+	#	master: '/server/http/master/{0}.mask'
+	#	viewTemplate: '/public/view/{0}/{1}.mask'
+	#	viewController: '/public/view/{0}/{1}.js'
+	#	viewStyle: '/public/view/{0}/{1}.less'
+		
+pages:
+	# Each page item can allso have additional infos
+	# which will be then available at `ctx.page.data`
+
+
+	!/:
+		template: notes
+		title: 'My Notes'
+		
+	'/note/:id/:action(edit|delete)':
+		template: editor
+		title: Editor
+	
+	'/note/create':
+		template: editor
+		title: 'Create Note'
+

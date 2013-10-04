@@ -1,19 +1,35 @@
 include
 	.load('demos.mask')
 	.done(function(resp) {
-
+	
 	
 	mask.registerHandler(':view:index', Class({
 		Base: mask.getHandler(':view:default'),
 		compos: {
-			overlay: 'compo: :overlay',
-			tmpl : 'compo: #demo-task-tracker'
+			overlay: 'compo: :overlay'
 		},
 		slots: {
 			demoTaskTracker: function(){
+				var tmpl = jmask(resp.load.demos)
+					.filter('#tasks')
+					.children();
 				
 				
-				this.compos.overlay.show('task-tracker', resp.load.demos);
+				
+				this
+					.compos
+					.overlay
+					.show('demo-task-tracker', tmpl);
+			},
+			demoNote: function(){
+				var tmpl = jmask(resp.load.demos)
+					.filter('#notes')
+					.children();
+					
+				this
+					.compos
+					.overlay
+					.show('demo-notes', tmpl);
 			}
 		},
 		Override: {

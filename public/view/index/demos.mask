@@ -1,4 +1,5 @@
-.-about-sample-container >
+:template #tasks >
+    .-about-sample-container {
         .-about-sample {
             :sourceViewer
                 source='
@@ -19,4 +20,33 @@
                 '
                 execute='/public/view/index/todo/release/index.html'
             ;
-        }
+            
+        }        
+    }
+    
+:template #notes >
+    .-about-sample-container {
+        .-about-sample {
+             :sourceViewer
+                source='
+                    /public/view/index/note/index.js,
+                    /public/view/index/note/server/compo/editor/editor.js,
+                    /public/view/index/note/server/compo/editor/editor.mask,
+                    /public/view/index/note/server/compo/notes/notes.js,
+                    /public/view/index/note/server/compo/notes/notes.mask,
+                    /public/view/index/note/server/compo/styles/styles.js,
+                    /public/view/index/note/server/config/env/both.yml,
+                    /public/view/index/note/server/config/env/client.yml,
+                    /public/view/index/note/server/config/env/server.yml,
+                    /public/view/index/note/server/config/pages.yml,
+                    /public/view/index/note/server/config/handlers.yml,
+                    /public/view/index/note/server/http/handler/less.js,
+                    /public/view/index/note/server/http/master/default.mask,
+                    /public/view/index/note/server/http/page/editor/editor.mask,
+                    /public/view/index/note/server/http/page/notes/notes.mask,
+                    /public/view/index/note/server/model/model.js
+                '
+            ;
+        }        
+    }    
+   

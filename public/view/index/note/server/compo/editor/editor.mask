@@ -1,0 +1,24 @@
+
+% if=message >
+	p >
+		'~[message]'
+		
+p {
+	a href='/' > 'Back'
+	span > ' to my notes'
+}
+
+
+
+form.-editor method=post {
+	
+	textarea name=text > '~[text]';
+
+	div {
+		% visible='page.query.id' >
+			input name=btnDelete type=submit value='Delete';
+			
+		input name=btnSubmit type=submit value='Send';
+	}
+}
+

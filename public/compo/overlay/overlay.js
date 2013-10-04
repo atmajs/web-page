@@ -50,7 +50,6 @@ include
 					$div = $(fragment);
 				}
 				
-				window.X = $div.show();
 				this.animate('show');
 				
 			},

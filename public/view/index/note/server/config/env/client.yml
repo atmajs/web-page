@@ -1,0 +1,7 @@
+
+
+
+client:
+
+	styles:
+		- '/public/style/main.less'
