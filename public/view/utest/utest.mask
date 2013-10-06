@@ -7,7 +7,7 @@ layout:view master='view' {
 
     @content #tabs {
         button name='info' > 'Info'
-        button name='doc' > 'DOC'
+        button name='readme' > 'Readme'
     }
 
 
@@ -19,7 +19,7 @@ layout:view master='view' {
 
         }
 
-        div name='doc' {
+        div name='readme' {
             :markdown src='/public/view/utest/README.md';
         }
     }

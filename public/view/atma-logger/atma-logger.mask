@@ -1,0 +1,18 @@
+layout:view master='view' {
+
+    @content #title {
+        a href='https://github.com/atmajs/atma-logger' target=_blank> 'github@Atma.Logger';
+    }
+
+    @content #tabs {
+        button name='info' > 'Readme'
+    }
+
+    @content #content {
+       
+        div name='info' {
+            :markdown src='/public/view/atma-logger/README.md';
+        }
+    }
+
+}

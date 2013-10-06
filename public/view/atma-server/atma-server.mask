@@ -1,0 +1,18 @@
+layout:view master='view' {
+
+    @content #title {
+        a href='https://github.com/atmajs/atma-server' target=_blank> 'github@Atma.Server';
+    }
+
+    @content #tabs {
+        button name='info' > 'Readme'
+    }
+
+    @content #content {
+       
+        div name='info' {
+            :markdown src='/public/view/atma-server/README.md';
+        }
+    }
+
+}
