@@ -6608,91 +6608,67 @@ include.setCurrent({
             ensureTemplateFunction: ensureTemplateFunction
         };
     }(Node, TextNode, Fragment, Component);
-    function build_resumeDelegate(controller, model, cntx, container, childs) {
-        var anchor = container.appendChild(document.createComment(""));
-        return function() {
-            return build_resumeController(controller, model, cntx, anchor, childs);
-        };
-    }
-    function build_resumeController(controller, model, cntx, anchor, childs) {
-        if (null != controller.tagName && controller.tagName !== controller.compoName) controller.nodes = {
-            tagName: controller.tagName,
-            attr: controller.attr,
-            nodes: controller.nodes,
-            type: 1
-        };
-        if (null != controller.model) model = controller.model;
-        var nodes = controller.nodes, elements = [];
-        if (null != nodes) {
-            var isarray = nodes instanceof Array, length = true === isarray ? nodes.length : 1, i = 0, childNode = null, fragment = document.createDocumentFragment();
-            for (;i < length; i++) {
-                childNode = true === isarray ? nodes[i] : nodes;
-                builder_build(childNode, model, cntx, fragment, controller, elements);
-            }
-            anchor.parentNode.insertBefore(fragment, anchor);
-        }
-        if (null == controller.tagName) {
-            var attrHandlers = controller.handlers && controller.handlers.attr, attrFn, key;
-            for (key in controller.attr) {
-                attrFn = null;
-                if (attrHandlers && fn_isFunction(attrHandlers[key])) attrFn = attrHandlers[key];
-                if (null == attrFn && fn_isFunction(custom_Attributes[key])) attrFn = custom_Attributes[key];
-                if (null != attrFn) attrFn(node, controller.attr[key], model, cntx, elements[0], controller);
-            }
-        }
-        if (fn_isFunction(controller.renderEnd)) controller.renderEnd(elements, model, cntx, anchor.parentNode);
-        if (null != childs && childs !== elements) {
-            var il = childs.length, jl = elements.length;
-            j = -1;
-            while (++j < jl) childs[il + j] = elements[j];
-        }
-    }
     var _controllerID = 0;
-    function builder_build(node, model, cntx, container, controller, childs) {
-        if (null == node) return container;
-        var type = node.type, elements = null, j, jmax, key, value;
-        if (null == container && 1 !== type) container = document.createDocumentFragment();
-        if (null == controller) controller = new Component();
-        if (10 === type || node instanceof Array) {
-            for (j = 0, jmax = node.length; j < jmax; j++) builder_build(node[j], model, cntx, container, controller, childs);
-            return container;
+    var builder_build = function(custom_Attributes, Component) {
+        function build_resumeDelegate(controller, model, cntx, container, childs) {
+            var anchor = container.appendChild(document.createComment(""));
+            return function() {
+                return build_resumeController(controller, model, cntx, anchor, childs);
+            };
         }
-        if (null == type) if (null != node.tagName) type = 1; else if (null != node.content) type = 2;
-        if (1 === type) {
-            var tagName = node.tagName, attr = node.attr, tag;
-            try {
-                tag = document.createElement(tagName);
-            } catch (error) {
-                console.error(tagName, "element cannot be created. If this should be a custom handler tag, then controller is not defined");
-                return;
+        function build_resumeController(controller, model, cntx, anchor, childs) {
+            if (null != controller.tagName && controller.tagName !== controller.compoName) controller.nodes = {
+                tagName: controller.tagName,
+                attr: controller.attr,
+                nodes: controller.nodes,
+                type: 1
+            };
+            if (null != controller.model) model = controller.model;
+            var nodes = controller.nodes, elements = [];
+            if (null != nodes) {
+                var isarray = nodes instanceof Array, length = true === isarray ? nodes.length : 1, i = 0, childNode = null, fragment = document.createDocumentFragment();
+                for (;i < length; i++) {
+                    childNode = true === isarray ? nodes[i] : nodes;
+                    builder_build(childNode, model, cntx, fragment, controller, elements);
+                }
+                anchor.parentNode.insertBefore(fragment, anchor);
             }
-            if (null != childs) {
-                childs.push(tag);
-                childs = null;
-                attr["x-compo-id"] = controller.ID;
+            if (null == controller.tagName) {
+                var attrHandlers = controller.handlers && controller.handlers.attr, attrFn, key;
+                for (key in controller.attr) {
+                    attrFn = null;
+                    if (attrHandlers && fn_isFunction(attrHandlers[key])) attrFn = attrHandlers[key];
+                    if (null == attrFn && fn_isFunction(custom_Attributes[key])) attrFn = custom_Attributes[key];
+                    if (null != attrFn) attrFn(node, controller.attr[key], model, cntx, elements[0], controller);
+                }
             }
-            if (null != container) container.appendChild(tag);
-            for (key in attr) {
-                if ("function" === typeof attr[key]) {
-                    value = attr[key]("attr", model, cntx, tag, controller, key);
-                    if (value instanceof Array) value = value.join("");
-                } else value = attr[key];
-                if (value) if ("function" === typeof custom_Attributes[key]) custom_Attributes[key](node, value, model, cntx, tag, controller, container); else tag.setAttribute(key, value);
+            if (fn_isFunction(controller.renderEnd)) controller.renderEnd(elements, model, cntx, anchor.parentNode);
+            if (null != childs && childs !== elements) {
+                var il = childs.length, jl = elements.length;
+                j = -1;
+                while (++j < jl) childs[il + j] = elements[j];
             }
-            container = tag;
         }
-        if (2 === type) {
-            var x, content, result, text;
-            content = node.content;
-            if ("function" === typeof content) {
-                result = content("node", model, cntx, container, controller);
-                if ("string" === typeof result) container.appendChild(document.createTextNode(result)); else {
-                    text = "";
-                    for (j = 0, jmax = result.length; j < jmax; j++) {
+        var build_textNode = function() {
+            var append_textNode = function(document) {
+                return function(element, text) {
+                    element.appendChild(document.createTextNode(text));
+                };
+            }(document);
+            return function build_textNode(node, model, ctx, container, controller) {
+                var content = node.content;
+                if (fn_isFunction(content)) {
+                    var result = content("node", model, ctx, container, controller);
+                    if ("string" === typeof result) {
+                        append_textNode(container, result);
+                        return;
+                    }
+                    var text = "", jmax = result.length, j = 0, x;
+                    for (;j < jmax; j++) {
                         x = result[j];
                         if ("object" === typeof x) {
                             if ("" !== text) {
-                                container.appendChild(document.createTextNode(text));
+                                append_textNode(container, text);
                                 text = "";
                             }
                             if (null == x.nodeType) {
@@ -6704,33 +6680,64 @@ include.setCurrent({
                         }
                         text += x;
                     }
-                    if ("" !== text) container.appendChild(document.createTextNode(text));
+                    if ("" !== text) append_textNode(container, text);
+                    return;
                 }
-            } else container.appendChild(document.createTextNode(content));
-            return container;
-        }
-        if (4 === type) {
-            var Handler = node.controller, handler = "function" === typeof Handler ? new Handler(model) : Handler, attr;
+                append_textNode(container, content);
+            };
+        }();
+        var build_node = function() {
+            var el_create = function(doc) {
+                return function(name) {
+                    return doc.createElement(name);
+                };
+            }(document);
+            return function build_node(node, model, ctx, container, controller, childs) {
+                var tagName = node.tagName, attr = node.attr, tag;
+                try {
+                    tag = el_create(tagName);
+                } catch (error) {
+                    console.error(tagName, "element cannot be created. If this should be a custom handler tag, then controller is not defined");
+                    return;
+                }
+                if (null != childs) {
+                    childs.push(tag);
+                    attr["x-compo-id"] = controller.ID;
+                }
+                if (null != container) container.appendChild(tag);
+                var key, value;
+                for (key in attr) {
+                    if (fn_isFunction(attr[key])) {
+                        value = attr[key]("attr", model, ctx, tag, controller, key);
+                        if (value instanceof Array) value = value.join("");
+                    } else value = attr[key];
+                    if (value) if (fn_isFunction(custom_Attributes[key])) custom_Attributes[key](node, value, model, ctx, tag, controller, container); else tag.setAttribute(key, value);
+                }
+                return tag;
+            };
+        }();
+        function build_compo(node, model, ctx, container, controller) {
+            var Handler = node.controller, handler = fn_isFunction(Handler) ? new Handler(model) : Handler, attr, key;
             if (null != handler) {
                 handler.compoName = node.tagName;
                 handler.attr = attr = attr_extend(handler.attr, node.attr);
-                for (key in attr) if ("function" === typeof attr[key]) attr[key] = attr[key]("attr", model, cntx, container, controller, key);
-                if (null != node.nodes) handler.nodes = node.nodes;
                 handler.parent = controller;
+                handler.model = model;
+                for (key in attr) if (fn_isFunction(attr[key])) attr[key] = attr[key]("attr", model, ctx, container, controller, key);
+                if (null != node.nodes) handler.nodes = node.nodes;
                 if (null != listeners && null != listeners["compoCreated"]) {
-                    var fns = listeners.compoCreated;
-                    for (j = 0, jmax = fns.length; j < jmax; j++) fns[j](handler, model, cntx, container);
+                    var fns = listeners.compoCreated, jmax = fns.length, j = 0;
+                    for (;j < jmax; j++) fns[j](handler, model, ctx, container);
                 }
-                if ("function" === typeof handler.renderStart) handler.renderStart(model, cntx, container);
+                if (fn_isFunction(handler.renderStart)) handler.renderStart(model, ctx, container);
                 node = handler;
             }
             if (null == controller.components) controller.components = [ node ]; else controller.components.push(node);
             controller = node;
             controller.ID = ++_controllerID;
-            elements = [];
             if (true === controller.async) {
-                controller.await(build_resumeDelegate(controller, model, cntx, container));
-                return container;
+                controller.await(build_resumeDelegate(controller, model, ctx, container));
+                return null;
             }
             if (null != controller.model) model = controller.model;
             if (null != handler && null != handler.tagName) handler.nodes = {
@@ -6740,38 +6747,67 @@ include.setCurrent({
                 type: 1
             };
             if ("function" === typeof controller.render) {
-                controller.render(model, cntx, container);
+                controller.render(model, ctx, container);
+                return null;
+            }
+            return controller;
+        }
+        return function builder_build(node, model, ctx, container, controller, childs) {
+            if (null == node) return container;
+            var type = node.type, elements, key, value, j, jmax;
+            if (null == container && 1 !== type) container = document.createDocumentFragment();
+            if (null == controller) controller = new Component();
+            if (10 === type || node instanceof Array) {
+                j = 0;
+                jmax = node.length;
+                for (;j < jmax; j++) builder_build(node[j], model, ctx, container, controller, childs);
                 return container;
             }
-        }
-        var nodes = node.nodes;
-        if (null != nodes) {
-            if (null != childs && null == elements) elements = childs;
-            var isarray = nodes instanceof Array, length = true === isarray ? nodes.length : 1, i = 0, childNode = null;
-            for (;i < length; i++) {
-                childNode = true === isarray ? nodes[i] : nodes;
-                builder_build(childNode, model, cntx, container, controller, elements);
+            if (null == type) if (null != node.tagName) type = 1; else if (null != node.content) type = 2;
+            if (1 === type) {
+                container = build_node(node, model, ctx, container, controller, childs);
+                childs = null;
             }
-        }
-        if (4 === type) {
-            if (null == node.tagName) {
-                var attrHandlers = node.handlers && node.handlers.attr, attrFn, key;
-                for (key in node.attr) {
-                    attrFn = null;
-                    if (attrHandlers && fn_isFunction(attrHandlers[key])) attrFn = attrHandlers[key];
-                    if (null == attrFn && fn_isFunction(custom_Attributes[key])) attrFn = custom_Attributes[key];
-                    if (null != attrFn) attrFn(node, node.attr[key], model, cntx, elements[0], controller);
+            if (2 === type) {
+                build_textNode(node, model, ctx, container, controller);
+                return container;
+            }
+            if (4 === type) {
+                controller = build_compo(node, model, ctx, container, controller);
+                if (null == controller) return container;
+                elements = [];
+                node = controller;
+                if (controller.model !== model) model = controller.model;
+            }
+            var nodes = node.nodes;
+            if (null != nodes) {
+                if (null != childs && null == elements) elements = childs;
+                var isarray = nodes instanceof Array, length = true === isarray ? nodes.length : 1, i = 0, childNode = null;
+                for (;i < length; i++) {
+                    childNode = true === isarray ? nodes[i] : nodes;
+                    builder_build(childNode, model, ctx, container, controller, elements);
                 }
             }
-            if (fn_isFunction(node.renderEnd)) node.renderEnd(elements, model, cntx, container);
-        }
-        if (null != childs && childs !== elements) {
-            var il = childs.length, jl = elements.length;
-            j = -1;
-            while (++j < jl) childs[il + j] = elements[j];
-        }
-        return container;
-    }
+            if (4 === type) {
+                if (null == node.tagName) {
+                    var attrHandlers = node.handlers && node.handlers.attr, attrFn, key;
+                    for (key in node.attr) {
+                        attrFn = null;
+                        if (null != attrHandlers && fn_isFunction(attrHandlers[key])) attrFn = attrHandlers[key];
+                        if (null == attrFn && fn_isFunction(custom_Attributes[key])) attrFn = custom_Attributes[key];
+                        if (null != attrFn) attrFn(node, node.attr[key], model, ctx, elements[0], controller);
+                    }
+                }
+                if (fn_isFunction(node.renderEnd)) node.renderEnd(elements, model, ctx, container);
+            }
+            if (null != childs && childs !== elements) {
+                var il = childs.length, jl = elements.length;
+                j = -1;
+                while (++j < jl) childs[il + j] = elements[j];
+            }
+            return container;
+        };
+    }(custom_Attributes, Component);
     var cache = {}, Mask = {
         render: function(template, model, cntx, container, controller) {
             if (null != container && "function" !== typeof container.appendChild) {
@@ -8617,7 +8653,8 @@ include.setCurrent({
                     old = value;
                     value = x;
                     rebinder(path, old);
-                }
+                },
+                configurable: true
             });
         }
         function obj_crumbRebindDelegate(obj) {
@@ -9484,6 +9521,7 @@ include.setCurrent({
         });
         __mask_registerAttrHandler("x-toggle", "client", function(node, attrValue, model, ctx, element, controller) {
             var event = attrValue.substring(0, attrValue.indexOf(":")), expression = attrValue.substring(event.length + 1), ref = expression_varRefs(expression);
+            if ("string" !== typeof ref) ref = ref[0];
             __dom_addEventListener(element, event, function() {
                 var value = expression_eval(expression, model, ctx, controller);
                 obj_setProperty(model, ref, value);
@@ -10458,13 +10496,19 @@ include.getResource("/.reference/atma/mask/lib/mask.js", "js").readystatechanged
                 },
                 changed: function() {
                     this.listener.changed(location.pathname + location.search);
+                },
+                current: function() {
+                    return location.pathname + location.search;
                 }
             };
         })();
-        function Location(collection, action) {
+        function Location(collection, type) {
             this.collection = collection || new Routes();
-            this.emitter = new HistoryEmitter(this);
-            if (action) this.action = action;
+            if (type) {
+                var Constructor = "hash" === type ? HashEmitter : HistoryEmitter;
+                this.emitter = new Constructor(this);
+            }
+            if (null == this.emitter) this.emitter = new HistoryEmitter(this);
             if (null == this.emitter) this.emitter = new HashEmitter(this);
             if (null == this.emitter) console.error("Router can not be initialized - (nor History API / nor Hashchage");
         }
@@ -10474,7 +10518,7 @@ include.getResource("/.reference/atma/mask/lib/mask.js", "js").readystatechanged
                 if (item) this.action(item);
             },
             action: function(route) {
-                route.value(route);
+                if ("function" === typeof route.value) route.value(route);
             },
             navigate: function(url) {
                 this.emitter.navigate(url);
@@ -10493,6 +10537,10 @@ include.getResource("/.reference/atma/mask/lib/mask.js", "js").readystatechanged
     }
     var Ruta = {
         Collection: Routes,
+        setRouterType: function(type) {
+            if (null == router) router = new Location(routes, type);
+            return this;
+        },
         add: function(regpath, mix) {
             router_ensure();
             return routes.add(regpath, mix);
@@ -11120,8 +11168,14 @@ window.L = include.exports = {
     namespace: "atma",
     size: "-",
     libs: [ {
-        env: "both",
+        env: "browser",
         file: "class/class.js",
+        name: "ClassJS",
+        enabled: true,
+        exports: [ "Class" ]
+    }, {
+        env: "node",
+        file: "class/class.node.js",
         name: "ClassJS",
         enabled: true,
         exports: [ "Class" ]
@@ -12197,6 +12251,7 @@ include.setCurrent({
 
 include.js("prism.lib.js::Prism").done(function(resp) {
     var Prism = resp.Prism || window.Prism;
+    if ("undefined" !== typeof global) global.Prism = Prism;
     var PrismCompo = Compo({
         mode: "server:all",
         attr: {

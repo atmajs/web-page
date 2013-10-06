@@ -3,88 +3,95 @@ layout:view master='view' {
 
       @content #tabs {
         
-          button name='install' > 'Install'
+          button name='github' > 'GitHub'
+          button name='npm' > 'NPM'
           button name='download' > 'Download'
       
     }
     
 
     @content #content {
-
-        div name='install' {
-            ol {
-               
+        
+        div name='github' {
+            :markdown > '''
                 
-                li {
-                    'Install Atma.js Toolkit'
-                    div > code > '$ npm install atma'
-
-                    .hint {
-                        'test: ' code > 'atma --help'
-                    }
-                    
-                    .hint {
-                        'Could not install? Ensure to have proper node.js enviroment'
-                         p {
-                          div > code > a href='http://nodejs.org' target=_blank > 'NodeJS > Download'
-                          div > code > a href='http://yuilibrary.com/yui/docs/tutorials/git/' target=_blank > 'GIT'
-                          div > code > a href='http://www.python.org/getit/releases/2.7.4/' target=_blank> 'Python (2.7.4 important)'
-                          div >
-                              code >
-                                  a
-                                      href='http://www.microsoft.com/en-us/download/details.aspx?id=8279'
-                                      target=_blank
-                                          > '(Windows) MSBuild'
-                       }
-                    }
-                }
-                li {
-                    'Install Atma Libraries'
-                    div > code > '$ cd c:/anyfolder/to/save/atma_libraries'
-                    div > code > '$ atma git-clone atma'
-                    .hint {
-                        'test: ' code > 'atma globals'
-                        p > 'Should contain in projects.libjs.path = "file:///c:/anyfolder/to/save/atma_libraries"'
-                    }
-                }
-            }
-            
-            'Now, you can play around with some ready projects'
-            ol {
-                li {
-                    h5 > 'Template Project'
-
-                    prism language='css' > formatter:pre > '
-                      $ cd c:/any/temp/folder
-                      $ atma template starter
-                    '
-
-                    .hint {
-                        'In some case to create symbolic links to installed libjs you have run this command with admin. rights'
-                    }
-                    .hint {
-                        'test: ' code > 'atma server index.dev.html'
-                        p > 'Page should be opened, or navigate to http://localhost:5777/index.dev.html'
-                        p > 'If you see some text on the page, then everything was successfully installed'
-                    }
-                }
-
-                li {
-                    h5 > 'Todo MVC'
-                     prism language='css' > formatter:pre > '
-                      $ cd c:/any/temp/folder
-                      $ atma template todoapp
-                    '
-                    
-                    p {
-                        'Play around with small todo app, to see libs in work'
-                    }
-                }
-            }
+                This installation is prefered, as all repositories are cloned, and while developing the application,
+                you can include only that libraries, that you need. It is also easy to browse the source code.
+                
+                - Install Atma.js Toolkit:
+                    ``` $ npm install -g atma ```
+                    ``` $ atma --help ```
+                    Could not install? Ensure to have proper node.js environment
+                    - [Download Nodejs](http://node.js.org)
+                    - [GIT](http://yuilibrary.com/yui/docs/tutorials/git/)
+                    - [Python 2.7.4](http://www.python.org/getit/releases/2.7.4/)
+                    - [(Windows) MSBuild](http://www.microsoft.com/en-us/download/details.aspx?id=8279)
+                                          
+                - Install Atma Libraries
+                    ``` $ cd c:/anyfolder/atma_libraries ```
+                    ``` $ atam git-clone atma ```
+                    Test: ``` $ atma globals ```
+                    projects.txt file should be opened and under 'projects.atma.path' you should see
+                    the path to the cloned atmajs folder
+                
+                
+                Now you can play around with some ready projects
+                
+                - Template Project
+                    ``` $ cd c:/any_folder ```
+                    ``` $ atma template starter ```
+                    _In some cases you may need to run this command with admin rights, to create proper symbolic links
+                    to the atma libraries folder_
+                
+                - Todo Demo Application
+                    ``` $ atma template todoapp ```
+                
+            '''
         }
         
-        div name='download' >
+        div name='npm' > :markdown > '''
+            Install Atma.js libraries from npm repository. Beyond node.js libraries, there are also browser versions.
+            Included libraries:
+            
+            - MaskJS
+            - IncludeJS
+            - ClassJS
+            - RutaJS
+            - Mask.Animation
+            - Ruqq Arr
+            - Ruqq Utils
+            
+            Extra Components:
+            
+            - layout
+            
+            ``` $ npm install atma-libs ```
+            
+            Usage:
+            
+            ```javascript
+            // global 'atma' namespace ( atma.mask / atma.include / ...)
+            require('atma-libs');
+            
+            // inject direct to global ( mask / include / ...)
+            require('atma-libs/globals');
+            
+            // CommonJS exports
+            var atmaLibs = require('atma-libs/exports');
+            
+            // You can also use not minified versions
+            require('atma-libs/index-dev');
+            require('atma-libs/globals-dev');
+            
+            var atmaLibs = require('atma-libs/exports-dev');
+            
+            ```
+        '''
+        
+        div name='download' {
+            p > 'Custom Build'
             :downloader;
+        }
         
     }
 
