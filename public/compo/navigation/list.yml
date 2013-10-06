@@ -48,6 +48,17 @@
 		-
 			id: atma-tool
 			name: 'Atma Tool'
+		
+		-
+			id: atma-io
+			name: 'Node.IO'
+		-
+			id: atma-logger
+			name: 'Node.Logger'
+		-
+			id: atma-server
+			name: 'Node.Server'
+			
 		-
 			id: utest
 			name: UTest

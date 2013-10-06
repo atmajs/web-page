@@ -55,6 +55,21 @@
             "styles": false,
             "load": true
         },
+        "atma-io": {
+            "scripts": false,
+            "styles": false,
+            "load": true
+        },
+        "atma-logger": {
+            "scripts": false,
+            "styles": false,
+            "load": true
+        },
+        "atma-server": {
+            "scripts": false,
+            "styles": false,
+            "load": true
+        },
         "atma-tool": {
             "scripts": false,
             "styles": false,
@@ -86,5 +101,5 @@
             "load": true
         }
     },
-    "buildVersion": 1381065087045
+    "buildVersion": 1381090494174
 }

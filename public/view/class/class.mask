@@ -34,38 +34,35 @@ layout:view master='view' {
             div name='info' {
                 h4 >  'Business Logic Layer'
                 img src='/images/logos/class.png' style='float:right; ';
-                p {
-                    'Check out speed comparison: '
-                    a href='http://jsperf.com/class-libjs-vs-others' target='_blank' > 'jsperf.com'
-                }
                 
-                ul {
-                    li {
-                        'Proper inheritance initialization with all constructor calls'
-                        div > tt > 'instanceof works' 
-                    }
-                    li { 'Proper ' tt > 'JSON.stringify' }
+                :markdown > '''
                     
-                    li > 'Static / Private properties'
-                    li > 'Validations'
-                    li > 'Overrides'
-                    li > 'Model Storage - AJAX / Localstorage'
+                    ### Business Logic Layer
                     
-                    li {
-                        'Some ready to use classes for inheritance, like'
-                        ul {
-                            li > tt > 'Class.EventEmitter'
-                            li > tt > 'Class.Deferred'
-                            li > tt > 'Class.Serializable'
-                        }
-                    }
                     
-                    li {
-                        'Collections (with each/where/first querying)'
-                    }
+                    _Check out speed comparison: [jsperf.com](http://jsperf.com/class-libjs-vs-others)_
+                                                              
+                    - Proper inheritance / initialization with all constructor calls.
+                        ``` instanceof ``` works.
+                    - Proper ``` JSON.stringify ```
+                    - Static and Private properties
+                    - Validation
+                    - Override methods
+                    - Storage
+                        - RESTful
+                        - LocalStorage
+                        - MongoDB (node.js build)
+                    - Ready to use classes for inheritance
+                        - Class.EventEmitter
+                        - Class.Deferred
+                        - Class.Serializable
+                    - **Collections**
+                        _Also has Storage feature, queries and much more_
+                    - No dependencies
                     
-                    li > 'No Dependencies'
-                }
+                '''
+                    
+                
             }
     
             div name='examples' {

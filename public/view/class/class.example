@@ -335,6 +335,67 @@ new Human({
 
 ```
 
+### Save:MongoDB
+```javascript
+
+// the api is same as from examples above, but you have to define mongodb settings
+
+Class.MongoStore.settings({
+    ip: '127.0.01' // is default
+    port: 27017,   // is default
+    db: 'someDataBaseName'
+});
+
+var User = Class({
+    Extends: Class.Serializable,
+    Store: Class.MongoStore.Single('users'),
+    
+    username: '',
+    age: -1,
+    log: function(){
+        console.log(this.username);
+    }
+});
+
+var _user = User
+    .fetch({username: 'foo'}) // here also MongoDB query object can be used
+    .done(function(user){
+        _user === user; // -> true
+        
+        user.age = 30;
+        user
+            .save()
+            .done(function(){
+                console.log('Saved');
+            })
+    })
+    .fail(function(error){
+        console.log(error);
+        
+    });
+
+
+
+var Users = Class.Collection(User, {
+    Store: Class.MongoStore.Collection('users'),
+    
+    // ... other methods
+});
+
+Users
+    // you can also use direct MongoDB query, as this one,
+    // will be converted to { age: { $gt: 27 } }
+    .fetch({ age: '>27' }) 
+    .done(function(collection){
+        collection.each(function(user){
+            user.log();
+        });
+    });
+    
+
+
+```
+
 ### Collection
 
 ```javascript

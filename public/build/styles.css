@@ -421,6 +421,9 @@ menu {
   -ms-transition: -ms-transform 200ms ease-in;
   transition: transform 200ms ease-in;
 }
+menu a {
+  border-width: 0px;
+}
 menu:hover {
   /*z-index: 999;*/
 
@@ -865,6 +868,10 @@ button {
 a {
   color: inherit;
   text-decoration: inherit;
+  border-bottom: 1px dotted #f97732;
+}
+a:hover {
+  border-bottom-style: solid;
 }
 ul {
   margin: 0px;

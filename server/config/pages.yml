@@ -100,7 +100,17 @@ pages:
 		tabs:
 			api:
 				navigation: false
-				
+	
+	/atma-io:
+		title: 'Atma IO Module'
+	
+	/atma-logger:
+		title: 'Atma Logger Module'
+	
+	/atma-server:
+		title: 'Atma Server Module'
+		
+	
 	/atma-tool: 
 		title: 'Atma Toolkit'
 	
