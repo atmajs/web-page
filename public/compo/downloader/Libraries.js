@@ -6,8 +6,15 @@ window.L = include.exports = {
 	size: '-',
 	
 	libs: [{
-			env: 'both',
+			env: 'browser',
 			file: 'class/class.js',
+			name: 'ClassJS',
+			enabled: true,
+			exports: ['Class']
+		},
+		{
+			env: 'node',
+			file: 'class/class.node.js',
 			name: 'ClassJS',
 			enabled: true,
 			exports: ['Class']

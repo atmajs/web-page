@@ -50,6 +50,7 @@
 		return '/' + parts.join('/');
 	}
 	
+	// end:source ../src/utils/path.js
 	// source ../src/utils/query.js
 	function query_deserialize(query, delimiter) {
 		delimiter == null && (delimiter = '/');
@@ -84,6 +85,31 @@
 	}
 	
 	
+	// end:source ../src/utils/query.js
+	// source ../src/utils/rgx.js
+	
+	function rgx_fromString(str, flags) {
+		return new RegExp(str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&"), flags);
+	}
+	
+	/**
+	 *  Url part should be completely matched, so add ^...$
+	 */
+	function rgx_aliasMatcher(str){
+		
+		if (str[0] === '^') 
+			return new RegExp(str);
+		
+		var groups = str.split('|');
+		for (var i = 0, imax = groups.length; i < imax; i++){
+			groups[i] = '^' + groups[i] + '$';
+		}
+		
+		return new RegExp(groups.join('|'));
+	}
+	
+	
+	// end:source ../src/utils/rgx.js
 
 	// source ../src/route/Collection.js
 	var Routes = (function(){
@@ -113,8 +139,9 @@
 				strictCount = 0;
 		
 			var gettingMatcher = true,
-				isConditional,
-				isAlias;
+				isOptional,
+				isAlias,
+				rgx;
 		
 			var array = [];
 			
@@ -128,11 +155,11 @@
 				c0 = x.charCodeAt(0);
 				c1 = x.charCodeAt(1);
 		
-				isConditional = c0 === 63; /* ? */
-				isAlias = (isConditional ? c1 : c0) === 58; /* : */
+				isOptional = c0 === 63; /* ? */
+				isAlias = (isOptional ? c1 : c0) === 58; /* : */
 				index = 0;
 				
-				if (isConditional) 
+				if (isOptional) 
 					index++;
 				
 				if (isAlias) 
@@ -144,24 +171,34 @@
 				
 		
 				// if DEBUG
-				!isConditional && !gettingMatcher && console.log('Strict route part found after conditional', definition);
+				!isOptional && !gettingMatcher && console.log('Strict route part found after optional', definition);
 				// endif
 		
 		
-				if (isConditional) 
+				if (isOptional) 
 					gettingMatcher = false;
 				
 		
-				if (gettingMatcher) {
-					strictCount += 1;
-					matcher += '/' + (isAlias ? regexp_var : x)
-				}
-		
-				if (isAlias) {
-					(alias || (alias = {}))[index] = x;
+				////if (gettingMatcher) {
+				////	strictCount += 1;
+				////	matcher += '/' + (isAlias ? regexp_var : x)
+				////}
+				////
+				////if (isAlias) {
+				////	(alias || (alias = {}))[index] = x;
+				////}
+				
+				var bracketIndex = x.indexOf('(');
+				if (isAlias && bracketIndex !== -1) {
+					var end = x.length - 1;
+					if (x[end] !== ')') 
+						end+= 1;
+					
+					rgx = new RegExp(rgx_aliasMatcher(x.substring(bracketIndex + 1, end)));
+					x = x.substring(0, bracketIndex);
 				}
 				
-				if (!isConditional && !isAlias) {
+				if (!isOptional && !isAlias) {
 					array.push(x);
 					continue;
 				}
@@ -169,7 +206,8 @@
 				if (isAlias) {
 					array.push({
 						alias: x,
-						optional: isConditional
+						matcher: rgx,
+						optional: isOptional
 					});
 				}
 				
@@ -229,6 +267,7 @@
 			return current;
 		}
 		
+		// end:source parse.js
 		// source match.js
 			
 			
@@ -282,6 +321,10 @@
 					return false;
 				}
 				
+				if (x.matcher && x.matcher.test(parts[i]) === false) {
+					return false;
+				}
+				
 				if (x.optional) 
 					return true;
 				
@@ -297,6 +340,7 @@
 			
 			return true;
 		}
+		// end:source match.js
 		
 		var regexp_var = '([^\\\\]+)';
 		
@@ -314,6 +358,7 @@
 			current: null
 		};
 		
+		// end:source Route.js
 		
 		
 		function RouteCollection() {
@@ -344,6 +389,7 @@
 		
 		return RouteCollection;
 	}());
+	// end:source ../src/route/Collection.js
 
 	// source ../src/emit/Location.js
 	
@@ -397,6 +443,7 @@
 			};
 		
 		}());
+		// end:source Hash.js
 		// source History.js
 		
 		function HistoryEmitter(listener){
@@ -436,19 +483,30 @@
 				changed: function(){
 					
 					this.listener.changed(location.pathname + location.search);
+				},
+				current: function(){
+					
+					return location.pathname + location.search;
 				}
 			};
 		
 		}());
+		// end:source History.js
 		
-		function Location(collection, action) {
+		function Location(collection, type) {
 			
 			this.collection = collection || new Routes();
-			this.emitter = new HistoryEmitter(this);
 			
-			if (action) 
-				this.action = action;
+			if (type) {
+				var Constructor = type === 'hash'
+					? HashEmitter
+					: HistoryEmitter
+					;
+				this.emitter = new Constructor(this);
+			}
 			
+			if (this.emitter == null) 
+				this.emitter = new HistoryEmitter(this);
 			
 			if (this.emitter == null) 
 				this.emitter = new HashEmitter(this);
@@ -467,7 +525,9 @@
 				
 			},
 			action: function(route){
-				route.value(route)
+				
+				if (typeof route.value === 'function')
+					route.value(route);
 			},
 			navigate: function(url){
 				this.emitter.navigate(url);
@@ -481,6 +541,7 @@
 		
 		return Location;
 	}());
+	// end:source ../src/emit/Location.js
 	// source ../src/ruta.js
 	
 	var routes = new Routes(),
@@ -496,6 +557,13 @@
 	var Ruta = {
 		
 		Collection: Routes,
+		
+		setRouterType: function(type){
+			if (router == null) 
+				router = new Location(routes, type);
+			
+			return this;
+		},
 		
 		add: function(regpath, mix){
 			router_ensure();
@@ -524,6 +592,7 @@
 	
 	
 	
+	// end:source ../src/ruta.js
 	
 	// source ../src/mask/attr/anchor-dynamic.js
 	
@@ -546,6 +615,7 @@
 		
 	}());
 	
+	// end:source ../src/mask/attr/anchor-dynamic.js
 	
 	return Ruta;
 }));

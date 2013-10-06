@@ -1,6 +1,7 @@
 # FROM {atma}/ : TO /public/libs/
 
 class/lib/class.js : class/class.js
+class/lib/class.node.js : class/class.node.js
 class/lib/class.min.js : class/class.min.js
 
 include/lib/include.js : include/include.js
