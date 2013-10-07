@@ -13297,9 +13297,8 @@ include.js("marked.js").done(function(resp) {
         highlight: function(code, lang) {
             code = code.replace(/&nbsp;/g, " ");
             if ("undefined" === typeof Prism) return code;
-            if (null == lang) lang = "javascript";
-            if (lang && lang in Prism.languages) return Prism.highlight(code, Prism.languages[lang]);
-            return Prism.highlight(code);
+            if (false === lang in Prism.languages) lang = "javascript";
+            return Prism.highlight(code, Prism.languages[lang]);
         }
     });
 });
