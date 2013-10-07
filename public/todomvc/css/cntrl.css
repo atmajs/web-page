@@ -1,0 +1,16 @@
+
+.-validate-invalid {
+	position: absolute;
+	width: 100%;
+	
+	
+	text-align: center;
+	font-weight: bold;
+	color: rgb(200,80,50);
+	letter-spacing: 1px;
+	text-shadow: 0px 0px 3px #fff;
+}
+
+.-validate-invalid > button {
+	display: none;
+}

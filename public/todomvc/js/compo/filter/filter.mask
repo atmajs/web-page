@@ -1,0 +1,6 @@
+
+ul#filters > 
+	% each='.' > 
+		li >
+			a.~[bind:selected] href="#~[action]" >
+				'~[title]'

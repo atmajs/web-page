@@ -1,0 +1,44 @@
+
+
+
+li.~[bind:completed ? 'completed'].~[bind:state]
+	x-signal	= 'dblclick: edit'
+	xx-visible	= 'isVisible(completed, closest(":app").action)' {
+
+	:animation x-slots='domInsert'{
+		@model {
+			'transform | scale(1.5) > scale(1) | 200ms linear'
+			'opacity | .2 > 1 | 200ms linear'
+		}
+	}
+	
+	:animation #remove {
+		'transform |  > scale(0) | 200ms'
+	}
+
+	.view {
+		input.toggle type="checkbox" {
+			:dualbind
+				log // [e.g.] - logs when dom/object changes
+				x-signal='dom: taskChanged'
+				expression = 'completed ? "checked" ';
+		}
+
+		label > '~[bind:label]';
+		button.destroy x-signal='click: taskRemoved';
+	}
+	
+	todo:input .edit
+		preserve
+		x-signal='cancel: inputCanceled' {
+		
+			:dualbind
+				value = label
+				change-event = enter
+				x-signal = 'dom:taskChanged'
+				no-validation;
+		}
+		
+
+}
+

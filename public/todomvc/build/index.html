@@ -1,0 +1,127 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+		<title>Template • TodoMVC</title>
+		
+	<link rel="stylesheet" href="lib/style.css" /></head>
+	<body>
+
+		<script type="mask/template" id="layout">
+			section #todoapp {
+				header #header {
+					h1 > 'todos'
+					
+					todo:input #new-todo
+						autofocus
+						x-signal='enter: newTask'
+						placeholder = "What needs to be done?"
+						;
+				
+				}
+				
+				section #main >
+					:todoList;
+				
+				
+				
+				footer #footer xx-visible='status.count' {
+				
+					span #todo-count {
+						strong  > '~[bind: status.todoCount]'
+						span    > ' item~[bind: status.todoCount != 1 ? "s"] left'
+					}
+				
+					:filter;
+						
+					button#clear-completed
+						xx-visible  = 'status.completedCount > 0'
+						x-signal    = 'click:removeAllCompleted' {
+						
+							'Clear completed (~[bind:status.completedCount])'
+					}
+				}
+			}
+			footer #info {
+				p { 'Double-click to edit a todo' }
+				p { 'Template by ' a href='http://github.com/sindresorhus' > 'Sindre Sorhus' }
+				p { 'Created by ' a href='http://libjs.it' > 'tenbits' }
+				p { 'Part of ' a href='http://todomvc.com' > 'TodoMVC' }
+			}
+		</script>
+
+
+		
+		
+		
+		
+		
+		
+	<div id="build.release.xhr" style="display: none;" hidden="hidden"><script type="include/load" id="includejs-jscompotodoListtodoListmask" data-appuri="/js/compo/todoList/todoList.mask"> 
+input#toggle-all
+	type        = 'checkbox'
+	checked     = '~[bind: status.todoCount == 0 ? "checked" ]'
+	x-signal    = 'click: toggleAll'
+	xx-visible  = 'status.count';
+
+label for='toggle-all' > 'Mark all as complete'
+
+ul#todo-list {
+	// binded task list
+	%% each='.' > :todoTask;
+}
+
+ </script>
+<script type="include/load" id="includejs-jscompotodoListtodoTasktodoTaskmask" data-appuri="/js/compo/todoList/todoTask/todoTask.mask"> 
+
+
+li.~[bind:completed ? 'completed'].~[bind:state]
+	x-signal	= 'dblclick: edit'
+	xx-visible	= 'isVisible(completed, closest(":app").action)' {
+
+	:animation x-slots='domInsert'{
+		@model {
+			'transform | scale(1.5) > scale(1) | 200ms linear'
+			'opacity | .2 > 1 | 200ms linear'
+		}
+	}
+	
+	:animation #remove {
+		'transform |  > scale(0) | 200ms'
+	}
+
+	.view {
+		input.toggle type="checkbox" {
+			:dualbind
+				log // [e.g.] - logs when dom/object changes
+				x-signal='dom: taskChanged'
+				expression = 'completed ? "checked" ';
+		}
+
+		label > '~[bind:label]';
+		button.destroy x-signal='click: taskRemoved';
+	}
+	
+	todo:input .edit
+		preserve
+		x-signal='cancel: inputCanceled' {
+		
+			:dualbind
+				value = label
+				change-event = enter
+				x-signal = 'dom:taskChanged'
+				no-validation;
+		}
+		
+
+}
+
+ </script>
+<script type="include/load" id="includejs-jscompofilterfiltermask" data-appuri="/js/compo/filter/filter.mask"> 
+ul#filters > 
+	% each='.' > 
+		li >
+			a.~[bind:selected] href="#~[action]" >
+				'~[title]' </script></div><script type="text/javascript" src="lib/script.js"></script></body>
+</html>

@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<title>Template • TodoMVC</title>
+		<link rel="stylesheet" href="bower_components/todomvc-common/base.css">
+	</head>
+	<body>
+
+		<script type="mask/template" id="layout">
+			section #todoapp {
+				header #header {
+					h1 > 'todos'
+					
+					todo:input #new-todo
+						autofocus
+						x-signal='enter: newTask'
+						placeholder = "What needs to be done?"
+						;
+				
+				}
+				
+				section #main >
+					:todoList;
+				
+				
+				
+				footer #footer xx-visible='status.count' {
+				
+					span #todo-count {
+						strong  > '~[bind: status.todoCount]'
+						span    > ' item~[bind: status.todoCount != 1 ? "s"] left'
+					}
+				
+					:filter;
+						
+					button#clear-completed
+						xx-visible  = 'status.completedCount > 0'
+						x-signal    = 'click:removeAllCompleted' {
+						
+							'Clear completed (~[bind:status.completedCount])'
+					}
+				}
+			}
+			footer #info {
+				p { 'Double-click to edit a todo' }
+				p { 'Template by ' a href='http://github.com/sindresorhus' > 'Sindre Sorhus' }
+				p { 'Created by ' a href='http://libjs.it' > 'tenbits' }
+				p { 'Part of ' a href='http://todomvc.com' > 'TodoMVC' }
+			}
+		</script>
+
+
+		<script src="bower_components/todomvc-common/base.js"></script>
+		<script src="bower_components/jquery/jquery.js"></script>
+		
+		<script src="lib/atma-globals-dev.js"></script>
+		<script src="js/app.js"></script>
+		
+	</body>
+</html>
