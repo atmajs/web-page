@@ -9,7 +9,8 @@ include.exports = {
 			'node/io/': 'atma-io/',
 			'node/logger/': 'atma-logger/',
 			'node/server/': 'atma-server/',
-			'utest/' : 'utest/'
+			'utest/' : 'utest/',
+			'atma-tool/' : 'atma-tool/'
 		};
 		
 		
