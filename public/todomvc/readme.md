@@ -1,58 +1,103 @@
 # Atma.js TodoMVC Example
 
-This is a todo application created with [Atma.js](http://atmajs.com/). GitHub <a href='http://github.com/atmajs'>link</a>
+> Fast, elegant and component oriented framework for desktops, mobiles or servers _(node.js)_
+> _[Atma - atmajs.com](http://atmajs.com)_
 
-## Project
+The framework consists of several stand-alone libraries. This approach not only reduces barriers to entry, but also
+allows developers to exclude or replace any library with other third party one.
 
-Atma.js Project consists of stand-alone libraries, so that you can peek only what you need, but best to use
-all together, and this application demonstrates, how this all works. _Everything could be
-also executed in node.js environment (MaskJS renders HTML for the client, and in ClassJS use MongoDB Store instead of
-LocalStorage)._
+The goal of the framework is to deliver the component-based development and to provide libraries for making their composition easily and with blazing fast performance _(even on mobile CPUs)_.
 
-#### ClassJS 
-— is a class-model implementation. This will be a business logic layer. It does not depend on any further
-library and is a good starting point for an application.
+## Learning Atma.js
+
+#### ClassJS
+[web-page](http://atmajs.com/class) [github](http://github.com/atmajs/ClassJS)
+
+— is a class-model implementation. A business logic layer for applications. It accumulates best practices of the OOP and supports model de-/serialization with the persistence to localStorage, RESTful service or MongoDB. Any additional adapter can be created by the developer.
+
 
 #### MaskJS
-— stands for the MVC Presentation. 
+[web-page](http://atmajs.com/mask) [github](https://github.com/atmajs/MaskJS)
 
-- Mask Markup are parsed into MaskDOM(AST) first, and then DOM Builder creates DOM Nodes. This approach
-allows controllers to be blazingly fast, as at the  application start, the work goes mainly with MaskDOM,
-and then it is mapped into Live DOM
-- Component controllers are the custom tag handlers, all dependencies and nesting are nice declared in templates
-- DOM events could be transformed into signals and sent to the template owner and upper in a controllers tree
-- Single/Two way data-bindings consumes any Javascript object, so you can use even raw data-centric models, or
-some other library you like instead of ClassJS
-- Best used with jQuery or other compatible DOM Library, like Zepto. But does not depend on it, so can be
-used without.
+— is the core library of the Atma.js framework. It brings HMVC engine into play and everything starts with the markup. Instead of HTML, more compact and component-oriented syntax is used, which is similar to LESS and Zen Coding. But not the syntax is the advantage of the mask markup, but the DOM creation approach. It allows very fast to parse the templates to tiny MaskDOM (_json with the tree structure_). And while traversing the MaskDOM, the builder creates DOM Elements and initializes components. As the MaskDom structure is extremely lightweight, each component can easily manipulate the MaskDOM. So the all dynamic behavior, like interpolation, 1-/2way-binding, component's nesting and many other things, are almost for free in sens of the performance. Beyond fast DOM creation there are other distinguishing features:
+
+- model agnostic
+- components hierarchy
+	- better referencing via ```find/closest``` search _in a jquery way)_
+	- better communication via signals and slots. _Piped-signals are used to bind components, that are not in ascendant-descendant relation, but anywhere in an app_
+- one-/two-way bindings with complex object observers, so even if deep, nested path to the property is used, any manipulations with the model preserve observers in place.
+- custom attribute handlers
+- designed to be used with other libraries. For example, with small wrappers we can encapsulate twitter bootstrap markups and widgets initializations
+- high code reuse
+
+To mention is, that the templates and the components can be rendered on the server side. 
+
 
 #### IncludeJS
-— is a resource loader.
+[web-page](http://atmajs.com/include) [github](https://github.com/atmajs/IncludeJS)
 
-- designed for simple and complex cases
-- loads javascript / coffeescript / css / less / json / raw data 
-- any further custom loaders can be simply implemented
-- resources and dependencies are declared in-place without the need of any additional configuration files
-- has flexible routing based on namespaces
-- has no pre-requests for a module definition, but supports module exporting in CommonJS manner or using ```include.exports```
-- does not need the application to be built, but when your scripts amount is over 70 files (js / css / templates / ..),
-it worth to build the app before production. Builder can be found in Atma.Toolkit
-- works same in browser and node.js
+— is created to load component's resources and to work in browsers and node.js the same way.
 
-These where, may be, the core points and unfortunately not everything was mentioned.
+Some key points of the library are:
 
-## Implementation
+- no requirements for the module definition, but supports several: CommonJS and ```include.exports```
+- in-place dependency declaration with nice namespaced routing
+- custom loaders. _Already implemented ```coffee, less, yml, json```_
+- lazy modules
+- better debugging: loads javascript in browsers via ```script src='x'```
+- for production builder can combine and optimize all resources into single ```*.js``` and single ```*.css```. All the templates are embedded into main ```*.html```. _Developing a web page using Atma node application module, builder also creates additionally single js/css/html files per page from the components that are specific to a page_
 
-There are, as usual, no strict rules, how you must structure the app, but we could, may be, give some advices.
-You should definitely split an Application into components hierarchy, and so the application structure will
-consist of a Component and an Application Layer. Any component has the resources (that are component specific),
-like styles / templates and other nested components, in the same folder and sub-. These makes it easer to
-**reuse** it in other applications and makes it easer to test it. The Components itself, beyond domain model,
-belongs to application layer, which is structured according design patterns you will use.
 
-## Run
+##### µTest
+[github](https://github.com/atmajs/utest)
 
-To run the main example, file access should be allowed in browser, as includejs loads templates with
+— _inspired by Buster.JS_ Simplifies unit test creation and runs them in node.js or in browser-slave(s) environments. All the Atma.js libraries are tested using the µTest.
+
+##### Ruta
+[github](https://github.com/atmajs/Ruta)
+
+— is not only an url routing via History API or ```hashchange```, but it implements a Route-Value Collection for adding/retrieving any object by the route.
+
+#### Atma.Toolkit
+[github](https://github.com/atmajs/Atma.Toolkit)
+
+— command-line tool, which runs unit tests, builds applications, runs node.js ```bash``` scripts, creates static file server with live reload feature, etc.
+
+### Mask.Animation
+[github](https://github.com/atmajs/mask-animation)
+
+— CSS3 and sprite animations for MaskJS.
+
+
+### Atma.js Server Application
+[web-page](http://atmajs.com/atma-server) [github](https://github.com/atmajs/atma-server)
+
+— a connect middle-ware. All the routes are declared in configuration files, and there are 3 types of endpoints:
+
+- Handlers
+- RESTful services
+- Pages
+
+Pages benefits from component based approach. Each component's controller can define caching settings, so that the component renders only once. Developer can restrict any component for the server side rendering only, so that the controller itself and any sensitive data is not sent to the client. When a component is rendered, then only HTML is sent to the client, _where all bindings and event listeners are attached_. So it is extremely SEO friendly.
+
+
+
+Here are some links you may find helpful:
+
+- [Get Started](http://atmajs.com/get/github)
+- [Mask Markup Live Test](http://atmajs.com/mask-try)
+- [Atma.js on GitHub](https://github.com/atmajs)
+
+_If you have other helpful links to share, or find any of the links above no longer work, please [let us know](https://github.com/tastejs/todomvc/issues)._
+
+### Implementation
+
+The Application is split into components hierarchy, and so the application structure consists of a Component and an Application Layer. Any component has the resources (_that are component specific, like styles / templates and other nested components_) in the same folder and sub-. These makes it easer to _reuse_ them in other applications and makes it easer to develop and test them.
+For the application globals dev build of Atma.js was used.
+
+### Run
+
+To run the main example, file access should be allowed in browser, as ```include``` loads templates with
 ```XMLHttpRequest```. But you can also start a built-in local server:
 
 ```bash
@@ -62,7 +107,12 @@ $ atma server
 
 navigate to ``` http://localhost:5777/ ```
 
-## Build
+### Build
 
-To build the application for release run ``` $ atma ```. We provide also a compiled version in 'build/' directory, so you
-can view how the application looks like for production.
+To build the application for release, run ``` $ atma ```. We provide also a compiled version in 'build/' directory, so you
+can see how the application looks like for production.
+
+
+## Contact
+- [team@atmajs.com](mailto:team@atmajs.com)
+- [Google Group QA](https://groups.google.com/forum/#!forum/atmajs)

@@ -1,36 +1,28 @@
+/*global Class, ruqq */
+
 (function () {
 	'use strict';
 
-	var Task = Class({
+	var Todo = Class({
 		Base: Class.Serializable,
-
-		label: '',
-		completed: false,
-
-		Validate: {
-			label: function (value) {
-				if (!value) 
-					return 'Task can not be empty';
-				
-				if (value.length > 50) 
-					return 'Task is too long';
-				
-			}
-		}
+		
+		// Properties with default values
+		title: '',
+		completed: false
 	});
 
 
-	include.exports = Class.Collection(Task, {
-		Store: Class.LocalStore('todo/atmajs'),
+	include.exports = Class.Collection(Todo, {
+		Store: Class.LocalStore('todos-atmajs'),
 
-		create: function(label, completed) {
+		create: function (title) {
+			// `push` initilizes the `Task` instance. It does the same
+			// as if we would do this via `new Task({title: title})`
 			return this
 				.push({
-					label: label,
-					completed: completed
+					title: title
 				})
-				.save()
-				.last();
+				.save();
 		},
 
 		status: {
@@ -40,26 +32,25 @@
 		},
 
 		Override: {
-			save: function() {
+			// Override mutators and recalculate status,
+			// which will be use lately in M-V bindings
+			save: function () {
 				return this
 					.super(arguments)
 					.calcStatus();
 			},
-			del: function() {
+			del: function () {
 				return this
 					.super(arguments)
 					.calcStatus();
 			},
-			fetch: function() {
+			fetch: function () {
 				return this
 					.super(arguments)
 					.calcStatus();
 			}
 		},
-		Static: {
-			Task: Task
-		},
-		calcStatus: function() {
+		calcStatus: function () {
 
 			this.status.count = this.length;
 			this.status.todoCount = ruqq.arr.count(this, 'completed', '==', false);

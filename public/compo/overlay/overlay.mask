@@ -8,6 +8,7 @@
 		@model > 'display | > block'
 		@next  > 'transform | translateY(-100%) > translateY(0%) | ease-in 150ms'
 	}
+	
 	:animation #hide {
 		
 		@model > 'opacity | 1 > 0 | ease-in 150ms'

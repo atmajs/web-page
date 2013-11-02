@@ -48,6 +48,9 @@ include
 					
 					
 					$div = $(fragment);
+				} else {
+					
+					$div.show();
 				}
 				
 				this.animate('show');

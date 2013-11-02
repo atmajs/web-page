@@ -1,113 +1,72 @@
-/*
- *	Role -
- *		Task Create/Edit
+/*global include, mask, Compo */
+
+/**
+ *	Extend INPUT tag to edit a todo's title
+ *		- format string
+ *		- complete edit on ENTER
+ *		- cancel edit on BLUR
  *
- *	Public events -
- *		cancel: input interrupted
- *		enter : input succefully validated and completed
+ *	Used as
+ *		- a main application's input
+ *		- single todo item editor
+ *	
+ *	Public Events
+ *		- cancel: input interrupted
+ *		- enter : input formatted and completed
+ *
  */
 
-include
-	.js({
-		model: 'Tasks'
-	})
-	.done(function (response){
+(function () {
+	'use strict';
 
-	var key_ENTER = 13;
-	var key_ESCAPE = 27;
-	var Task = response.Tasks.Task;
+	var ENTER_KEY = 13;
+	var ESCAPE_KEY = 27;
 	
 	mask.registerHandler('todo:input', Compo({
 		tagName: 'input',
 		attr: {
 			type: 'text',
-			value: '~[label]'
+			value: '~[title]',
+			
+			// Clear input after edit, `true` for main input, `false` for todo's edit.
+			preserve: false
 		},
 		events: {
-			'keydown': function(event){
+			'keydown': function (event) {
 				
 				switch (event.which) {
-					case key_ENTER:
-						var value = this.format();
-						
-						var result = this.compos.validator.validate(value);
-						if (result === false){
-							return;
-						}
-						
+					case ENTER_KEY:
+						var value = this.$.val().trim();
 						
 						this.$.trigger('enter', value);
 						this.afterEdit();
-						return;
-					case key_ESCAPE:
+						
+						// prevent IE from button click - `Clear Completed`
+						event.preventDefault();
+						break;
+					case ESCAPE_KEY:
 						this.cancel();
-						return;
+						break;
 				}
 			},
 			'blur': 'cancel'
 		},
-		compos: {
-			validator: 'compo: input:validate'
-		},
-		onRenderStart: function(model){
-			if (model instanceof Task === false) {
-				this.model = new Task;
-			}
+		focus: function () {
 			
-			jmask(this).prepend('input:validate value=label');
-		},
-		
-		onRenderEnd: function(){
-			this.compos.validator.before = this.format;
-		},
-		
-		format: function(str){
-			return (str || this.$.val()).trim();
-		},
-		
-		focus: function(){
 			this.$.focus();
 		},
 		
-		cancel: function(){
+		cancel: function () {
+			
 			this.$.trigger('cancel');
 			this.afterEdit();
 		},
 		
-		afterEdit: function(){
-			this.$.val(this.attr.preserve ? this.model.label : '');
+		afterEdit: function () {
+			
+			this.$.val(this.attr.preserve ? this.model.title : '');
 		}
 		
 	}));
 	
-	
-	mask.registerHandler('input:validate', Class({
-		Base: mask.getHandler(':validate'),
-		Override: {
-			notifyInvalid: function(){
-				
-				var $element = this.super(arguments);
-				
-				mask.animate($element.get(0), {
-					
-					model: {
-						model: ['display | > block',
-								'opacity | 0 > 1 | 200ms ease-out',
-								'transform | translateY(-20px) > translateY(0px) | 200ms ease-in',
-								],
-						next: {
-							model: 'transform | translateY(0px) > translateY(-50px) | 1s ease-in',
-							next: 'opacity | 1 > 0 | 500ms'
-						}
-					},
-					next: {
-						model: 'display | > none '
-					}
-					
-				});
-				
-			}
-		}
-	}))
-	
-});
+}());

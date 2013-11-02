@@ -9,6 +9,42 @@
 	<body>
 
 		<script type="mask/template" id="layout">
+			/*
+			
+				TodoMVC Atma.js Application
+			
+				1. Read readme.md - you will get basic information about the libraries
+				2. Hint: Viewing *.mask files enable javascript or less syntax highlighting in your IDE
+				
+				
+				The application structure guide:
+				
+				Controls Overview:
+					todo:input; 
+			
+				Components Overview:
+					:app\
+						:filter;
+						:todoList\
+							:todoTask;
+							
+						
+				Scripts overview (sorted from the most atomic parts up to the application component):
+					js/
+						model/Tasks.js
+						cntrl/input.js
+						filter/filter.js
+						todoList/
+							todoTask/todoTask.js
+							todoList.js
+						app.js
+						
+				_If the controller loads a template, do not forget to review that._
+			 */
+			
+			
+			// Application Template 
+			
 			section #todoapp {
 				header #header {
 					h1 > 'todos'

@@ -2,13 +2,9 @@
 % if='execute' >
 	.-executor {
 		
-		:animation #show {
-			
-		}
 		
 		iframe.-executor-frame
 			height='100%'
-			onresize='alert("1")'
 			x-signal='resize: iframeResize'
 			src='~[execute]';
 	}

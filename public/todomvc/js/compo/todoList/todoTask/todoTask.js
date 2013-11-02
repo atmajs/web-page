@@ -1,16 +1,19 @@
+/*global include, mask, Compo */
 
 /**
- *	Role -
- *		Single Task Representation __ View / Edit
+ *	Single Todo Item Component
+ *		- View
+ *		- Edit
  *
  *	Public signals -
- *		taskChanged: Task State/Description was changed
- *		taskRemoved: Task was removed
+ *		taskChanged: Todo's state or title was changed
+ *		taskRemoved: Todo was removed
+ *			@arguments: Todo Model
  *		
  */
 
 include
-	.load('todoTask.mask')
+	.load('todoTask.mask::Template')
 	.done(function (response) {
 	'use strict';
 
@@ -18,21 +21,43 @@ include
 	var state_EDIT = 'editing';
 	
 	mask.registerHandler(':todoTask', Compo({
-		template: response.load.todoTask,
+		
+		//= Properties
+		
 		state: state_VIEW,
 		
+		//= Component Definition
+		
+		template: response.load.Template,
 		slots: {
-			inputCanceled: 'editEnd',
+			inputCanceled: '_editEnd',
 			
-			taskChanged: 'editEnd',
-			taskRemoved: function (){
-				this.animate('remove', this.remove.bind(this));
+			taskChanged: function () {
+				if (!this.model.title) {
+					
+					// [emitIn/emitOut] signal propagation begins from a sender
+					this.emitOut('taskRemoved');
+					
+					// stop propagation of the `taskChanged` signal
+					return false;
+				}
+				
+				this._editEnd();
+			},
+			taskRemoved: function () {
+				// remove component
+				this.remove();
+				
+				// add arguments to the signal 
+				return [this.model];
 			},
 			
 			edit: function (){
+				
 				this.state = state_EDIT;
 				this.compos.input.focus();
 				
+				// stop signal propagation (example purpose)
 				return false;
 			}
 			
@@ -41,11 +66,14 @@ include
 			input: 'compo: todo:input'
 		},
 		
-		editEnd: function (){
+		
+		//= Private Methods
+		
+		_editEnd: function () {
 			this.state = state_VIEW;
 		},
 
-		isVisible: function(completed, action){
+		_isVisible: function (completed, action) {
 			if ('completed' === action && !completed) {
 				return false;
 			}

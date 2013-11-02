@@ -9,6 +9,42 @@
 	<body>
 
 		<script type="mask/template" id="layout">
+			/*
+			
+				TodoMVC Atma.js Application
+			
+				1. Read readme.md - you will get basic information about the libraries
+				2. Hint: Viewing *.mask files enable javascript or less syntax highlighting in your IDE
+				
+				
+				The application structure guide:
+				
+				Controls Overview:
+					todo:input; 
+			
+				Components Overview:
+					:app\
+						:filter;
+						:todoList\
+							:todoTask;
+							
+						
+				Scripts overview (sorted from the most atomic parts up to the application component):
+					js/
+						model/Tasks.js
+						cntrl/input.js
+						filter/filter.js
+						todoList/
+							todoTask/todoTask.js
+							todoList.js
+						app.js
+						
+				_If the controller loads a template, do not forget to review that._
+			 */
+			
+			
+			// Application Template 
+			
 			section #todoapp {
 				header #header {
 					h1 > 'todos'
@@ -63,13 +99,16 @@ input#toggle-all
 	type        = 'checkbox'
 	checked     = '~[bind: status.todoCount == 0 ? "checked" ]'
 	x-signal    = 'click: toggleAll'
-	xx-visible  = 'status.count';
+	// bind and hide/show accordingly
+	xx-visible  = 'status.count'
+	;
 
 label for='toggle-all' > 'Mark all as complete'
 
 ul#todo-list {
-	// binded task list
-	%% each='.' > :todoTask;
+	// binded todos array
+	%% each='.' >
+		:todoTask;
 }
 
  </script>
@@ -77,49 +116,48 @@ ul#todo-list {
 
 
 li.~[bind:completed ? 'completed'].~[bind:state]
+	// emit `edit` on `dblclick` event
 	x-signal	= 'dblclick: edit'
-	xx-visible	= 'isVisible(completed, closest(":app").action)' {
+	// bind to `completed` status and parents action + change display property
+	xx-visible	= '_isVisible(completed, closest(":todoList").action)' {
 
-	:animation x-slots='domInsert'{
-		@model {
-			'transform | scale(1.5) > scale(1) | 200ms linear'
-			'opacity | .2 > 1 | 200ms linear'
-		}
-	}
 	
-	:animation #remove {
-		'transform |  > scale(0) | 200ms'
-	}
-
-	.view {
-		input.toggle type="checkbox" {
-			:dualbind
-				log // [e.g.] - logs when dom/object changes
-				x-signal='dom: taskChanged'
-				expression = 'completed ? "checked" ';
-		}
-
-		label > '~[bind:label]';
-		button.destroy x-signal='click: taskRemoved';
-	}
+		.view {
+			input.toggle type='checkbox' {
+				:dualbind
+					value='completed'
+					// emit signal when INPUTs state changes via user input
+					x-signal='dom: taskChanged'
+					;
+			}
 	
-	todo:input .edit
-		preserve
-		x-signal='cancel: inputCanceled' {
+			label > '~[bind:title]';
+			button.destroy x-signal='click: taskRemoved';
+		}
 		
-			:dualbind
-				value = label
-				change-event = enter
-				x-signal = 'dom:taskChanged'
-				no-validation;
-		}
+		// custom `todo:input` control
+		todo:input .edit
+			preserve
+			
+			// emit signal on custom event `cancel`
+			// Note: we could also listen direct for the `cancel` event in the
+			//		controller
+			x-signal='cancel: inputCanceled' {
+			
+				:dualbind
+					value = title
+					// change model on custom event `enter` defined in the control
+					change-event = enter
+					x-signal = 'dom: taskChanged';
+			}
 		
 
 }
 
  </script>
 <script type="include/load" id="includejs-jscompofilterfiltermask" data-appuri="/js/compo/filter/filter.mask"> 
-ul#filters > 
+ul #filters >
+	// take each filter item from the array model
 	% each='.' > 
 		li >
 			a.~[bind:selected] href="#~[action]" >

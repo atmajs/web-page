@@ -1,54 +1,61 @@
-"use strict";
+/*global include, mask, Compo*/
+
+'use strict';
+
+/**
+ * Application Entry Point
+ *
+ * - load immediate dependecies
+ * - define and initialize Application Component
+ * 
+ */
 
 include
 
+	// Global route namespaces, to simplify resource dependency loading
 	.routes({
 		model: 'model/{0}.js',
 		cntrl: 'cntrl/{0}.js',
 		compo: 'compo/{0}/{1}.js'
 	})
 	
-	.cfg('lockedToFolder', true)
+	.cfg({
+		// Load `/foo.bar` from current _directory_ path, and not from domain's root
+		lockToFolder: true
+	})
 	
 	.js({
-		// lib
-		model: 'Tasks',
+		model: 'Todos',
 		cntrl: 'input',
 		compo: ['todoList', 'filter']
 	})
 	
-	.css('/css/cntrl.css')
-	
 	.ready(function (resp) {
-	
-		var tasks = resp.Tasks.fetch();
 		
-		mask.registerHandler(':app', Compo({
+		/* Initialize and load the model from LocalStore */
+		var todos = resp.Todos.fetch();
+		
+		var Application = Compo({
 			template: '#layout',
-			action: '',
 			slots: {
-				appAction: function(sender, action){
-					this.action = action;
-				},
-				newTask: function(event, label){
-					this.model.create(label);
+				
+				newTask: function (event, title) {
+					
+					if (title) {
+						this.model.create(title);
+					}
 				},
 			
 				removeAllCompleted: function () {
-							
-					jmask(this)
-						.find(':todoTask')
-						.each(function (task){
-							if (task.model.completed) {
-								task.remove();
-							
-								this.model.del(task.model);
-							}
-						}, this);
 					
+					this
+						.model
+						.del(function (x) {
+							return x.completed === true;
+						});
 				}
 			}
-		}));
+		});
 	
-		window.app = Compo.initialize(':app', tasks, document.body);
+		Compo.initialize(Application, todos, document.body);
 	});
